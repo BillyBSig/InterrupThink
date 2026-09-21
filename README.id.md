@@ -10,17 +10,19 @@ pula pada batas token mentah.
 
 InterrupThink adalah library eksperimental, bukan produk atau layanan hosted.
 
-[Examples](examples/) · [Cases](cases/) · [Contributing](CONTRIBUTING.md) · [Lisensi](LICENSE)
+[Mulai cepat](docs/id/getting-started.md) · [Examples](examples/) · [Cases](cases/) · [Contributing](CONTRIBUTING.md) · [Lisensi](LICENSE)
 
-Dokumentasi utama: [`docs/`](docs/) ·
-[Dokumentasi Bahasa Indonesia](docs/id/README.md)
+Mulai dari [`Mulai cepat`](docs/id/getting-started.md). Peta lengkap
+dokumentasi tersedia di [`docs/`](docs/) dan
+[dokumentasi Bahasa Indonesia](docs/id/README.md).
 
 ## Tentang InterrupThink
 
 InterrupThink adalah library Python open-source dengan thinking floor yang
-sederhana: specialist menghasilkan langkah yang dapat diperiksa, lalu
+sederhana. Specialist menghasilkan langkah yang dapat diperiksa, lalu
 supervisor meninjaunya. Hanya output dengan watermark yang boleh di-commit.
-Jika terjadi interupsi, proses tidak harus berakhir. Default-nya adalah
+
+Interupsi tidak selalu mengakhiri sesi. Secara default, sistem memakai
 **rollback**: sisipkan koreksi, buang bagian yang salah, lalu lanjutkan dari
 langkah terakhir yang diterima. Restart penuh hanya menjadi pilihan terakhir.
 

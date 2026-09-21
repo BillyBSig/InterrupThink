@@ -8,13 +8,20 @@ A supervisor can **interrupt** a specialist at **ThoughtUnit** boundaries and **
 
 This is an experimental library, not a product or a hosted service.
 
-[Examples](examples/) · [Cases](cases/) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[Getting started](docs/getting-started.md) · [Examples](examples/) · [Cases](cases/) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
-Public documentation: [`docs/`](docs/).
+Start here: [`Getting started`](docs/getting-started.md). For the full map,
+see [`docs/`](docs/).
 
 ## About
 
-InterrupThink is an open-source Python library for a simple thinking floor: a specialist streams checkable steps; after each complete ThoughtUnit a supervisor may issue a verdict. Only watermarked output is committed. An interruption is not necessarily the end of the session. The default is **rollback**: inject a correction, drop the invalid tail, and continue from the last accepted step. A full restart is the fallback, not the default.
+InterrupThink is an open-source Python library with a simple thinking floor.
+A specialist streams checkable steps, and a supervisor may issue a verdict
+after each complete ThoughtUnit. Only watermarked output is committed.
+
+An interruption does not necessarily end the session. The default is
+**rollback**: inject a correction, drop the invalid tail, and continue from
+the last accepted step. A full restart is the fallback, not the default.
 
 - Import: `interrupthink`
 - Distribution name: `interrupthink` (local wheel or editable install; **not** PyPI)
