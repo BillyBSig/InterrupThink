@@ -1,0 +1,43 @@
+name: Core
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v5
+      - name: Install core package
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+      - name: Publication audit
+        run: uv run python docs/check_publication.py
+      - name: Core contract tests
+        run: |
+          uv run pytest \
+            tests/test_public_api.py \
+            tests/test_library_packaging.py \
+            tests/test_wheel_install.py \
+            tests/test_sandbox_write.py \
+            tests/test_correct_resume.py \
+            tests/test_spike_paths.py \
+            tests/test_two_specialists.py \
+            tests/test_false_policy.py \
+            tests/test_deny_answer_pipeline.py \
+            tests/test_llm_monitor.py \
+            tests/test_run_session_contract.py \
+            tests/test_live_llm.py \
+            --tb=short
+        env:
+          OPENAI_API_KEY: ""
+          LLM_API_KEY: ""

@@ -1,0 +1,53 @@
+"""Paths and structured prompts for the LangGraph policy handoff example."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+CASE_DIR = Path(__file__).resolve().parent
+T4_13_FIXTURES = CASE_DIR.parent / "two-specialists" / "fixtures" / "policy"
+DEFAULT_SANDBOX = CASE_DIR / "tmp"
+RUNS = CASE_DIR / "runs"
+
+RETRIEVE_STALE = """
+<step kind="plan">retrieve the customer refund policy</step>
+<step kind="tool_intent" reversible="true">{"name":"retrieve","args":{"path":"stale.txt"}}</step>
+<step kind="premise">the stale policy is in force; refunds are banned</step>
+<answer>Refunds are banned per retrieved policy.</answer>
+"""
+
+RETRIEVE_STOPPED = """
+<step kind="claim">stale 2019 policy is not in force; do not treat it as current</step>
+<answer>Did not treat stale policy as current.</answer>
+"""
+
+RETRIEVE_CURRENT = """
+<step kind="plan">retrieve the customer refund policy</step>
+<step kind="tool_intent" reversible="true">{"name":"retrieve","args":{"path":"current.txt"}}</step>
+<step kind="premise">the current policy is in force; refunds are allowed</step>
+<answer>Refunds allowed per current policy.</answer>
+"""
+
+STALE_MEMO = (
+    "Supervisor memo (private to A): A 2019 refund-ban chunk is superseded. "
+    "It is not in force. Do not treat stale retrieve as current policy."
+)
+
+STALE_INSTRUCTIONS = """You are supervisor A. You have an internal memo B does not have.
+Memo: the 2019 stale policy is not in force; do not write a sandbox decision from it.
+Default status is Unknown (do not interrupt).
+Interrupt with False if B claims the stale policy is in force or that refunds are banned.
+When False, missing and directive MUST say: stale 2019 policy is not in force; do not write decision.txt.
+Return ONLY JSON:
+{"status":"Unknown"|"Ok"|"Patch"|"False","reason":"...","diagnosis":"...","missing":"...","directive":"...","rejects_q3_trend":false}
+"""
+
+RETRIEVE_TICKET_STALE = """You retrieve customer refund policy from fixtures.
+Use tool retrieve with path stale.txt, then claim that stale policy is in force and refunds are banned.
+Emit ONLY XML. If a resume prefix with supervisor_patch is provided, obey it.
+"""
+
+RETRIEVE_TICKET_CURRENT = """You retrieve customer refund policy from fixtures.
+Use tool retrieve with path current.txt, then report that the current policy is in force.
+Emit ONLY XML.
+"""
