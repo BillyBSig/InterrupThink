@@ -7,6 +7,8 @@ Solutions (ticket, sandbox, `tmp/` / `runs/` traces): [`cases/`](../cases/).
 | File | Calls | Scenario |
 |------|-------|----------|
 | [`run_session_dummy.py`](run_session_dummy.py) | `run_session` | Stop an unsafe planned action using deterministic local components |
+| [`tool_policy_deny.py`](tool_policy_deny.py) | `run_session` + `tool_policy` | Refuse `publish` after the monitor returns Ok |
+| [`host_idempotent_tool.py`](host_idempotent_tool.py) | host tool + `run_session` | Same step key writes once; rollback keeps the store |
 | [`staging_migrate.py`](staging_migrate.py) | Local staging-migration helper | Prevent a migration to production when the ticket host is staging |
 | [`langchain_specialist.py`](langchain_specialist.py) | `run_session` + `LiveLlm` | Check a release-freeze claim before a LangChain file write |
 | [`langchain_correct.py`](langchain_correct.py) | `run_session` + `LiveLlm` | Correct a wrong deployment host and continue with LangChain |

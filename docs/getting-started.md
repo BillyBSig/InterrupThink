@@ -83,6 +83,59 @@ replacement facts on that next request so the specialist continues the reasoning
 instead of only stopping. See [Concepts](concepts.md) and
 [`cases/correct-resume/`](../cases/correct-resume/).
 
+## Expected failures
+
+These two failures are part of the contract. Fix the scripted document list
+or the model output. Do not loosen the parser.
+
+`FakeLlm` with only the first document, after an interrupt:
+
+```python
+from interrupthink import FakeLlm, ScriptedMonitor, SessionError, run_session
+
+try:
+    run_session(
+        llm=FakeLlm([wrong]),
+        monitor=ScriptedMonitor(
+            trigger_kind="premise",
+            trigger_contains="already approved",
+        ),
+    )
+except SessionError as exc:
+    print(exc)
+```
+
+`SessionError: llm has no further output for this request; after an interrupt, FakeLlm needs a second XML document`
+
+Text with no `<step>` fails in the parser:
+
+```python
+from interrupthink import ParseError, parse_steps
+
+parse_steps("The changelog is already approved. Publish it.")
+```
+
+`ParseError: no <step> element in llm output`
+
+The same prose through `run_session` raises `ValueError: llm produced no complete <step>`, because the assembler never hands a step to the parser.
+
+## Where to look
+
+| You see this | Open this first |
+|---|---|
+| A tool runs before the premise is accepted | [`examples/run_session_dummy.py`](../examples/run_session_dummy.py) |
+| A wrong premise, and the task should not restart from empty | [`cases/correct-resume/`](../cases/correct-resume/) |
+| A file write that must stay inside a sandbox | [`cases/freeze-write/`](../cases/freeze-write/) |
+| A stale retrieved chunk or note | [`cases/stale-retrieve/`](../cases/stale-retrieve/) |
+| An answer that cites a policy not in the source | [`cases/false-policy/`](../cases/false-policy/) |
+| Read is allowed and delete is not | [`cases/op-class/`](../cases/op-class/) |
+| A second specialist that must not start | [`cases/two-specialists/`](../cases/two-specialists/) |
+| `publish` still requested after the monitor returns `Ok` | [`examples/tool_policy_deny.py`](../examples/tool_policy_deny.py) |
+| A repeated tool step that must not write again | [`examples/host_idempotent_tool.py`](../examples/host_idempotent_tool.py) |
+| An existing graph or role | [Integrations](integrations.md) |
+
+Command-line cases that call `LiveLlm` need a personal environment file. The scripted documents above are the no-key shape.
+
 ## Build a local wheel
 
 The local wheel path is useful for checking installation from a clean working

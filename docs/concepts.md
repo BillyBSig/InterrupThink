@@ -37,6 +37,7 @@ in the current XML document. Typical step kinds include:
 This is not a raw-token cancellation protocol. The floor waits for a
 checkable unit, records the unit, and then applies the monitor verdict.
 A live `LlmMonitor` call is a blocking HTTP request for that unit.
+Only askable kinds (`premise`, `claim`, `tool_intent`, and `answer_draft`) make that call, and exhausting `max_requests` without a committed answer raises `SessionError`, a legitimate result when the session does not finish.
 Specialist generation does not continue in the background while the
 supervisor answers. The live specialist Responses request streams in the
 foreground (`background` is false). An interrupt closes that stream and
@@ -91,6 +92,16 @@ supplied tool runs. That default is for demos and OSS examples, not production
 authorization. Hosts must pass `tool_policy(name, args)` for consequential
 tools. Returning `False` skips execute even when the model labeled the intent
 reversible. Model `reversible` is intent only.
+
+Three checks, in this order:
+
+1. The monitor verdict on the `ThoughtUnit`.
+2. The host `tool_policy(name, args)`. An `Ok` verdict and
+   `reversible="true"` do not authorize a name the host refuses.
+   [`examples/tool_policy_deny.py`](../examples/tool_policy_deny.py) shows
+   that with no API key: `publish` is denied and `save_draft` still runs.
+3. A person at the tool boundary, when the host adds that gate. It does not
+   replace the monitor or the host policy.
 
 The current examples exercise:
 

@@ -34,14 +34,19 @@ dokumen XML. Jenis langkah yang umum:
 - `claim` — pernyataan yang dapat diperiksa;
 - `tool_intent` — usulan pemanggilan tool dan sifat reversibilitasnya.
 
-Ini bukan protokol pembatalan per token mentah. Floor menunggu unit yang bisa
-diperiksa, mencatatnya, lalu menerapkan verdict monitor. `LlmMonitor` live
-melakukan permintaan HTTP secara blocking untuk unit itu. Specialist tidak
-melanjutkan generate di latar belakang saat supervisor menjawab.
-Permintaan specialist live menggunakan stream foreground (`background` false).
-Interupsi menutup stream itu lalu mengirim POST cancel. Tes mock mengunci mode
-permintaan; respons HTTP cancel yang sukses bukan bukti bahwa generate benar-
-benar berhenti di provider.
+Ini bukan protokol pembatalan pada setiap token mentah. Floor menunggu unit
+yang bisa diperiksa, mencatatnya, lalu menerapkan verdict monitor. `LlmMonitor`
+live mengirim permintaan HTTP blocking untuk setiap unit.
+Hanya jenis askable (`premise`, `claim`, `tool_intent`, dan `answer_draft`) yang
+memicu permintaan ini. Jika `max_requests` habis sebelum jawaban di-commit,
+sesi berakhir dengan `SessionError`. Itu hasil yang sah ketika sesi tidak
+selesai. Specialist tidak terus menghasilkan output di latar belakang saat
+supervisor menjawab.
+Permintaan live dari specialist menggunakan stream foreground
+(`background` false). Saat terjadi interupsi, stream ditutup lalu sistem
+mengirim permintaan POST cancel. Tes mock memastikan mode permintaannya;
+respons HTTP cancel yang sukses belum membuktikan bahwa provider benar-benar
+menghentikan proses generate.
 
 ## Verdict monitor
 
@@ -81,11 +86,24 @@ otorisasi produksi. Host yang memanggil tool berkonsekuensi wajib mengirim
 policy eksplisit. `reversible` dari model hanya intent; `Ok` monitor bukan
 sistem otorisasi.
 
-Contoh yang tersedia mencakup tool irreversible, penulis sandbox, dan writer
-downstream yang tidak dijalankan ketika specialist upstream diinterupsi.
+Tiga pemeriksaan ini berlangsung berurutan:
 
-Contoh hanya memakai dummy tool dan file sandbox. Tidak ada database, Git,
-email, atau deployment yang dikendalikan oleh contoh ini.
+1. Verdict monitor pada `ThoughtUnit`.
+2. `tool_policy(name, args)` milik host. Verdict `Ok` dan
+   `reversible="true"` tetap tidak dapat mengizinkan nama tool yang ditolak
+   host.
+   [`examples/tool_policy_deny.py`](../../examples/tool_policy_deny.py)
+   menunjukkan alur ini tanpa API key: `publish` ditolak, sedangkan
+   `save_draft` tetap dijalankan.
+3. Manusia di batas tool, jika host menambahkan pemeriksaan itu. Pemeriksaan
+   ini tidak menggantikan monitor atau kebijakan host.
+
+Contoh yang tersedia mencakup tool yang tidak dapat dibatalkan, penulis
+sandbox, dan writer downstream yang tidak dijalankan ketika specialist
+upstream diinterupsi.
+
+Contoh hanya menggunakan dummy tool dan file sandbox. Tidak ada database, Git,
+email, atau sistem deployment yang dikendalikan oleh contoh ini.
 
 ## Batas penalaran yang terlihat
 

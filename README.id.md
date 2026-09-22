@@ -123,6 +123,8 @@ monitor = ScriptedMonitor(trigger_kind="premise", trigger_contains="already appr
 result = run_session(llm=llm, monitor=monitor, tool=tool)
 ```
 
+Kebijakan host diperiksa secara terpisah. [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) menunjukkan bahwa `publish` tetap ditolak meskipun monitor mengembalikan `Ok`.
+
 Setelah interupsi, `FakeLlm` harus menyediakan dokumen XML kedua. `run_session`
 tidak menambahkan prompt khusus aplikasi ke request.
 

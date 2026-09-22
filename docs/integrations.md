@@ -111,3 +111,8 @@ See [`../cases/autogen-pipe/`](../cases/autogen-pipe/) and
 The integration examples demonstrate wiring, not framework replacement. They
 do not claim that InterrupThink inherits the framework's reliability,
 observability, persistence, or deployment guarantees.
+
+The session result carries a prefix and watermarks. The host stores those in
+its own checkpointer or queue. InterrupThink stays a 1:1 floor inside the
+process that called `run_session`. It does not import a graph checkpointer
+and it does not recover a crashed process.

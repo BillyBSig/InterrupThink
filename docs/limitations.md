@@ -24,7 +24,9 @@ deployment decision.
 - Correction-and-continue is demonstrated on a synthetic fixture. It is not a
   claim that interruption improves model accuracy in general.
 - The current rollback behavior does not provide durable distributed
-  checkpointing or process recovery.
+  checkpointing or process recovery. The host may store the session prefix
+  and watermarks in its own checkpointer. The library stays a 1:1 floor
+  inside one process and does not recover a crashed process.
 - A live `LlmMonitor` verdict is a blocking HTTP call per `ThoughtUnit`.
   Generation and supervision do not overlap.
 - The live specialist request does not enable background continuation.

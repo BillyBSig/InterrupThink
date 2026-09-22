@@ -120,6 +120,8 @@ monitor = ScriptedMonitor(trigger_kind="premise", trigger_contains="already appr
 result = run_session(llm=llm, monitor=monitor, tool=tool)
 ```
 
+Host policy is a separate check. [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) refuses `publish` after the monitor returns `Ok`.
+
 After an interrupt, `FakeLlm` must supply a second XML document or the session reports an error. `run_session` does not add application-specific prompts to the request.
 
 Local wheel (still **not** PyPI):
@@ -139,6 +141,7 @@ Short call sites after `pip install -e .`. Not full use-case cookbooks — those
 | [`examples/staging_migrate.py`](examples/staging_migrate.py) | canned staging-migrate example (local helper) |
 | [`examples/freeze_push_dummy.py`](examples/freeze_push_dummy.py) | freeze + dummy `push` |
 | [`examples/host_loop_dummy.py`](examples/host_loop_dummy.py) | host loop; HITL at the tool boundary |
+| [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) | host denies `publish` after monitor `Ok` |
 
 Framework demos (install the framework in the venv with `pip`): LangGraph, LangChain, LlamaIndex, CrewAI, and AutoGen — see [`examples/README.md`](examples/README.md).
 

@@ -2,12 +2,12 @@
 
 [English](../integrations.md) · [Bahasa Indonesia](integrations.md)
 
-InterrupThink berintegrasi pada batas host. Framework dapat menyediakan
-message, node, agent, task, atau retrieval; thinking floor tetap dijalankan
-melalui `run_session`.
+InterrupThink berintegrasi di batas host. Framework dapat menyediakan pesan,
+node, agent, task, atau retrieval; thinking floor tetap dijalankan melalui
+`run_session`.
 
-Framework opsional bukan dependency inti. Instal framework di environment
-terpisah saat menjalankan contoh tertentu.
+Framework opsional bukan dependensi inti. Instal framework di environment
+terpisah jika ingin menjalankan contoh tertentu.
 
 ## Host Python biasa
 
@@ -19,13 +19,13 @@ from interrupthink import LlmMonitor, run_session
 result = run_session(llm=specialist_llm, monitor=LlmMonitor(), tool=tool)
 ```
 
-Untuk pipeline dua specialist, host menjalankan sesi pertama untuk retrieval
-dan baru memulai sesi writer setelah konteksnya diizinkan.
+Untuk pipeline dengan dua specialist, host menjalankan sesi retrieval terlebih
+dahulu. Sesi writer baru dimulai setelah konteks dari sesi pertama diizinkan.
 
 ## LangGraph
 
 Letakkan `run_session` di dalam node specialist dan pertahankan `ToolNode`
-di batas host yang normal. Batas tool LangGraph dapat menjadi pemeriksaan
+di batas host. Interupsi pada batas tool LangGraph dapat menjadi pemeriksaan
 lapis kedua, tetapi bukan pengganti thinking floor semantik.
 
 ```bash
@@ -35,8 +35,8 @@ python3 cases/langgraph-correct/run.py
 
 ## LangChain
 
-Gunakan LangChain untuk prompt, message history, atau wrapper tool, lalu
-panggil `run_session` untuk giliran penalaran.
+Gunakan LangChain untuk prompt, riwayat pesan, atau wrapper tool, lalu panggil
+`run_session` untuk giliran penalaran.
 
 ```bash
 pip install langchain
@@ -53,12 +53,12 @@ python3 cases/llamaindex-retrieve/run.py
 ```
 
 Retrieval tetap menjadi tanggung jawab LlamaIndex; `run_session` memeriksa
-proses penalaran sebelum tindakan berikutnya.
+langkah penalaran sebelum tindakan berikutnya.
 
 ## CrewAI
 
-CrewAI dapat mengatur satu atau beberapa role secara berurutan. Thinking floor
-tetap dipanggil dari masing-masing role.
+CrewAI dapat mengatur satu atau beberapa peran secara berurutan. Thinking
+floor tetap dijalankan dari masing-masing peran.
 
 ```bash
 pip install crewai
@@ -68,7 +68,7 @@ python3 cases/crewai-correct/run.py
 ## AutoGen
 
 AutoGen dapat mengatur `ConversableAgent`, sementara `run_session` tetap
-menjadi batas untuk memeriksa langkah semantik.
+menjadi batas pemeriksaan langkah semantik.
 
 ```bash
 pip install autogen
@@ -79,4 +79,9 @@ python3 cases/autogen-correct/run.py
 
 Framework host menyediakan struktur aplikasi, bukan keputusan thinking floor.
 Host tetap bertanggung jawab atas kredensial, retry, idempotensi, transaksi,
-dan efek samping eksternal.
+serta efek samping eksternal.
+
+Hasil sesi membawa prefix dan watermark. Host menyimpan keduanya di
+checkpointer atau antriannya sendiri. InterrupThink tetap menjadi floor 1:1
+di dalam proses yang memanggil `run_session`. Paket ini tidak mengimpor
+checkpointer milik graf dan tidak memulihkan proses yang sudah mati.
