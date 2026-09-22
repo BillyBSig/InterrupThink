@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 CASE_DIR = Path(__file__).resolve().parent
 FIXTURES = CASE_DIR / "fixtures" / "policy"
@@ -155,7 +155,7 @@ def stale_monitor() -> LlmMonitor:
 
 
 def _live_llm(ticket: str):
-    llm = LiveOpenAILlm(user_prompt=ticket, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=ticket, timeout_s=180.0)
     llm.resume_mode = "rollback"
     return llm
 

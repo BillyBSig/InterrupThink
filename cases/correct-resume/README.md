@@ -9,7 +9,7 @@ The invalid `production.txt` file is never created. After the correction,
 `staging.txt` may be written. The session resumes with rollback rather than
 starting the whole task again.
 
-The command-line run uses `LiveOpenAILlm` and `LlmMonitor`. The tests use
+The command-line run uses `LiveLlm` and `LlmMonitor`. The tests use
 deterministic substitutes so they can run without credentials.
 
 ```bash

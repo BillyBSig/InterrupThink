@@ -122,7 +122,7 @@ def test_delete_outside_sandbox_rejected(tmp_path: Path):
 
 def test_case_is_sandbox_not_railway_or_db():
     text = (REPO / "cases" / "op-class" / "run.py").read_text(encoding="utf-8")
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "from interrupthink import" in text
     assert "import git" not in text
     assert "pymongo" not in text

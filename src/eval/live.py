@@ -15,7 +15,7 @@ from src.eval.types import TrialResult
 from src.eval.osaka_trap import osaka_live_monitor, osaka_monitor, stub_supervisor_ask
 from src.monitor.llm import LlmMonitor
 from src.monitor.scripted import ScriptedMonitor
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 from src.runtime.log import JsonlLogger
 from src.eval.g1 import run_path
 
@@ -29,7 +29,7 @@ def _require_live_key() -> None:
 def run_c0_live(*, seed: str, logger: JsonlLogger | None = None) -> TrialResult:
     load_dotenv()
     logger = logger or JsonlLogger()
-    llm = LiveOpenAILlm(user_prompt=llm_prompt(seed), timeout_s=180.0)
+    llm = LiveLlm(user_prompt=llm_prompt(seed), timeout_s=180.0)
     critic = LiveCritic()
     monitor = ScriptedMonitor(trigger_kind=None)
     t0 = time.monotonic()
@@ -71,7 +71,7 @@ def run_c1_live(
 ) -> TrialResult:
     load_dotenv()
     logger = logger or JsonlLogger()
-    llm = LiveOpenAILlm(
+    llm = LiveLlm(
         user_prompt=llm_prompt(seed, require_draft=require_draft),
         timeout_s=180.0,
     )

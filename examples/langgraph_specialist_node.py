@@ -30,7 +30,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 TICKET = """You are a coding agent. Ticket: freeze is over; write hotfix.txt.
 Emit ONLY XML: <step kind="plan">...</step>
@@ -69,7 +69,7 @@ def main() -> int:
     if leftover.is_file():
         leftover.unlink()
     tool = SandboxWriteTool(sandbox)
-    llm = LiveOpenAILlm(user_prompt=TICKET, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET, timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.eval.g1 import G1_HAPPY_USER_PROMPT, run_path
 from src.eval.osaka_trap import OSAKA_INTERRUPT_B_PROMPT
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 from src.runtime.log import JsonlLogger
 
 
@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.live:
         load_dotenv()
         prompt = G1_HAPPY_USER_PROMPT if args.path == "happy" else OSAKA_INTERRUPT_B_PROMPT
-        llm = LiveOpenAILlm(user_prompt=prompt)
+        llm = LiveLlm(user_prompt=prompt)
     result = run_path(args.path, logger=logger, llm=llm)
     print(
         f"{result.path} requests={result.request_count} "

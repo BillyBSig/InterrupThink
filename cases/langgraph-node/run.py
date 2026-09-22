@@ -6,7 +6,7 @@ Scenario
     The graph’s tools node is backup; ThoughtUnit interrupt cuts before HITL-at-tools.
 
 Flow
-    ``StateGraph`` with ``LiveOpenAILlm`` + ``LlmMonitor`` by default. Tests may inject a double.
+    ``StateGraph`` with ``LiveLlm`` + ``LlmMonitor`` by default. Tests may inject a double.
     No LangGraph checkpoint swap. Not a separate ``interrupthink-langgraph`` package.
 
 Expected
@@ -31,7 +31,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 CASE_DIR = Path(__file__).resolve().parent
 DEFAULT_SANDBOX = CASE_DIR / "tmp"
@@ -155,7 +155,7 @@ def run_langgraph_specialist(
     logger = logger or JsonlLogger()
     box: dict = {"visits": 0, "result": None}
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=LIVE_TICKET, timeout_s=180.0)
+        llm = LiveLlm(user_prompt=LIVE_TICKET, timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = freeze_monitor(interrupt=interrupt)

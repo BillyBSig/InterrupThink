@@ -8,7 +8,7 @@ Scenario
 Flow
     One ``run_session``. Tool ``retrieve`` calls
     ``index.as_retriever().retrieve(query)``. The thinking model is
-    ``LiveOpenAILlm`` and the write remains ``SandboxWriteTool``.
+    ``LiveLlm`` and the write remains ``SandboxWriteTool``.
 
 Expected
     Stale index: interrupt; no ``notice.txt``.

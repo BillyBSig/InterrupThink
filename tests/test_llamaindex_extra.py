@@ -136,7 +136,7 @@ def test_case_is_llamaindex_extra_not_package_retriever():
 def test_example_calls_interruptible_not_the_case():
     example = (REPO / "examples" / "llamaindex_retrieve_node.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "from llama_index.llms.openai import OpenAI" in example
     assert "from llama_index.embeddings.openai import OpenAIEmbedding" in example
     assert "as_retriever" in example

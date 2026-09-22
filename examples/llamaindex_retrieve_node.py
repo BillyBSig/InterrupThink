@@ -6,7 +6,7 @@ Scenario
 
 Flow
     ``VectorStoreIndex.from_documents`` + ``as_retriever``. The retrieve tool
-    calls ``retriever.retrieve``. ``LiveOpenAILlm`` + ``LlmMonitor`` own the
+    calls ``retriever.retrieve``. ``LiveLlm`` + ``LlmMonitor`` own the
     thinking loop. This is not a conversational agent.
 
 Expected
@@ -31,7 +31,7 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 REPO = Path(__file__).resolve().parents[1]
 FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"
@@ -89,7 +89,7 @@ def main() -> int:
     )
     retriever = index.as_retriever(similarity_top_k=1)
     tool = LlamaIndexRetrieveThenWrite(retriever, SandboxWriteTool(sandbox))
-    llm = LiveOpenAILlm(user_prompt=TICKET, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET, timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,

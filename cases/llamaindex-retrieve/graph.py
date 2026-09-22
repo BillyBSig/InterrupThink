@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from interrupthink import JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     CURRENT_TICKET,
@@ -53,7 +53,7 @@ def stale_monitor(*, interrupt: bool) -> LlmMonitor:
 
 
 def _live_llm(ticket: str):
-    llm = LiveOpenAILlm(user_prompt=ticket, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=ticket, timeout_s=180.0)
     llm.resume_mode = "rollback"
     return llm
 

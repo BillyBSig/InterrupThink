@@ -80,11 +80,37 @@ flowchart TB
 
 ## Mulai cepat
 
-Membutuhkan Python 3.11 atau lebih baru. Contoh deterministik tidak
-membutuhkan API key.
+Membutuhkan Python 3.11 atau lebih baru. Jalur live memanggil endpoint yang
+kompatibel dengan OpenAI Responses API. Salin `.env.example` menjadi `.env`,
+lalu isi model, base URL, dan kunci.
 
 ```bash
+cp .env.example .env
 uv pip install -e .
+python3 cases/freeze-write/run.py
+```
+
+```python
+from interrupthink import LiveLlm, LlmMonitor, run_session
+
+result = run_session(
+    llm=LiveLlm(user_prompt="Check the claim, then answer."),
+    monitor=LlmMonitor(),
+)
+# result.committed_answer, interrupt_ids, dropped_ids, request_count, tool_calls
+```
+
+`LiveLlm` membaca `LLM_MODEL`, `LLM_BASE_URL`, dan `LLM_API_KEY` (atau
+`OPENAI_API_KEY`). Base URL default adalah `https://api.openai.com/v1`.
+Arahkan `LLM_BASE_URL` ke endpoint lain yang menerima bentuk request yang
+sama. `LlmMonitor` membaca variabel `SUPERVISOR_*`.
+
+### Tanpa kunci
+
+Floor yang sama menerima specialist skrip. Jalur ini tidak membutuhkan API
+key dan hasilnya tetap sama setiap kali dijalankan.
+
+```bash
 python3 examples/run_session_dummy.py
 ```
 
@@ -95,7 +121,6 @@ tool = DummyTool()
 llm = FakeLlm([wrong_xml, stopped_xml])
 monitor = ScriptedMonitor(trigger_kind="premise", trigger_contains="already approved")
 result = run_session(llm=llm, monitor=monitor, tool=tool)
-# result.committed_answer, interrupt_ids, dropped_ids, request_count, tool_calls
 ```
 
 Setelah interupsi, `FakeLlm` harus menyediakan dokumen XML kedua. `run_session`
@@ -119,8 +144,8 @@ thinking floor tetap menggunakan `run_session`.
 | CrewAI | [`cases/crewai-pipe/`](cases/crewai-pipe/) | Floor di setiap role |
 | AutoGen | [`cases/autogen-pipe/`](cases/autogen-pipe/) | Floor di setiap agent |
 
-CLI live menggunakan `LiveOpenAILlm` dan `LlmMonitor` dengan `.env` pribadi.
-Jangan commit kredensial.
+Runner case memakai `LiveLlm` dan `LlmMonitor` dengan `.env` pribadi.
+Jangan commit kredensial. File dummy tetap memakai specialist skrip.
 
 ## Pengembangan
 

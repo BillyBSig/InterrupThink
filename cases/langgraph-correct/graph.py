@@ -17,7 +17,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 
 from interrupthink import JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     DEFAULT_SANDBOX,
@@ -158,7 +158,7 @@ def create_correct_graph(
     inner, lc_tool = build_write_tool(root)
     logger = logger or JsonlLogger()
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
+        llm = LiveLlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = host_monitor(interrupt=interrupt)

@@ -9,7 +9,7 @@ from typing import Any
 from autogen import ConversableAgent
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     DEFAULT_SANDBOX,
@@ -97,7 +97,7 @@ def run_autogen_correct(
     tool = SandboxWriteTool(root)
     logger = logger or JsonlLogger()
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
+        llm = LiveLlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = host_monitor(interrupt=interrupt)

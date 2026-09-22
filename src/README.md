@@ -8,7 +8,7 @@ src/
   parse/       <step> / ThoughtUnit
   runtime/     floor, watermark, resume prefix, JSONL, session tiga jalur
   monitor/     ScriptedMonitor and LlmMonitor
-  providers/   FakeLlm + LiveOpenAILlm (SSE abort)
+  providers/   FakeLlm + LiveLlm (SSE abort)
   cli/         local command-line helpers
 ```
 

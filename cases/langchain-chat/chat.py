@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from interrupthink import DummyTool, JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     ALLOWED,
@@ -93,7 +93,7 @@ def run_chat(
     if leftover.is_file():
         leftover.unlink()
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=format_turn(USER_TURN_1, []), timeout_s=180.0)
+        llm = LiveLlm(user_prompt=format_turn(USER_TURN_1, []), timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = policy_monitor(interrupt=interrupt)

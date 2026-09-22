@@ -99,7 +99,7 @@ This is a local packaging check, not a release to PyPI.
 
 The [`../cases/`](../cases/) directory contains sandboxed host examples. The
 deterministic tests inject doubles; the command-line cases can use
-`LiveOpenAILlm` with a personal environment file.
+`LiveLlm` with a personal environment file.
 
 For example:
 

@@ -45,7 +45,7 @@ Yang diperiksa:
 
 ### Live smoke path
 
-Runner case dapat menggunakan `LiveOpenAILlm` dan `LlmMonitor` dengan `.env`
+Runner case dapat menggunakan `LiveLlm` dan `LlmMonitor` dengan `.env`
 pribadi. Setiap verdict live menunggu respons provider sebelum sesi lanjut. Ini
 memeriksa wiring terhadap model live, bukan akurasi model.
 

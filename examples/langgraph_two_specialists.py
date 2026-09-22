@@ -7,7 +7,7 @@ Scenario
 Flow
     ``StateGraph``: START → retrieve (``run_session``) → write (``run_session``) or END.
     The host forwards retrieved text and keeps the handoff one-way. One
-    ``LlmMonitor`` and ``LiveOpenAILlm`` provide the live run.
+    ``LlmMonitor`` and ``LiveLlm`` provide the live run.
 
 Expected
     Stale retrieve: write node does not run; no ``decision.txt``.
@@ -30,7 +30,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 REPO = Path(__file__).resolve().parents[1]
 FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"
@@ -84,7 +84,7 @@ def main() -> int:
         leftover.unlink()
     retrieve_tool = FixtureRetrieveTool(FIXTURES)
     write_tool = SandboxWriteTool(sandbox)
-    llm = LiveOpenAILlm(user_prompt=TICKET, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET, timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,
@@ -102,7 +102,7 @@ def main() -> int:
 
     def write(state: PipeState) -> PipeState:
         forwarded = state.get("forwarded") or ""
-        write_llm = LiveOpenAILlm(
+        write_llm = LiveLlm(
             user_prompt=(
                 "Host forwarded this retrieved policy. Write decision.txt with exactly that text.\n"
                 f"Policy:\n{forwarded}\n"

@@ -5,7 +5,7 @@ Scenario
     asks for a hotfix write; the supervisor memo still blocks the write.
 
 Flow
-    Demonstrates ``from interrupthink`` + ``LiveOpenAILlm`` without the cookbook layout.
+    Demonstrates ``from interrupthink`` + ``LiveLlm`` without the cookbook layout.
     One live run into ``examples/tmp/``.
 
 Expected
@@ -28,7 +28,7 @@ from pathlib import Path
 from langchain_core.prompts import ChatPromptTemplate
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 TICKET = ChatPromptTemplate.from_messages(
     [
@@ -69,7 +69,7 @@ def main() -> int:
     leftover = sandbox / "hotfix.txt"
     if leftover.is_file():
         leftover.unlink()
-    llm = LiveOpenAILlm(user_prompt=TICKET.format(), timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET.format(), timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,

@@ -7,7 +7,7 @@ Scenario
 
 Flow
     One ``run_session`` with ``SandboxWriteTool`` (not a no-op DummyTool).
-    The default specialist is ``LiveOpenAILlm`` and the supervisor is
+    The default specialist is ``LiveLlm`` and the supervisor is
     ``LlmMonitor``. Tests may inject deterministic substitutes.
     Traces land under ``cases/freeze-write/runs/``.
 
@@ -29,7 +29,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 CASE_DIR = Path(__file__).resolve().parent
 DEFAULT_SANDBOX = CASE_DIR / "tmp"
@@ -156,7 +156,7 @@ def run_sandbox_write(
     tool = SandboxWriteTool(sandbox)
     logger = logger or JsonlLogger()
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=LIVE_TICKET, timeout_s=180.0)
+        llm = LiveLlm(user_prompt=LIVE_TICKET, timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = freeze_monitor(interrupt=interrupt)

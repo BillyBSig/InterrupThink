@@ -100,7 +100,7 @@ def test_cookbook_does_not_present_fake_llm():
         assert "ScriptedMonitor" not in text
         assert "--mock" not in text
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "run_session" in example
     assert "MessagesPlaceholder" in example
     assert "importlib" not in example
@@ -108,7 +108,7 @@ def test_cookbook_does_not_present_fake_llm():
     assert "FakeLlm" not in example
     assert "run_chat" in chat
     assert "MessagesPlaceholder" in chat
-    assert "LiveOpenAILlm" in chat
+    assert "LiveLlm" in chat
     assert "run_chat" not in public
     assert "interruptible-langchain" not in chat
     assert "from langgraph" not in chat

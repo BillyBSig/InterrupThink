@@ -8,8 +8,8 @@ Solutions (ticket, sandbox, `tmp/` / `runs/` traces): [`cases/`](../cases/).
 |------|-------|----------|
 | [`run_session_dummy.py`](run_session_dummy.py) | `run_session` | Stop an unsafe planned action using deterministic local components |
 | [`staging_migrate.py`](staging_migrate.py) | Local staging-migration helper | Prevent a migration to production when the ticket host is staging |
-| [`langchain_specialist.py`](langchain_specialist.py) | `run_session` + `LiveOpenAILlm` | Check a release-freeze claim before a LangChain file write |
-| [`langchain_correct.py`](langchain_correct.py) | `run_session` + `LiveOpenAILlm` | Correct a wrong deployment host and continue with LangChain |
+| [`langchain_specialist.py`](langchain_specialist.py) | `run_session` + `LiveLlm` | Check a release-freeze claim before a LangChain file write |
+| [`langchain_correct.py`](langchain_correct.py) | `run_session` + `LiveLlm` | Correct a wrong deployment host and continue with LangChain |
 | [`langchain_chat.py`](langchain_chat.py) | `run_session` per chat turn | Check a support-policy claim before publishing an answer |
 | [`langgraph_specialist_node.py`](langgraph_specialist_node.py) | `run_session` in one LangGraph node | Stop a hotfix write when the release-freeze claim is wrong |
 | [`langgraph_apply.py`](langgraph_apply.py) | `run_session` + `ToolNode` | Add the thinking check to an existing LangGraph tool workflow |

@@ -10,7 +10,7 @@ from typing import Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     DEFAULT_SANDBOX,
@@ -65,7 +65,7 @@ def stale_monitor() -> LlmMonitor:
 
 
 def _live_llm(ticket: str):
-    llm = LiveOpenAILlm(user_prompt=ticket, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=ticket, timeout_s=180.0)
     llm.resume_mode = "rollback"
     return llm
 

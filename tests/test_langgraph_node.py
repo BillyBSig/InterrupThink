@@ -76,7 +76,7 @@ def test_without_interrupt_tools_node_writes_hotfix(tmp_path: Path):
 def test_case_is_one_node_not_a_framework_package():
     text = (REPO / "cases" / "langgraph-node" / "run.py").read_text(encoding="utf-8")
     public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "execute_tools_when_ok=False" in text
     assert 'add_node("specialist"' in text
     assert 'add_node("tools"' in text
@@ -91,7 +91,7 @@ def test_case_is_one_node_not_a_framework_package():
 def test_example_calls_interruptible_not_the_case():
     example = (REPO / "examples" / "langgraph_specialist_node.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "run_session" in example
     assert "from langgraph.graph import" in example
     assert "importlib" not in example

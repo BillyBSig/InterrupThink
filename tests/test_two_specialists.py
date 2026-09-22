@@ -89,7 +89,7 @@ def test_case_is_native_host_not_framework_or_package_retriever():
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
     assert "run_session" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "class FixtureRetrieveTool" in text
     assert "DummyTool()" not in text
     assert "import langgraph" not in text

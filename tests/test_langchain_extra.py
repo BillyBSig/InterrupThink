@@ -118,13 +118,13 @@ def test_cookbook_does_not_present_fake_llm():
         assert "ScriptedMonitor" not in text
         assert "--mock" not in text
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "run_session" in example
     assert "importlib" not in example
     assert "spec_from_file_location" not in example
     assert "create_specialist" not in example
     assert "FakeLlm" not in example
-    assert "LiveOpenAILlm" in agents
+    assert "LiveLlm" in agents
     assert "LlmMonitor" in agents
     assert "from interrupthink import" in agents
     assert "def create_specialist(" in agents

@@ -75,7 +75,7 @@ def test_example_uses_sandbox_tool_not_dummy():
     text = (REPO / "cases" / "freeze-write" / "run.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "class DummyTool" not in text
     assert "DummyTool()" not in text
     assert "import git" not in text

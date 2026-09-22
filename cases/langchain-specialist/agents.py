@@ -10,7 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableLambda
 
 from interrupthink import JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 
 from config import (
     DEFAULT_SANDBOX,
@@ -117,7 +117,7 @@ def create_specialist(
         leftover.unlink()
     inner, lc_tool = build_write_tool(root)
     if llm is None:
-        llm = LiveOpenAILlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
+        llm = LiveLlm(user_prompt=format_ticket(ticket), timeout_s=180.0)
         llm.resume_mode = "rollback"
     if monitor is None:
         monitor = freeze_monitor(interrupt=interrupt)

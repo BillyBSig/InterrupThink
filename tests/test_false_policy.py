@@ -67,7 +67,7 @@ def test_case_is_claim_gate_not_smtp_or_classifier():
     text = (REPO / "cases" / "false-policy" / "run.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "FALSE_POLICY" in text
     assert "DummyTool()" not in text
     assert "smtplib" not in text

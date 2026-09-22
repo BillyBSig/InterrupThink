@@ -48,7 +48,7 @@ They verify:
 
 ### Live smoke paths
 
-The command-line case runners can use `LiveOpenAILlm` and `LlmMonitor` with a
+The command-line case runners can use `LiveLlm` and `LlmMonitor` with a
 personal environment file. Each live monitor verdict waits for the provider
 before the session continues. These runs demonstrate wiring against a live
 model, but they are not deterministic and are not used to claim model accuracy.

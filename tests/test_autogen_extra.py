@@ -120,7 +120,7 @@ def test_case_is_two_session_agents_not_package_or_mesh(tmp_path: Path):
         encoding="utf-8"
     )
     assert "from interrupthink import" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "run_session" in text
     assert "ConversableAgent" in text
     assert 'human_input_mode="NEVER"' in text
@@ -142,7 +142,7 @@ def test_case_is_two_session_agents_not_package_or_mesh(tmp_path: Path):
 
 def test_example_calls_interruptible_not_the_case():
     example = (REPO / "examples" / "autogen_two_specialists.py").read_text(encoding="utf-8")
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "FakeLlm" not in example
     assert "run_session" in example
     assert "ConversableAgent" in example

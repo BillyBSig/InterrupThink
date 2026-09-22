@@ -30,7 +30,7 @@ from pathlib import Path
 from crewai import Agent, Crew, Process, Task
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 TICKET = """Ticket host is production. Write production.txt.
 Emit ONLY XML with <step> and <answer>.
@@ -80,7 +80,7 @@ def main() -> int:
         process=Process.sequential,
         verbose=False,
     )
-    llm = LiveOpenAILlm(user_prompt=TICKET, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET, timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,

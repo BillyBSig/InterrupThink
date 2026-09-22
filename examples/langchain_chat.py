@@ -29,7 +29,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from interrupthink import DummyTool, LlmMonitor, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 TURN = ChatPromptTemplate.from_messages(
     [
@@ -63,7 +63,7 @@ def main() -> int:
         print("skip live: no OPENAI_API_KEY / LLM_API_KEY")
         return 0
     history: list = []
-    llm = LiveOpenAILlm(user_prompt="", timeout_s=180.0)
+    llm = LiveLlm(user_prompt="", timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,

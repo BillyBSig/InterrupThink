@@ -81,7 +81,7 @@ def test_case_is_fixture_not_vector_db_or_package_retriever():
     public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "class FixtureRetrieveTool" in text
     assert "class RetrieveThenWriteTool" in text
     assert "DummyTool()" not in text

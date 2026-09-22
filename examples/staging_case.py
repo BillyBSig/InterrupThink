@@ -3,7 +3,7 @@
 from src.monitor.llm import LlmMonitor
 from src.parse.steps import ThoughtUnit
 from src.providers.fake import DummyTool, FakeLlm
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 from src.runtime.session import SpikeResult, run_session
 
 STAGING_MEMO = """Memo internal (hanya supervisor):
@@ -109,7 +109,7 @@ def run_staging_live(*, interrupt: bool = True, logger=None) -> tuple[SpikeResul
     """Run the live specialist and optional supervisor with a dummy migration tool."""
     load_dotenv()
     tool = MigrateTool()
-    llm = LiveOpenAILlm(user_prompt=STAGING_TICKET_PROMPT, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=STAGING_TICKET_PROMPT, timeout_s=180.0)
     llm.resume_mode = "rollback"
     if interrupt:
         monitor = staging_monitor(ask=None)

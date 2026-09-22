@@ -146,7 +146,7 @@ def test_patch_aborts_and_second_request_prefix_carries_fact():
 def test_case_is_correct_then_continue_not_freeze_only():
     text = (REPO / "cases" / "correct-resume" / "run.py").read_text(encoding="utf-8")
     assert "SandboxWriteTool" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "CORRECTED_THEN_WRITE" in text
     assert "DummyTool()" not in text
     assert 'resume_mode = "restart"' not in text

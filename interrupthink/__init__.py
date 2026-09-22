@@ -13,6 +13,7 @@ from src.monitor.scripted import ScriptedMonitor
 from src.parse.steps import ParseError, ParsedDocument, ThoughtUnit, parse_steps
 from src.providers.base import Llm
 from src.providers.fake import DummyTool, FakeLlm
+from src.providers.live import LiveLlm
 from src.providers.sandbox import SandboxWriteTool
 from src.runtime.events import Patch, Verdict
 from src.runtime.floor import Floor
@@ -27,6 +28,7 @@ PUBLIC_API = (
     "Floor",
     "JsonlLogger",
     "Llm",
+    "LiveLlm",
     "LlmMonitor",
     "Monitor",
     "ParseError",

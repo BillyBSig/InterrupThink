@@ -21,8 +21,12 @@ class LiveLlmError(RuntimeError):
     """Provider call failed or returned empty text."""
 
 
-class LiveOpenAILlm:
-    """Live specialist model via the OpenAI Responses API."""
+class LiveLlm:
+    """Live specialist via an OpenAI Responses-compatible endpoint.
+
+    The default base URL is the OpenAI API. ``LLM_BASE_URL`` selects another
+    endpoint that accepts the same request shape.
+    """
 
     def __init__(
         self,

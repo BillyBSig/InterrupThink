@@ -8,7 +8,7 @@ Scenario
 
 Flow
     ``create_specialist`` / ``.run()`` in ``agents.py``; the live model is
-    ``LiveOpenAILlm``. The correction is carried into the resumed request.
+    ``LiveLlm``. The correction is carried into the resumed request.
 
 Expected
     With interrupt: no ``production.txt``, ``staging.txt`` exists, ``resume_modes`` are

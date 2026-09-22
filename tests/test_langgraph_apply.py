@@ -114,7 +114,7 @@ def test_case_uses_official_tool_node_not_host_copy():
 def test_example_calls_interruptible_not_the_case():
     example = (REPO / "examples" / "langgraph_apply.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "run_session" in example
     assert "from langgraph.prebuilt import ToolNode" in example
     assert "importlib" not in example

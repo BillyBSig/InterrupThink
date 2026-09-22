@@ -9,7 +9,7 @@ import pytest
 from src.eval.g1 import run_path
 from src.providers.live import (
     LiveLlmError,
-    LiveOpenAILlm,
+    LiveLlm,
     _cancel_response,
     _output_text,
     _responses_request,
@@ -91,7 +91,7 @@ def test_live_llm_generate_mocked():
         {"type": "response.output_text.delta", "delta": xml},
         {"type": "response.completed", "response": {"usage": {"output_tokens": 9}}},
     ]
-    llm = LiveOpenAILlm(user_prompt="q", api_key="sk-test", base_url="https://example.test/v1")
+    llm = LiveLlm(user_prompt="q", api_key="sk-test", base_url="https://example.test/v1")
     with patch("src.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
         text = llm.generate()
     assert "<step kind=\"plan\">p</step>" in text
@@ -127,7 +127,7 @@ def test_live_llm_abort_posts_cancel():
         streams["n"] += 1
         return _SSE(stream_events if streams["n"] == 1 else resume_events)
 
-    llm = LiveOpenAILlm(
+    llm = LiveLlm(
         user_prompt="q",
         api_key="sk-test",
         base_url="https://example.test/v1",
@@ -274,6 +274,6 @@ def test_responses_request_never_sets_background():
 
 
 def test_live_llm_requires_key():
-    llm = LiveOpenAILlm(user_prompt="q", api_key="")
+    llm = LiveLlm(user_prompt="q", api_key="")
     with pytest.raises(LiveLlmError, match="missing"):
         llm.generate()

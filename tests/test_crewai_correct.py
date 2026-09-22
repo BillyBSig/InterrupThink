@@ -120,7 +120,7 @@ def test_case_is_one_role_not_pipe_or_kickoff(tmp_path: Path):
     public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     pipe = (REPO / "cases" / "crewai-pipe" / "graph.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "run_session" in text
     assert "Process.sequential" in text
     assert "allow_delegation=False" in text
@@ -144,7 +144,7 @@ def test_example_calls_interruptible_not_the_case():
     graph = (CASE / "graph.py").read_text(encoding="utf-8")
     readme = (CASE / "README.md").read_text(encoding="utf-8")
     assert "from interrupthink import" in example
-    assert "LiveOpenAILlm" in example
+    assert "LiveLlm" in example
     assert "run_session" in example
     assert "Process.sequential" in example
     assert "allow_delegation=False" in example

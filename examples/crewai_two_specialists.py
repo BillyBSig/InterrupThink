@@ -8,7 +8,7 @@ Flow
     CrewAI ``Agent`` / ``Task`` / ``Crew`` (``Process.sequential``) label two
     roles. The host runs two ``run_session`` calls and forwards retrieved text.
     The crew manages ordering, while ``run_session`` remains the thinking loop.
-    One ``LlmMonitor`` and ``LiveOpenAILlm`` provide the live run.
+    One ``LlmMonitor`` and ``LiveLlm`` provide the live run.
 
 Expected
     Stale retrieve: write role does not run; no ``decision.txt``.
@@ -30,7 +30,7 @@ from pathlib import Path
 from crewai import Agent, Crew, Process, Task
 
 from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveOpenAILlm, load_dotenv
+from src.providers.live import LiveLlm, load_dotenv
 
 REPO = Path(__file__).resolve().parents[1]
 FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"
@@ -79,7 +79,7 @@ def main() -> int:
         leftover.unlink()
     retrieve_tool = FixtureRetrieveTool(FIXTURES)
     write_tool = SandboxWriteTool(sandbox)
-    llm = LiveOpenAILlm(user_prompt=TICKET, timeout_s=180.0)
+    llm = LiveLlm(user_prompt=TICKET, timeout_s=180.0)
     llm.resume_mode = "rollback"
     monitor = LlmMonitor(
         memo=MEMO,
@@ -125,7 +125,7 @@ def main() -> int:
         print("write_calls", write_tool.calls)
         return 0
     forwarded = retrieve_tool.retrieved[-1] if retrieve_tool.retrieved else ""
-    write_llm = LiveOpenAILlm(
+    write_llm = LiveLlm(
         user_prompt=(
             "Host forwarded this retrieved policy. Write decision.txt with exactly that text.\n"
             f"Policy:\n{forwarded}\n"

@@ -57,5 +57,5 @@ Case live memerlukan `.env` pribadi:
 python3 cases/correct-resume/run.py
 ```
 
-Contoh live menggunakan `LiveOpenAILlm` dan `LlmMonitor`. Kredensial tidak
+Contoh live menggunakan `LiveLlm` dan `LlmMonitor`. Kredensial tidak
 boleh disimpan di repository.

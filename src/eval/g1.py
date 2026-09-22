@@ -8,7 +8,7 @@ from src.monitor.base import Monitor
 from src.monitor.scripted import ScriptedMonitor
 from src.providers.base import Llm
 from src.providers.fake import DummyTool, FakeLlm
-from src.providers.live import LiveOpenAILlm
+from src.providers.live import LiveLlm
 from src.runtime.events import Patch
 from src.runtime.log import JsonlLogger
 from src.runtime.session import SpikeResult, _run_session
@@ -98,7 +98,7 @@ def run_path(
     if path == "interrupt":
         llm = llm or FakeLlm([INTERRUPT_XML_1, INTERRUPT_XML_2])
         if monitor is None:
-            if isinstance(llm, LiveOpenAILlm):
+            if isinstance(llm, LiveLlm):
                 monitor = g1_live_interrupt_monitor()
             else:
                 monitor = ScriptedMonitor(

@@ -105,7 +105,7 @@ def test_native_host_not_smtp_or_required_langgraph():
     assert "from interrupthink import" in text
     assert "run_session" in text
     assert "SandboxWriteTool" in text
-    assert "LiveOpenAILlm" in text
+    assert "LiveLlm" in text
     assert "DummyTool()" not in text
     assert "smtplib" not in text
     assert "import langgraph" not in text
