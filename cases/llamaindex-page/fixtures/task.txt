@@ -1,0 +1,1 @@
+Answer the customer's exchange question only from the retrieved policy page.

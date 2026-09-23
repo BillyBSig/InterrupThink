@@ -4,90 +4,115 @@
 
 ## Tujuan
 
-Evaluasi memeriksa dua kontrak:
+Evaluasi saat ini mengajukan dua pertanyaan kontrak:
 
-1. Apakah host dapat menghentikan langkah semantik yang tidak didukung sebelum
-   efek samping di-commit?
-2. Setelah interupsi, apakah host dapat mengoreksi proses penalaran dengan patch dan
-   watermark lalu melanjutkan dengan rollback?
+> Dapatkah host **menghentikan** langkah semantik yang tidak didukung sebelum
+> efek sampingnya di-commit?
+>
+> Setelah pemutusan, dapatkah host **mengoreksi** proses penalaran (patch +
+> watermark) dan **melanjutkan** dengan rollback, alih-alih hanya membatalkan
+> atau memulai ulang dari awal?
 
-Ini bukan benchmark kualitas model, latency, throughput, biaya, atau performa
-agent secara umum.
+Ini adalah verifikasi kontrak untuk library floor, bukan benchmark kualitas
+model bahasa, latency, throughput, atau performa agent secara umum.
+
+Pemeriksaan kontrak tambahan mencakup penerima bernama. Escalation,
+konsultasi, dan takeover mempertahankan status `Ok` serta mencantumkan nama
+pada hasil. Test memeriksa siapa yang menerima paket, langkah mana yang tetap
+ada di dalamnya, dan apakah jawaban pertama di-commit. Test tidak menilai
+prosa penerima.
 
 ## Desain perbandingan
 
-Setiap case yang memiliki efek samping mencakup:
+Setiap case dengan efek samping memiliki jalur kontrol:
 
-- **jalur interupsi** — premise yang salah dihentikan sebelum tool, sink jawaban,
-  atau sesi downstream;
-- **jalur koreksi dan lanjut** — patch diterapkan lalu request berikutnya
-  melanjutkan dari checkpoint;
-- **jalur yang diizinkan** — tugas yang sama berjalan tanpa interupsi.
+- **jalur interupsi** — premise yang salah atau tidak didukung terdeteksi
+  sebelum tool, sink jawaban, atau sesi downstream;
+- **jalur koreksi-dan-lanjut** — setelah pemutusan, patch diterapkan dan
+  specialist melanjutkan dari checkpoint (`rollback`);
+- **jalur izinkan** — tugas dengan bentuk yang sama berjalan saat tidak ada
+  interupsi.
 
-Jalur yang diizinkan adalah pembanding serial lokal. Klaim dibatasi pada efek
-samping dan perilaku sesi yang terlihat pada fixture.
+Jalur izinkan adalah perbandingan serial/kontrol lokal. Klaim dibatasi pada
+efek samping dan perilaku sesi yang diamati dalam fixture.
 
-## Jenis bukti
+## Kelas bukti
 
 ### Test kontrak deterministik
 
 Bukti utama menggunakan `FakeLlm`, monitor scripted, sandbox tool, dan fixture
-kecil. Test ini dapat diulang dan tidak membutuhkan API key.
+kecil. Test ini dapat diulang dan tidak memerlukan API key.
 
-Yang diperiksa:
+Test memverifikasi:
 
-- unit semantik dan verdict monitor;
+- unit semantik yang diparse dan verdict monitor;
 - urutan interupsi;
-- ada atau tidaknya efek samping pada sandbox;
+- ada atau tidaknya efek samping sandbox;
 - field event rollback;
 - perilaku dependency opsional;
 - instalasi wheel lokal.
 
-### Live smoke path
+### Jalur smoke live
 
-Runner case dapat menggunakan `LiveLlm` dan `LlmMonitor` dengan `.env`
-pribadi. Setiap verdict live menunggu respons provider sebelum sesi lanjut. Ini
-memeriksa wiring terhadap model live, bukan akurasi model.
+Runner case command-line dapat menggunakan `LiveLlm` dan `LlmMonitor` dengan
+file environment pribadi. Setiap verdict monitor live menunggu provider
+sebelum sesi berlanjut. Run ini menunjukkan wiring terhadap model live, tetapi
+tidak deterministik dan tidak digunakan untuk mengklaim akurasi model.
 
-Credential tidak boleh di-commit.
+Tidak ada API key proyek yang diperlukan ataupun disimpan. Kredensial tidak
+boleh di-commit.
 
-## Command reproduksi
+## Perintah reproduksi
 
-Dari root repository:
+Dari root source repository:
 
 ```bash
+uv venv
 uv pip install -e ".[dev]"
-python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py -x --tb=short -q
-python3 -m pytest tests/test_sandbox_write.py tests/test_correct_resume.py -x --tb=short -q
-python3 -m pytest tests/test_two_specialists.py tests/test_deny_answer_pipeline.py -x --tb=short -q
+python3 docs/check_publication.py
+python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py tests/test_wheel_install.py -x --tb=short -q
+python3 -m pytest tests/test_sandbox_write.py tests/test_correct_resume.py tests/test_spike_paths.py -x --tb=short -q
+python3 -m pytest tests/test_two_specialists.py tests/test_false_policy.py tests/test_deny_answer_pipeline.py -x --tb=short -q
+python3 -m pytest tests/test_llm_monitor.py tests/test_run_session_contract.py -x --tb=short -q
 ```
 
-Test framework opsional akan di-skip jika package belum tersedia:
+Test framework opsional akan di-skip dengan benar ketika package-nya tidak
+ada. Jika framework terpasang di environment, jalankan file test terkait:
 
 ```bash
-python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py -q
-python3 -m pytest tests/test_langchain_extra.py tests/test_langchain_chat.py -q
+python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py tests/test_langgraph_correct.py -q
+python3 -m pytest tests/test_langchain_extra.py tests/test_langchain_chat.py tests/test_langchain_correct.py -q
 python3 -m pytest tests/test_llamaindex_extra.py -q
-python3 -m pytest tests/test_crewai_extra.py tests/test_autogen_extra.py -q
+python3 -m pytest tests/test_crewai_extra.py tests/test_crewai_correct.py tests/test_autogen_extra.py tests/test_autogen_correct.py -q
 ```
 
-## Kapan dianggap lulus
+Versi Python yang tepat, keadaan package, dan revisi source harus disertakan
+pada setiap hasil yang dilaporkan secara eksternal. Lihat
+[Reproducibility](reproducibility.md).
 
-Case dilaporkan lulus hanya jika kontrak utamanya terlihat:
+## Kriteria lulus
+
+Skenario hanya dilaporkan lulus apabila kontrak utamanya diamati:
 
 - interupsi terjadi sebelum efek samping yang dilindungi;
-- setelah koreksi, resume melanjutkan dari watermark;
-- jalur yang diizinkan menghasilkan efek samping terbatas yang diharapkan;
-- hasil sesi mencatat data interupsi atau rollback;
-- framework opsional tidak menjadi dependency inti;
-- test dapat dipetakan ke source test atau case yang committed.
+- setelah koreksi, resume melanjutkan dari watermark, bukan hanya membatalkan
+  sesi;
+- jalur izinkan/kontrol menghasilkan efek samping terbatas yang diharapkan;
+- hasil sesi mencatat data interupsi atau rollback yang diharapkan;
+- package host opsional tidak menjadi dependency inti;
+- test dapat dipetakan ke source test atau case yang di-commit.
 
-Jika dependency tidak tersedia, hasilnya `not evaluated` atau `skipped`, bukan
-hasil positif yang disimpulkan hanya dari inspeksi source.
+Jika dependency tidak tersedia, hasilnya adalah `not evaluated` atau
+`skipped`, bukan keberhasilan yang disimpulkan dari inspeksi source.
 
 ## Disiplin pelaporan
 
-Hasil publik membedakan bukti test deterministik dari smoke test live,
-kontrak skenario dari jaminan produksi, dan pembanding lokal dari benchmark.
-Jangan menyertakan prompt privat, respons mentah model, kredensial, trace hasil
-generate, atau identifier riset internal.
+Hasil publik membedakan:
+
+- bukti test deterministik dari bukti smoke live;
+- kontrak skenario dari jaminan produksi;
+- perbandingan kontrol lokal dari benchmark baseline;
+- test yang lulus dari framework atau mode deployment yang belum diuji.
+
+Hasil tidak menyertakan prompt privat, respons model mentah, nilai environment,
+trace yang dihasilkan, atau identifier riset internal.

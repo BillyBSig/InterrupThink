@@ -6,9 +6,24 @@ from pathlib import Path
 
 
 class SandboxWriteTool:
-    """Like DummyTool, but execute('write') actually writes a file under root."""
+    """Write files only inside a sandbox directory.
+
+    ``execute("write")`` creates the file. Any other name is rejected.
+    A path that escapes the sandbox is rejected and recorded.
+
+    Attributes:
+        root: Absolute sandbox directory. It is created if missing.
+        calls: Calls in execution order.
+        written: Relative paths that were written.
+        rejected: Relative paths refused because they escaped the sandbox.
+    """
 
     def __init__(self, root: Path | str) -> None:
+        """Create the sandbox directory.
+
+        Args:
+            root: Directory that will contain every written file.
+        """
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
         self.calls: list[dict] = []
@@ -16,6 +31,20 @@ class SandboxWriteTool:
         self.rejected: list[str] = []
 
     def execute(self, name: str, args: dict) -> str:
+        """Write one file inside the sandbox.
+
+        Args:
+            name: Must be ``"write"``.
+            args: ``path`` is the relative file name. ``content`` is the
+                file text. Both may be omitted.
+
+        Returns:
+            ``"wrote {filename}"`` after the file is saved.
+
+        Raises:
+            ValueError: ``name`` is not ``"write"``, or ``path`` escapes
+                the sandbox.
+        """
         payload = {"name": name, "args": dict(args or {})}
         self.calls.append(payload)
         if name != "write":

@@ -83,6 +83,29 @@ replacement facts on that next request so the specialist continues the reasoning
 instead of only stopping. See [Concepts](concepts.md) and
 [`cases/correct-resume/`](../cases/correct-resume/).
 
+## Hand the task to a named receiver
+
+The same session result can name a receiver without committing the specialist's unfinished answer. Import `Escalation`, `Consult`, or `Takeover` and compose the package from the result. The object does not start the next session. The host does, and only when the name is present.
+
+```python
+from interrupthink import Escalation, ScriptedMonitor, run_session
+
+# dealer is the first specialist. task is the original task string.
+result = run_session(
+    llm=dealer,
+    monitor=ScriptedMonitor(
+        trigger_kind="claim",
+        trigger_contains="ask policy",
+        escalate_to="policy",
+    ),
+)
+if result.escalate_to:
+    package = Escalation.from_result(task, result)
+    # Give package.text() to the policy specialist as a new request.
+```
+
+Consultation uses `Consult` and then a `Patch` back to the same specialist. Takeover uses `Takeover`. For `takeover_to="human"`, return `package.text()` and do not open a second specialist. The full shapes are in [Concepts](concepts.md#named-handoffs).
+
 ## Expected failures
 
 These two failures are part of the contract. Fix the scripted document list
@@ -130,6 +153,9 @@ The same prose through `run_session` raises `ValueError: llm produced no complet
 | An answer that cites a policy not in the source | [`cases/false-policy/`](../cases/false-policy/) |
 | Read is allowed and delete is not | [`cases/op-class/`](../cases/op-class/) |
 | A second specialist that must not start | [`cases/two-specialists/`](../cases/two-specialists/) |
+| The next specialist should receive the kept work | [`examples/supervisor_escalation.py`](../examples/supervisor_escalation.py), [`cases/langgraph-offer/`](../cases/langgraph-offer/) |
+| The same specialist should continue after a checker | [`examples/supervisor_consult.py`](../examples/supervisor_consult.py), [`cases/langchain-rule/`](../cases/langchain-rule/) |
+| A human should receive the package, with no second agent | [`examples/supervisor_takeover.py`](../examples/supervisor_takeover.py), [`cases/autogen-support/`](../cases/autogen-support/) |
 | `publish` still requested after the monitor returns `Ok` | [`examples/tool_policy_deny.py`](../examples/tool_policy_deny.py) |
 | A repeated tool step that must not write again | [`examples/host_idempotent_tool.py`](../examples/host_idempotent_tool.py) |
 | An existing graph or role | [Integrations](integrations.md) |

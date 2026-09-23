@@ -9,6 +9,17 @@ When the claim is corrected to staging, the session rolls back to the last
 accepted step and continues. The invalid `production.txt` file is not created;
 the corrected path may write `staging.txt`.
 
+```mermaid
+flowchart TB
+  ticket[Ticket says production] --> role[One CrewAI role]
+  role --> session[run_session]
+  session --> patch[Correct the fact to staging]
+  patch --> rollback[Resume from the last accepted step]
+  rollback --> staging[staging.txt may be written]
+  blocked[production.txt is not created]
+  session --> blocked
+```
+
 ```python
 from graph import run_crewai_correct
 

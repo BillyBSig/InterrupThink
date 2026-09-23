@@ -16,6 +16,11 @@ The current evaluation asks two contract questions:
 This is contract verification for a library floor. It is not a benchmark of
 language-model quality, latency, throughput, or general agent performance.
 
+A further contract check covers a named receiver. Escalation, consultation,
+and takeover keep status `Ok` and put the name on the result. Tests check
+who receives the package, which steps stay in it, and whether the first
+answer was committed. They do not score the receiver's prose.
+
 ## Comparison design
 
 Every side-effect case has a control path:

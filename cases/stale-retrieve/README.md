@@ -5,6 +5,14 @@ document and then wants to use it to write a customer notice. The specialist
 must first describe what it found. If it claims that the old document is
 current, the supervisor interrupts the session and the notice is not written.
 
+```mermaid
+flowchart TB
+  old[Retrieved policy document] --> claim[Specialist describes what it found]
+  claim --> supervisor[Supervisor]
+  supervisor -->|document is current| write[Write the notice]
+  supervisor -->|stale document claimed as current| stop[Notice is not written]
+```
+
 Everything runs against local fixture files. There is no vector database or
 external messaging service, so the example is easy to run and inspect.
 

@@ -8,6 +8,15 @@ The semantic supervisor can stop or correct the model before it reaches the
 tool. LangGraph's own tool boundary remains a second safety check. The example
 does not require a separate InterrupThink plugin or a custom `ToolNode`.
 
+```mermaid
+flowchart TB
+  start([Start]) --> agent[Agent node]
+  agent --> session[run_session]
+  session -->|tool call kept| tools[Official ToolNode]
+  session -->|blocked| stop([Stop])
+  tools --> done([Done])
+```
+
 ```python
 from graph import create_apply_graph
 

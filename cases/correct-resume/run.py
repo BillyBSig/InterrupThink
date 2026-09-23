@@ -27,7 +27,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from interrupthink import JsonlLogger, LlmMonitor, Patch, SandboxWriteTool, run_session
+from interrupthink import JsonlLogger, LlmMonitor, Patch, SandboxWriteTool, ScriptedMonitor, run_session
 from src.providers.live import LiveLlm, load_dotenv
 
 CASE_DIR = Path(__file__).resolve().parent
@@ -101,8 +101,6 @@ def host_monitor(*, interrupt: bool) -> LlmMonitor:
 
 
 def scripted_supervisor():
-    from interrupthink import ScriptedMonitor
-
     return ScriptedMonitor(
         trigger_kind="claim",
         trigger_contains=WRONG_HOST,

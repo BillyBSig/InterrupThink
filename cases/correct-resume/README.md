@@ -9,6 +9,17 @@ The invalid `production.txt` file is never created. After the correction,
 `staging.txt` may be written. The session resumes with rollback rather than
 starting the whole task again.
 
+```mermaid
+flowchart TB
+  ticket[Ticket says production] --> specialist[Specialist]
+  specialist --> supervisor[Supervisor]
+  supervisor --> patch[Correct the fact to staging]
+  patch --> rollback[Resume from the last accepted step]
+  rollback --> staging[staging.txt may be written]
+  blocked[production.txt is never created]
+  supervisor --> blocked
+```
+
 The command-line run uses `LiveLlm` and `LlmMonitor`. The tests use
 deterministic substitutes so they can run without credentials.
 

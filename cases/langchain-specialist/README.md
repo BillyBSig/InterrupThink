@@ -9,6 +9,14 @@ LangChain remains responsible for prompt and tool wiring. `run_session` remains
 the semantic thinking boundary. The short version is available in
 `examples/langchain_specialist.py`.
 
+```mermaid
+flowchart TB
+  prompt[LangChain prompt] --> specialist[Specialist steps]
+  specialist --> supervisor[Supervisor]
+  supervisor -->|freeze claim passes| write[Sandbox write]
+  supervisor -->|freeze still holds| held[Write is not called]
+```
+
 ```python
 from agents import create_specialist
 

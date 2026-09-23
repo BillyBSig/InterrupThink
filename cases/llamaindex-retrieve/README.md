@@ -10,6 +10,15 @@ The important separation is simple: LlamaIndex finds information, while
 This example is not a chat application and does not add a vector database or a
 retriever to the InterrupThink package.
 
+```mermaid
+flowchart TB
+  index[LlamaIndex retriever] --> text[Retrieved text]
+  text --> session[run_session]
+  session --> supervisor[Supervisor]
+  supervisor -->|current| write[Write the notice]
+  supervisor -->|stale claimed as current| stop[Notice is not written]
+```
+
 The policy fixtures are shared with `cases/two-specialists/`.
 
 ```bash

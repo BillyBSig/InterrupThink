@@ -9,6 +9,15 @@ If the first specialist makes an unsupported claim, the graph stops there and
 does not start the second specialist. This is a one-way handoff, not a
 conversation in which the two specialists interrupt each other.
 
+```mermaid
+flowchart TB
+  start([Start]) --> retrieve[Retrieve node]
+  retrieve --> session[run_session]
+  session -->|context accepted| write[Write node]
+  session -->|unsupported claim| stop([Stop])
+  write --> done([Done])
+```
+
 The policy fixtures are shared with `cases/two-specialists/`. This folder is a
 host integration example, not a separate InterrupThink package.
 

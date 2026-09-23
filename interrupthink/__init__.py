@@ -16,6 +16,7 @@ from src.providers.fake import DummyTool, FakeLlm
 from src.providers.live import LiveLlm
 from src.providers.sandbox import SandboxWriteTool
 from src.runtime.events import Patch, Verdict
+from src.runtime.handoff import Consult, Escalation, Takeover
 from src.runtime.floor import Floor
 from src.runtime.log import JsonlLogger
 from src.runtime.session import SessionError, SpikeResult, run_session
@@ -23,7 +24,9 @@ from src.runtime.session import SessionError, SpikeResult, run_session
 # Export names for the package facade.
 PUBLIC_API = (
     "ASKABLE",
+    "Consult",
     "DummyTool",
+    "Escalation",
     "FakeLlm",
     "Floor",
     "JsonlLogger",
@@ -38,6 +41,7 @@ PUBLIC_API = (
     "ScriptedMonitor",
     "SessionError",
     "SpikeResult",
+    "Takeover",
     "ThoughtUnit",
     "Verdict",
     "parse_steps",

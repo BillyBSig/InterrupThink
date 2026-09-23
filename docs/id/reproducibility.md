@@ -2,72 +2,83 @@
 
 [English](../reproducibility.md) · [Bahasa Indonesia](reproducibility.md)
 
-Tujuan reproducibility adalah membantu orang lain membedakan hasil yang berasal
-dari source code, test deterministik, dan model live.
+Hasil publik terikat pada source code, test, asumsi environment, dan kelas
+bukti yang dinyatakan. Menjalankan ulang hanya klaim dalam prosa tidak cukup.
 
 ## Environment
 
-Catat informasi berikut:
+- Python: 3.11 atau lebih baru
+- Dependency inti: environment source yang di-commit
+- Framework opsional: dipasang terpisah di environment test
+- Test deterministik: tidak memerlukan API key
+- Jalur smoke live: hanya kredensial provider pribadi; bukan kredensial proyek
 
-- versi Python;
-- sistem operasi;
-- commit source;
-- versi dependency;
-- apakah framework opsional terpasang;
-- apakah test memakai `FakeLlm` atau model live.
-
-Buat environment yang terisolasi dari root repository:
+Buat environment terisolasi dan instal package inti:
 
 ```bash
 uv venv
-source .venv/bin/activate
 uv pip install -e ".[dev]"
 ```
 
-Jangan commit `.env`, API key, atau output lokal.
+Framework host opsional bukan bagian dari himpunan dependency inti. Instal
+hanya package yang diperlukan oleh case yang direproduksi:
+
+```bash
+uv pip install langgraph
+uv pip install langchain
+uv pip install llama-index llama-index-llms-openai
+uv pip install crewai
+uv pip install autogen
+```
 
 ## Pemeriksaan deterministik
 
-Jalankan test kontrak tanpa API key:
+Jalankan pemeriksaan kontrak inti:
 
 ```bash
-python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py -x --tb=short -q
-python3 -m pytest tests/test_sandbox_write.py tests/test_correct_resume.py -q
-python3 -m pytest tests/test_two_specialists.py tests/test_deny_answer_pipeline.py -q
+python3 docs/check_publication.py
+python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py tests/test_wheel_install.py -x --tb=short -q
+python3 -m pytest tests/test_sandbox_write.py tests/test_correct_resume.py tests/test_spike_paths.py -x --tb=short -q
+python3 -m pytest tests/test_two_specialists.py tests/test_false_policy.py tests/test_deny_answer_pipeline.py -x --tb=short -q
+python3 -m pytest tests/test_llm_monitor.py tests/test_run_session_contract.py -x --tb=short -q
+python3 -m pytest tests/test_supervisor_escalation.py tests/test_supervisor_consult.py tests/test_supervisor_takeover.py tests/test_supervisor_handoff.py -q
 ```
 
-Jika framework opsional tidak tersedia, test terkait boleh di-skip. Laporkan skip
-sebagai `not evaluated`, bukan sebagai hasil positif.
-
-## Smoke test live
-
-Salin `.env.example` menjadi `.env`, isi kredensial secara lokal, lalu jalankan
-case yang ingin diuji:
+Jalankan pemeriksaan host opsional setelah package-nya terinstal:
 
 ```bash
-cp .env.example .env
-python3 cases/correct-resume/run.py
+python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py tests/test_langgraph_correct.py -q
+python3 -m pytest tests/test_langchain_extra.py tests/test_langchain_chat.py tests/test_langchain_correct.py -q
+python3 -m pytest tests/test_llamaindex_extra.py -q
+python3 -m pytest tests/test_crewai_extra.py tests/test_crewai_correct.py tests/test_autogen_extra.py tests/test_autogen_correct.py -q
+python3 -m pytest tests/test_langgraph_offer_case.py tests/test_langchain_rule_case.py tests/test_crewai_order_case.py tests/test_autogen_support_case.py tests/test_llamaindex_page_case.py -q
 ```
 
-Hasil live dipengaruhi model, prompt, network, dan waktu. Jangan gunakan satu
-run live sebagai benchmark kualitas model.
+Suite lengkapnya adalah:
+
+```bash
+python3 -m pytest -q
+```
 
 ## Catatan bukti
 
-Setiap hasil yang dibagikan sebaiknya mencatat:
+Saat melaporkan hasil reproduksi, sertakan:
 
-- command yang dijalankan;
-- source revision;
-- versi Python dan dependency;
-- input atau fixture;
-- jalur yang diuji;
-- hasil yang diamati;
-- keterbatasan dan hal yang belum diuji.
+1. revisi source atau commit;
+2. sistem operasi;
+3. versi Python;
+4. perintah instalasi package;
+5. versi framework opsional;
+6. perintah test atau case yang tepat;
+7. status keluar dan artefak yang diamati;
+8. apakah hasilnya berupa bukti deterministik atau model live.
 
-Jangan bagikan respons mentah model, prompt privat, token, path kredensial,
-atau data pribadi.
+Jangan sertakan API key, prompt privat, trace model mentah, atau nilai
+environment pribadi dalam laporan.
 
-## Perbedaan juga merupakan bukti
+## Perbedaan adalah bukti yang berguna
 
-Perbedaan antara environment atau model tidak perlu disembunyikan. Catat
-perbedaan tersebut dan jelaskan apakah perbedaan itu dapat memengaruhi hasil.
+Jika reproduksi berbeda, pertahankan kegagalan dan laporkan artefak berguna
+yang paling kecil: perintah, environment, nama test, exception, dan apakah
+dependency opsional terinstal. Jangan diam-diam mengubah hasil yang diharapkan
+agar run berhasil.

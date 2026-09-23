@@ -83,6 +83,68 @@ The result exposes enough information for a host to inspect the outcome,
 including committed output, interrupt identifiers, dropped units, request
 count, and tool calls.
 
+## Named handoffs
+
+A monitor can end the current specialist while the verdict stays `Ok`.
+The verdict names one receiver:
+
+- `escalate_to` — another specialist should finish the task;
+- `consult_to` — a checker should answer, and that answer comes back to the same specialist;
+- `takeover_to` — an owner should receive the task.
+
+`Unknown` does not open a route. A blank name does not open a route. When a verdict carries more than one name, the session uses escalation, then consultation, then takeover.
+
+The current specialist stops. The uncommitted answer is not committed. The kept-step prefix leaves out dropped steps and that uncommitted answer. The host reads `escalate_to`, `consult_to`, or `takeover_to` on the session result and decides whether a later session starts.
+
+`Escalation`, `Consult`, and `Takeover` compose the text the receiver reads. They do not call `run_session`. The same three objects share one package shape:
+
+- the original task;
+- the receiver's name (`role`);
+- the supervisor's reason;
+- the kept-step prefix;
+- a `result {name}: {result}` line for each tool call that recorded a result;
+- a closing line that names the tool calls which must not be repeated.
+
+`from_result(task, result)` reads the matching floor event (`floor.escalate`, `floor.consult`, or `floor.takeover`). `from_note(task, note)` reads a note the host already has. `text()` returns the package.
+
+```mermaid
+flowchart TB
+  session[Current run_session]
+  monitor[Supervisor]
+  session --> monitor
+  monitor -->|escalate_to| next[Host opens the next specialist]
+  monitor -->|consult_to| checker[Host runs the checker]
+  checker --> patch[Patch returns to the same specialist]
+  monitor -->|takeover_to editor| editor[Host opens the editor]
+  monitor -->|takeover_to human| human[Host returns the package]
+```
+
+### Escalation
+
+`result.escalate_to` names the next specialist. The first specialist does not resume. The host starts a new `run_session` for that specialist and passes `Escalation.from_result(task, result).text()` as the new request.
+
+The graph, crew, or agent list does not choose the specialist. The host opens the next session only when the name is present.
+
+See [`examples/supervisor_escalation.py`](../examples/supervisor_escalation.py) and [`cases/langgraph-offer/`](../cases/langgraph-offer/).
+
+### Consultation
+
+`result.consult_to` names the checker. The host runs that checker on `Consult.from_result(task, result).text()`. The checker's committed answer returns to the same specialist as a `Patch` on a new `run_session(..., resume_patch=...)`. The owner of the task stays where it was.
+
+The same chat history, or the same assistant object, continues from the kept prefix plus that patch. The checker does not become the new owner.
+
+See [`examples/supervisor_consult.py`](../examples/supervisor_consult.py) and [`cases/langchain-rule/`](../cases/langchain-rule/).
+
+### Takeover
+
+`result.takeover_to` names the owner.
+
+`editor` is another specialist. The host may open a second `run_session` with `Takeover.from_result(task, result).text()`. The first specialist does not resume.
+
+`human` is not a specialist. The host returns that same package text. No second specialist starts, and the monitor does not write the reply the person will see.
+
+See [`examples/supervisor_takeover.py`](../examples/supervisor_takeover.py) and [`cases/autogen-support/`](../cases/autogen-support/).
+
 ## Tool safety
 
 Tools are not executed merely because the model emitted a

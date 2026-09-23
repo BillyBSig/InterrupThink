@@ -106,6 +106,20 @@ python3 cases/autogen-correct/run.py
 See [`../cases/autogen-pipe/`](../cases/autogen-pipe/) and
 [`../cases/autogen-correct/`](../cases/autogen-correct/).
 
+## Named handoffs inside a framework
+
+The framework keeps its nodes, roles, messages, or index. `run_session` still judges the specialist. When the result names a receiver, the host composes `Escalation`, `Consult`, or `Takeover` and opens the next step. The framework's own handoff, delegation, chat engine, or group chat does not make that choice.
+
+| Host | Route | What the folder shows |
+|---|---|---|
+| LangGraph | Escalation | [`cases/langgraph-offer/`](../cases/langgraph-offer/): the dealer node checks a listed price; the policy node receives the package; the one-dollar offer is not committed |
+| LangChain | Consultation | [`cases/langchain-rule/`](../cases/langchain-rule/): the checker receives the posted rule; the patch returns to the same chat |
+| CrewAI | Escalation | [`cases/crewai-order/`](../cases/crewai-order/): the counter role receives the order package; `place_order` does not run |
+| AutoGen | Takeover to `human` | [`cases/autogen-support/`](../cases/autogen-support/): the human receives the package; no second agent continues |
+| LlamaIndex | Consultation | [`cases/llamaindex-page/`](../cases/llamaindex-page/): the checker receives one retrieved page; the same assistant continues only as far as that page |
+
+Each folder owns its route. The short call sites live under [`examples/`](../examples/). Install the framework in a virtual environment when you run that folder. Do not add it to the core package.
+
 ## Integration boundary
 
 The integration examples demonstrate wiring, not framework replacement. They

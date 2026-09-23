@@ -42,6 +42,7 @@ python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py tests
 python3 -m pytest tests/test_sandbox_write.py tests/test_correct_resume.py tests/test_spike_paths.py -x --tb=short -q
 python3 -m pytest tests/test_two_specialists.py tests/test_false_policy.py tests/test_deny_answer_pipeline.py -x --tb=short -q
 python3 -m pytest tests/test_llm_monitor.py tests/test_run_session_contract.py -x --tb=short -q
+python3 -m pytest tests/test_supervisor_escalation.py tests/test_supervisor_consult.py tests/test_supervisor_takeover.py tests/test_supervisor_handoff.py -q
 ```
 
 Run optional host checks after installing their packages:
@@ -51,6 +52,7 @@ python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py tes
 python3 -m pytest tests/test_langchain_extra.py tests/test_langchain_chat.py tests/test_langchain_correct.py -q
 python3 -m pytest tests/test_llamaindex_extra.py -q
 python3 -m pytest tests/test_crewai_extra.py tests/test_crewai_correct.py tests/test_autogen_extra.py tests/test_autogen_correct.py -q
+python3 -m pytest tests/test_langgraph_offer_case.py tests/test_langchain_rule_case.py tests/test_crewai_order_case.py tests/test_autogen_support_case.py tests/test_llamaindex_page_case.py -q
 ```
 
 The complete suite is:

@@ -123,6 +123,31 @@ resume path is not the intended default.
   experiment. This does not evaluate hierarchical orchestration, group chat,
   delegation quality, or framework production behavior.
 
+### Named handoffs
+
+- **Method:** deterministic sessions. The monitor returns `Ok` and a
+  receiver name. `Escalation`, `Consult`, and `Takeover` compose the
+  package from the floor event. Optional-framework folders repeat the
+  same package shape inside one host each.
+- **Observed result:** the unfinished answer is not committed. The package
+  keeps the original task, the receiver, the supervisor reason, the kept
+  steps, recorded tool results, and the calls that must not be repeated.
+  Escalation does not resume the first specialist. Consultation returns a
+  patch to the same specialist. A human takeover returns the package and
+  does not start a second specialist.
+- **Evidence:** `tests/test_supervisor_escalation.py`,
+  `tests/test_supervisor_consult.py`,
+  `tests/test_supervisor_takeover.py`,
+  `tests/test_supervisor_handoff.py`,
+  `cases/langgraph-offer/`,
+  `cases/langchain-rule/`,
+  `cases/crewai-order/`,
+  `cases/autogen-support/`,
+  `cases/llamaindex-page/`.
+- **Limit:** the scripted documents lock the contract. A live run can show
+  that a session started and a package arrived. Its wording is not the
+  referee.
+
 ### Supervisor output and neutral core
 
 - **Method:** deterministic monitor and runtime tests.

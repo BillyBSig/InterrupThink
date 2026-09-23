@@ -9,6 +9,13 @@ The example demonstrates a one-way handoff: the second specialist does not
 start if the first specialist is interrupted. This keeps an unsafe or stale
 piece of information from reaching the next action.
 
+```mermaid
+flowchart TB
+  read[First specialist reads the policy] --> check[Supervisor checks that context]
+  check -->|accepted| decide[Second specialist writes the decision]
+  check -->|interrupted| stop[Second specialist does not start]
+```
+
 From the repository root:
 
 ```bash

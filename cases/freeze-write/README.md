@@ -9,6 +9,13 @@ The run uses a small sandbox, so it is safe to inspect the result. The
 supervisor watches the specialist's structured claim, and the host only
 commits the write after the claim passes.
 
+```mermaid
+flowchart TB
+  claim[Release-freeze claim] --> supervisor[Supervisor]
+  supervisor -->|claim passes| write[Write the file in the sandbox]
+  supervisor -->|unsupported| held[File tool is not called]
+```
+
 From the repository root:
 
 ```bash

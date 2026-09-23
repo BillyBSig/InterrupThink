@@ -2,52 +2,65 @@
 
 [English](../PUBLICATION_POLICY.md) · [Bahasa Indonesia](PUBLICATION_POLICY.md)
 
-Direktori `docs/` adalah batas dokumentasi publik di dalam repository sumber
-InterrupThink. Root README, `cases/`, `examples/`, dan docstring library juga
-merupakan materi yang dapat dibaca user.
+Direktori `docs/` adalah batas dokumentasi publik dalam repository sumber
+InterrupThink. README di root, `cases/`, `examples/`, dan docstring library
+juga merupakan materi untuk pengguna. Materi tersebut dikurasi bagi pembaca
+yang perlu memahami dan mereproduksi library, bukan untuk menerbitkan
+keseluruhan catatan riset internal.
 
-## Isi yang boleh
+## Konten yang diizinkan
 
-Tambahkan materi jika:
+Tambahkan konten jika:
 
-- ditulis dengan bahasa yang jelas;
-- berguna bagi user library, evaluator, atau contributor;
-- didukung source code, test yang sudah di-commit, atau hasil yang sudah
-  disanitasi;
-- dapat direproduksi tanpa kredensial pribadi;
-- menjelaskan cakupan, ketidakpastian, dan keterbatasan;
-- tidak memuat prompt privat, raw trace model, atau data pribadi.
+- ditulis dalam bahasa Inggris;
+- bermanfaat bagi pengguna library, evaluator, atau kontributor;
+- didukung oleh kode sumber, test yang telah di-commit, atau hasil run yang
+  telah disanitasi;
+- dapat direproduksi tanpa kredensial privat;
+- menjelaskan cakupan, ketidakpastian, dan keterbatasan secara tegas;
+- tidak memuat prompt privat, trace mentah model, atau data pribadi.
 
-Halaman hasil boleh menjelaskan skenario, metode, hasil yang diamati, source
-test, dan keterbatasan. Jangan mengubah satu fixture menjadi klaim umum
-tentang keamanan atau kualitas.
+Halaman evaluasi publik boleh menjelaskan skenario, metode, hasil yang
+diamati, test sumber, dan keterbatasan. Halaman tersebut tidak boleh mengubah
+satu fixture menjadi klaim umum tentang keamanan atau kualitas.
 
-## Isi yang dikecualikan
+## Konten yang dikecualikan
 
-Jangan salin:
+Jangan menyalin hal berikut ke `docs/`:
 
-- dokumen rencana internal, gate, task identifier, atau experiment card;
-- file notebook lokal yang tidak dipublikasikan;
-- prompt privat, memo internal, hidden reasoning, atau transkrip model;
-- `.env`, API key, token, certificate, atau path kredensial;
-- artefak `runs/`, `tmp/`, log, cache, atau environment lokal;
-- nama pribadi, detail infrastructure privat, atau data customer;
-- keputusan arsitektur yang belum dipublikasikan;
-- klaim tanpa test atau prosedur yang dapat direproduksi.
+- rencana internal, gate, identifier tugas, identifier kartu eksperimen, atau
+  label singkat yang hanya bermakna dalam catatan riset;
+- file lab lokal yang tidak dipublikasikan (`plan/`, termasuk
+  `plan/STATUS.md` dan `plan/AGENTS.md`);
+- prompt mentah, memo privat, penalaran tersembunyi, atau transkrip model;
+- file `.env`, API key, token, sertifikat, atau path kredensial;
+- artefak `runs/`, `tmp/`, log, cache, atau environment lokal yang dihasilkan;
+- nama pribadi, detail infrastruktur privat, atau informasi pelanggan;
+- keputusan arsitektur yang belum diterbitkan atau status proyek internal;
+- klaim tanpa test, catatan run, atau prosedur yang dapat direproduksi.
 
-## Checklist peninjauan
+Catatan riset tetap bersifat internal. Dokumentasi publik harus merangkum
+bukti tanpa membocorkan koordinasi atau perencanaan privat dalam catatan
+tersebut.
 
-- [ ] Halaman memiliki pembaca yang jelas.
-- [ ] Klaim perilaku memiliki source test atau hasil.
-- [ ] Test deterministik dibedakan dari model live.
-- [ ] Keterbatasan disebutkan.
+## Daftar periksa peninjauan
+
+Sebelum menerbitkan perubahan:
+
+- [ ] Halaman berbahasa Inggris dan memiliki pembaca yang jelas.
+- [ ] Setiap klaim angka atau perilaku memiliki test sumber atau catatan run.
+- [ ] Halaman membedakan test deterministik dari pemeriksaan model live.
+- [ ] Halaman menyatakan batasan dan kondisi yang belum diuji.
 - [ ] Tidak ada identifier internal atau konten riset privat.
-- [ ] Tidak ada nilai yang tampak seperti secret.
-- [ ] Link dan code block diperiksa dari root repository.
+- [ ] Markdown dan docstring untuk pengguna memakai penjelasan sederhana,
+      bukan label laboratorium atau nomor tugas.
+- [ ] Tidak ada nilai mirip secret atau artefak yang dihasilkan.
+- [ ] Link dan code block telah diperiksa dari root repository.
+- [ ] Seluruh diff hanya berisi perubahan dokumentasi yang dimaksud.
 
-## Koreksi dokumentasi
+## Kebijakan koreksi
 
-Jika hasil publik ternyata salah, perbaiki halaman dan jelaskan perubahan
-secara singkat dalam pesan commit. Jangan mengubah hasil gagal menjadi
-seolah-olah berhasil. Jika protokol atau source test berubah, perbarui metode
-dan keterbatasan secara bersamaan.
+Jika hasil publik keliru, perbaiki halaman dan sertakan penjelasan singkat
+dalam pesan commit. Jangan menulis ulang hasil yang gagal seolah-olah berhasil.
+Jika test sumber atau protokol berubah, perbarui metode dan batasan secara
+bersamaan.

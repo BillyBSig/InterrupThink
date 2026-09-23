@@ -37,6 +37,11 @@ deployment decision.
 - Semantic step parsing depends on the specialist producing the expected
   structured document.
 - A monitor verdict is not a proof of correctness.
+- `Escalation`, `Consult`, and `Takeover` compose receiver text. They do not open the next session. The host does that when the result names a receiver.
+- A consultation returns a `Patch` to the same specialist. It does not move ownership of the task.
+- `takeover_to="human"` returns the package to the host. It does not start a second specialist, and the monitor does not write the person's reply.
+- `takeover_to="editor"` names another specialist. The host may open that session. The first specialist still does not resume.
+- Live model wording is not the handoff contract. The scripted tests lock the receiver, the package, and whether the first answer was committed.
 
 ## Side-effect limitations
 
@@ -59,7 +64,7 @@ The project does not currently claim:
 - a user interface or production service;
 - voice activity detection or audio interruption;
 - symmetric specialist-to-specialist barge-in;
-- a multi-agent mesh;
+- a multi-agent mesh (a named handoff is a one-way host step);
 - hidden chain-of-thought transport;
 - token-level orchestration;
 - framework replacement;

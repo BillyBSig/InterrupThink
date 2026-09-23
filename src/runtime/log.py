@@ -9,7 +9,18 @@ _REDACT_KEYS = frozenset({"text", "args", "prefix", "binding", "reason"})
 
 
 class JsonlLogger:
-    """JSONL session trace. Default redacts unit text, tool args, resume prefix, and monitor reason."""
+    """JSONL trace of one session.
+
+    The default redacts unit text, tool arguments, the resume prefix,
+    the binding fact, and the monitor reason. Set ``redact`` false only
+    when the trace is allowed to keep those values.
+
+    Attributes:
+        path: File that receives one JSON object per line. ``None`` keeps
+            the trace in memory only.
+        redact: Whether sensitive fields are replaced before they are stored.
+        records: Copies of the records that were written.
+    """
 
     def __init__(
         self,
@@ -18,6 +29,13 @@ class JsonlLogger:
         *,
         redact: bool = True,
     ) -> None:
+        """Open a trace.
+
+        Args:
+            path: File to create or truncate. ``None`` skips the file.
+            stream: Extra text stream that receives the same lines.
+            redact: Replace sensitive fields. Defaults to true.
+        """
         self.path = Path(path) if path else None
         self._stream = stream
         self.redact = redact
@@ -27,6 +45,15 @@ class JsonlLogger:
             self.path.write_text("", encoding="utf-8")
 
     def write(self, event: str, **fields: Any) -> dict[str, Any]:
+        """Append one event.
+
+        Args:
+            event: Event name stored as ``"event"``.
+            **fields: Payload. Dataclasses are converted to dictionaries.
+
+        Returns:
+            The record that was stored, after redaction when that is on.
+        """
         record = {"event": event, **_plain(fields)}
         if self.redact:
             record = _redact(record)
@@ -41,6 +68,15 @@ class JsonlLogger:
 
 
 def _redact(record: dict[str, Any]) -> dict[str, Any]:
+    """Replace sensitive fields and leave the other fields unchanged.
+
+    Args:
+        record: One trace record.
+
+    Returns:
+        A copy. ``text``, ``args``, ``prefix``, ``binding``, and
+        ``reason`` are replaced with a redaction marker.
+    """
     out: dict[str, Any] = {}
     for key, value in record.items():
         if key in _REDACT_KEYS:
@@ -51,6 +87,15 @@ def _redact(record: dict[str, Any]) -> dict[str, Any]:
 
 
 def _redact_value(value: Any) -> Any:
+    """Replace one sensitive value.
+
+    Args:
+        value: Field value.
+
+    Returns:
+        The original value when it is empty. Otherwise a marker with the
+        character count or the dictionary keys.
+    """
     if value in (None, "", {}, []):
         return value
     if isinstance(value, dict):
@@ -61,6 +106,14 @@ def _redact_value(value: Any) -> Any:
 
 
 def _plain(value: Any) -> Any:
+    """Convert dataclasses and nested containers into JSON-ready values.
+
+    Args:
+        value: A field stored on a trace record.
+
+    Returns:
+        A value ``json.dumps`` can encode.
+    """
     if is_dataclass(value) and not isinstance(value, type):
         return asdict(value)
     if isinstance(value, dict):

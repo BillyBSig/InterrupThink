@@ -31,6 +31,11 @@ SUPERVISOR_JSON_SCHEMA: dict[str, Any] = {
 
 
 def supervisor_text_format() -> dict[str, Any]:
+    """Return the Responses text-format block for a supervisor verdict.
+
+    Returns:
+        A strict JSON schema named ``supervisor_verdict``.
+    """
     return {
         "type": "json_schema",
         "name": "supervisor_verdict",
@@ -40,7 +45,18 @@ def supervisor_text_format() -> dict[str, Any]:
 
 
 def parse_supervisor_payload(text: str) -> dict[str, Any]:
-    """JSON object → ask-dict. Garbage or unknown status → Unknown (never False)."""
+    """Turn supervisor text into a verdict payload.
+
+    Garbage, a non-object, or an unknown status becomes ``Unknown``.
+    It does not become ``False``.
+
+    Args:
+        text: Provider text. A surrounding markdown fence is ignored.
+
+    Returns:
+        A dictionary with ``status``, ``reason``, ``diagnosis``,
+        ``missing``, ``directive``, and ``rejects_q3_trend``.
+    """
     raw = _load_object(text)
     if raw is None:
         return {"status": "Unknown", "reason": "unparseable supervisor output"}
@@ -58,6 +74,14 @@ def parse_supervisor_payload(text: str) -> dict[str, Any]:
 
 
 def _load_object(text: str) -> dict[str, Any] | None:
+    """Parse the first JSON object in the text.
+
+    Args:
+        text: Supervisor text, with or without a markdown fence.
+
+    Returns:
+        The object, or ``None`` when no JSON object can be parsed.
+    """
     stripped = text.strip()
     stripped = re.sub(r"^```(?:json)?\s*", "", stripped)
     stripped = re.sub(r"\s*```$", "", stripped)
@@ -73,6 +97,14 @@ def _load_object(text: str) -> dict[str, Any] | None:
 
 
 def _try_json(text: str) -> Any:
+    """Parse JSON, or return ``None`` when it is invalid.
+
+    Args:
+        text: Candidate JSON text.
+
+    Returns:
+        The parsed value, or ``None``.
+    """
     try:
         return json.loads(text)
     except json.JSONDecodeError:

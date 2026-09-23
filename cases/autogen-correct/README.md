@@ -9,6 +9,17 @@ The supervisor supplies the corrected staging fact. The session rolls back to
 the last accepted step and continues, so `production.txt` is never created and
 the corrected path may write `staging.txt`.
 
+```mermaid
+flowchart TB
+  ticket[Ticket says production] --> agent[One ConversableAgent]
+  agent --> session[run_session]
+  session --> patch[Correct the fact to staging]
+  patch --> rollback[Resume from the last accepted step]
+  rollback --> staging[staging.txt may be written]
+  blocked[production.txt is not created]
+  session --> blocked
+```
+
 ```python
 from graph import run_autogen_correct
 

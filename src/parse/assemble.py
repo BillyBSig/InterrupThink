@@ -10,13 +10,39 @@ DEFAULT_MAX_BYTES = 256_000
 
 
 class StepAssembler:
-    """Yield complete <step> / <answer> blocks from a stream of text deltas."""
+    """Collect a text stream into complete step and answer blocks.
+
+    Incomplete tags stay in the buffer. A buffer that grows past
+    ``max_bytes`` raises ``SessionError``.
+
+    Attributes:
+        buf: Text that has not yet formed a complete block.
+        max_bytes: Largest incomplete buffer that is allowed.
+    """
 
     def __init__(self, *, max_bytes: int = DEFAULT_MAX_BYTES) -> None:
+        """Start with an empty buffer.
+
+        Args:
+            max_bytes: Largest incomplete buffer that is allowed.
+                Defaults to 256_000.
+        """
         self.buf = ""
         self.max_bytes = max_bytes
 
     def feed(self, delta: str) -> list[str]:
+        """Accept one chunk and return any blocks that are now complete.
+
+        Args:
+            delta: Next piece of specialist text.
+
+        Returns:
+            Complete ``<step>`` and ``<answer>`` blocks, in stream order.
+            An empty list when the buffer still holds a partial tag.
+
+        Raises:
+            SessionError: The incomplete buffer exceeds ``max_bytes``.
+        """
         self.buf += delta
         self.buf = _FENCE.sub("", self.buf.lstrip())
         if self.buf.endswith("```"):
@@ -48,10 +74,27 @@ class StepAssembler:
 
 
 def is_answer_fragment(xml: str) -> bool:
+    """Return whether a complete block is an answer.
+
+    Args:
+        xml: One block from the assembler.
+
+    Returns:
+        True when the block starts with ``<answer``.
+    """
     return xml.lstrip().lower().startswith("<answer")
 
 
 def answer_text(xml: str) -> str:
+    """Return the text inside an answer block.
+
+    Args:
+        xml: One block. A block without an answer tag is stripped and
+            returned as-is.
+
+    Returns:
+        The inner text of ``<answer>``.
+    """
     match = _ANSWER.search(xml)
     if not match:
         return xml.strip()
@@ -61,6 +104,15 @@ def answer_text(xml: str) -> str:
 
 
 def _lstrip_to_tag(buf: str) -> str | None:
+    """Drop text that sits before the next step or answer tag.
+
+    Args:
+        buf: Incomplete specialist text.
+
+    Returns:
+        The buffer from the earliest tag, or ``None`` when neither tag
+        is present yet.
+    """
     lower = buf.lower()
     idx_step = lower.find("<step")
     idx_ans = lower.find("<answer")

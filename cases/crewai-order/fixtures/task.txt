@@ -1,0 +1,1 @@
+Read the order transcript and place an order only when it is on the menu.

@@ -18,14 +18,38 @@ Do not use hidden reasoning as the team channel; put checkable thought in <step>
 
 
 class LiveLlmError(RuntimeError):
-    """Provider call failed or returned empty text."""
+    """The provider call failed, or the caller has no API key.
+
+    The message includes the HTTP status when the provider rejected the
+    request. It does not include the API key.
+    """
 
 
 class LiveLlm:
     """Live specialist via an OpenAI Responses-compatible endpoint.
 
-    The default base URL is the OpenAI API. ``LLM_BASE_URL`` selects another
-    endpoint that accepts the same request shape.
+    The default base URL is the OpenAI API. ``LLM_BASE_URL`` selects
+    another endpoint that accepts the same request shape. Streaming runs
+    in the foreground. ``abort`` closes that stream and posts cancel.
+    ``cancel_ok`` records the HTTP result; it does not prove the provider
+    stopped generating.
+
+    Attributes:
+        user_prompt: Task text for this specialist. The session does not
+            rewrite it.
+        model: Model name. Defaults to ``LLM_MODEL`` or ``gpt-5.6-luna``.
+        effort: Reasoning effort sent to the provider.
+        api_key: Key from the constructor, ``LLM_API_KEY``, or
+            ``OPENAI_API_KEY``.
+        base_url: API root, without a trailing slash.
+        timeout_s: Socket timeout for the streaming request.
+        prefix: Resume text stored by ``apply_resume``.
+        tokens_emitted: Rough count of text yielded to the caller.
+        tokens_wasted: Rough count charged by ``abort``.
+        aborted: Whether ``abort`` was called during the current request.
+        last_usage: Usage object from the completed response, if any.
+        response_id: Provider response id for the current stream.
+        cancel_ok: Whether the cancel HTTP call reported success.
     """
 
     def __init__(
@@ -38,6 +62,21 @@ class LiveLlm:
         base_url: str | None = None,
         timeout_s: float = 90.0,
     ) -> None:
+        """Store the prompt and the provider settings.
+
+        Args:
+            user_prompt: Task text. A later resume prefix is appended to
+                it and does not replace it.
+            model: Model name. Defaults to ``LLM_MODEL`` or
+                ``gpt-5.6-luna``.
+            effort: Reasoning effort. Defaults to ``LLM_REASONING_EFFORT``
+                or ``"none"``.
+            api_key: Bearer token. Defaults to ``LLM_API_KEY`` or
+                ``OPENAI_API_KEY``.
+            base_url: API root. Defaults to ``LLM_BASE_URL`` or the
+                OpenAI API.
+            timeout_s: Socket timeout for the streaming request.
+        """
         self.user_prompt = user_prompt
         self.model = model or os.environ.get("LLM_MODEL", "gpt-5.6-luna")
         self.effort = effort or os.environ.get("LLM_REASONING_EFFORT", "none")
@@ -55,9 +94,30 @@ class LiveLlm:
         self._request_tokens = 0
 
     def generate(self) -> str:
+        """Return the specialist document for this request.
+
+        Returns:
+            The streamed text joined into one string.
+
+        Raises:
+            LiveLlmError: No API key is configured, or the provider
+                returns an HTTP error.
+        """
         return "".join(self.iter_deltas())
 
     def iter_deltas(self):
+        """Stream the specialist document for this request.
+
+        The request sets ``background`` false, so generation runs in the
+        foreground. ``abort`` stops the iteration and closes the stream.
+
+        Yields:
+            Text deltas from the provider.
+
+        Raises:
+            LiveLlmError: No API key is configured, or the provider
+                returns an HTTP error.
+        """
         if not self.api_key:
             raise LiveLlmError("missing OPENAI_API_KEY or LLM_API_KEY")
         self.aborted = False
@@ -112,7 +172,11 @@ class LiveLlm:
             self._close_stream()
 
     def abort(self) -> None:
-        """Close the stream and POST cancel. ``cancel_ok`` is HTTP wiring, not a stop proof."""
+        """Close the stream and post cancel.
+
+        ``cancel_ok`` records whether that HTTP call succeeded. It is not
+        proof that the provider stopped generating.
+        """
         self.aborted = True
         wasted = max(1, self._request_tokens)
         self._close_stream()
@@ -121,9 +185,18 @@ class LiveLlm:
         self.tokens_wasted += wasted
 
     def apply_resume(self, envelope: str | None) -> None:
+        """Store the resume prefix for the next request.
+
+        The next stream sends the original prompt plus this prefix. The
+        provider cache is not rewound.
+
+        Args:
+            envelope: Resume text from the floor. ``None`` clears it.
+        """
         self.prefix = envelope or None
 
     def _close_stream(self) -> None:
+        """Close the current response stream, ignoring a second close."""
         stream = self._stream
         self._stream = None
         if stream is None:
@@ -135,6 +208,12 @@ class LiveLlm:
 
 
 def load_dotenv(path: str | Path = ".env") -> None:
+    """Load environment variables that are not already set.
+
+    Args:
+        path: File of ``KEY=value`` lines. Missing files are ignored.
+            Blank lines and ``#`` comments are skipped.
+    """
     env_path = Path(path)
     if not env_path.is_file():
         return
@@ -156,6 +235,20 @@ def _responses_request(
     user: str,
     stream: bool,
 ) -> urllib.request.Request:
+    """Build a streaming or blocking Responses request.
+
+    Args:
+        base_url: API root, without a trailing slash.
+        api_key: Bearer token.
+        model: Model name.
+        effort: Reasoning effort.
+        instructions: System text for the specialist.
+        user: User text, including a resume prefix when one is stored.
+        stream: Whether the response should be server-sent events.
+
+    Returns:
+        A POST request for ``/responses``. ``background`` is false.
+    """
     body = {
         "model": model,
         "reasoning": {"effort": effort},
@@ -177,6 +270,18 @@ def _responses_request(
 
 
 def _cancel_response(base_url: str, api_key: str, response_id: str) -> bool:
+    """Post a cancel for one response.
+
+    Args:
+        base_url: API root.
+        api_key: Bearer token.
+        response_id: Provider id captured from the stream.
+
+    Returns:
+        True when the HTTP call succeeds or the payload says the response
+        is cancelled or completed. False on a network or HTTP error.
+        Success here does not prove generation stopped.
+    """
     req = urllib.request.Request(
         f"{base_url}/responses/{response_id}/cancel",
         method="POST",
@@ -199,6 +304,15 @@ def _cancel_response(base_url: str, api_key: str, response_id: str) -> bool:
 
 
 def _iter_sse(stream):
+    """Yield JSON events from a server-sent event stream.
+
+    Args:
+        stream: Readable response body.
+
+    Yields:
+        One dictionary per ``data:`` event. ``[DONE]`` ends the stream.
+        A line that is not JSON is skipped.
+    """
     data_lines: list[str] = []
     while True:
         raw = stream.readline()
@@ -231,6 +345,15 @@ def _iter_sse(stream):
 
 
 def _output_text(payload: dict) -> str:
+    """Read the assistant text from a Responses payload.
+
+    Args:
+        payload: JSON object returned by the provider.
+
+    Returns:
+        ``output_text`` when it is present. Otherwise the text parts of
+        message output. An empty string when neither is present.
+    """
     direct = payload.get("output_text")
     if isinstance(direct, str) and direct.strip():
         return direct
@@ -249,6 +372,14 @@ def _output_text(payload: dict) -> str:
 
 
 def _strip_fences(text: str) -> str:
+    """Remove one surrounding markdown fence.
+
+    Args:
+        text: Provider text that may start with a fence.
+
+    Returns:
+        The text without that fence.
+    """
     stripped = text.strip()
     stripped = re.sub(r"^```(?:xml)?\s*", "", stripped)
     stripped = re.sub(r"\s*```$", "", stripped)

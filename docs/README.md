@@ -14,7 +14,11 @@ The library gives a host application a small 1:1 thinking floor:
 2. A monitor observes those steps.
 3. An interrupt can **stop** an unsafe or unsupported path **and inject a
    correction** (`Patch`), then resume with a watermark.
-4. The host commits only the approved, watermarked result.
+4. An `Ok` verdict can also name a receiver: escalation to the next
+   specialist, consultation back to the same specialist, or takeover by an
+   editor or a human. `Escalation`, `Consult`, and `Takeover` compose that
+   package. The host opens the next session.
+5. The host commits only the approved, watermarked result.
 
 A full restart is the fallback. The intended default is to continue the
 reasoning process from the last accepted step.
@@ -46,7 +50,7 @@ Start with [Getting started](getting-started.md), then read
 ## Documentation map
 
 - [Getting started](getting-started.md) — install, run, and inspect a first session.
-- [Concepts](concepts.md) — semantic units, verdicts, correction, rollback, and tool safety.
+- [Concepts](concepts.md) — semantic units, verdicts, correction, rollback, named handoffs, and tool safety.
 - [Integrations](integrations.md) — native hosts and optional framework examples.
 - [Evaluation protocol](evaluation.md) — how claims are tested and compared.
 - [Results](results.md) — the current public evidence summary.
@@ -66,7 +70,9 @@ The current test suite supports contract-level claims about:
 - keeping framework integrations optional;
 - preserving the same floor when a host uses LangGraph, LangChain,
   LlamaIndex, CrewAI, or AutoGen labels;
-- mapping malformed supervisor verdicts to the neutral `Unknown` state.
+- mapping malformed supervisor verdicts to the neutral `Unknown` state;
+- handing kept work to a named receiver through escalation, consultation,
+  or takeover, without committing the unfinished answer.
 
 These are small, deterministic or sandboxed checks. They are not a
 production benchmark, a safety certification, or a comparison of language

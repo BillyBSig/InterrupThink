@@ -9,6 +9,15 @@ The example is a backend workflow, not a user interface and not a replacement
 for LangChain's conversation features. A short version is available in
 `examples/langchain_chat.py`.
 
+```mermaid
+flowchart TB
+  history[LangChain history] --> turn[Chat turn]
+  turn --> session[run_session]
+  session --> supervisor[Supervisor]
+  supervisor -->|claim accepted| next[Reply is stored for the next turn]
+  supervisor -->|unsupported claim| held[That claim is not sent on]
+```
+
 ```python
 from chat import run_chat
 
