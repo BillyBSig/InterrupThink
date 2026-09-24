@@ -30,7 +30,7 @@ flowchart TB
 ```
 
 | Folder | What it demonstrates |
-|--------|--------|------|
+|--------|----------------------|
 | [`freeze-write/`](freeze-write/) | Check a release-freeze claim before writing a file |
 | [`two-specialists/`](two-specialists/) | Pass reviewed information from one specialist to a second specialist |
 | [`stale-retrieve/`](stale-retrieve/) | Prevent an outdated retrieved document from driving an action |
