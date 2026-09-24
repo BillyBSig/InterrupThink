@@ -4,9 +4,12 @@
 
 [English](README.md) · [Bahasa Indonesia](README.id.md)
 
-Supervisor dapat **menginterupsi** specialist pada batas `ThoughtUnit` dan
-**mengoreksi** alur penalarannya—bukan sekadar membatalkan, dan bukan pada
-batas token mentah.
+Pemeriksaan pada output akhir dapat menyembunyikan jawaban yang keliru, tetapi
+tidak menunjukkan premise mana yang perlu diperbaiki sebelum premise itu
+mengarahkan tool, handoff, atau turn chat berikutnya. InterrupThink
+memungkinkan supervisor **menginterupsi** specialist pada batas `ThoughtUnit`
+yang dapat diperiksa dan **mengoreksi** jalur penalarannya—bukan sekadar
+membatalkan proses, dan bukan pula pada batas token mentah.
 
 InterrupThink adalah library eksperimental, bukan produk atau layanan hosted.
 
@@ -71,14 +74,51 @@ uv build --wheel
 uv pip install --offline --no-index dist/interrupthink-0.0.1-py3-none-any.whl
 ```
 
+## Mengapa ini diperlukan
+
+Language model dapat menghasilkan jawaban yang terdengar meyakinkan, meskipun
+jawaban itu bertumpu pada informasi yang usang atau belum lengkap. Risikonya
+bertambah ketika jawaban bukan akhir dari pekerjaan. Dalam chat, klaim yang
+salah dapat tersimpan di history dan memengaruhi turn berikutnya. Dalam
+workflow, klaim itu dapat mengarah ke tindakan tool atau diteruskan ke
+specialist lain.
+
+Bayangkan assistant rilis membaca catatan lama yang menyebut sebuah rilis telah
+disetujui. Assistant itu dapat menyiapkan publish, lalu menyatakan bahwa
+publish aman dilakukan. Pemeriksaan pada output akhir masih dapat menolak
+jawaban yang terlihat. Namun, pemeriksaan itu sendiri belum memberi aplikasi
+checkpoint yang jelas untuk klaim persetujuan, tindakan yang direncanakan, dan
+pekerjaan yang sebenarnya sudah benar. Pilihan yang biasa diambil adalah
+membuang seluruh jawaban lalu mengulang dari awal.
+
+InterrupThink menambahkan checkpoint tersebut sebelum aplikasi meng-commit
+jawaban atau tindakan. Aplikasi mengeluarkan langkah tugas kecil yang
+terstruktur; supervisor memeriksanya; lalu aplikasi dapat menghentikan jalur
+yang tidak didukung atau memberikan fakta yang kurang dan melanjutkan dari
+langkah terakhir yang diterima. Supervisor bukan penentu kebenaran mutlak:
+ia bekerja berdasarkan bukti dan kebijakan yang diberikan aplikasi, sementara
+`Unknown` tetap menjadi default ketika buktinya tidak memadai.
+
 ## Cara kerjanya
 
-Aplikasi host tetap memiliki graph, role, atau tool-nya sendiri. Thinking floor
-adalah `run_session`: specialist menghasilkan langkah `ThoughtUnit` yang dapat
-diperiksa, supervisor memantau langkah-langkah itu, dan tool atau jawaban hanya
-di-commit jika diizinkan. Cut dapat **memblokir** tindakan tidak aman sekaligus
-**mengoreksi** jalurnya, lalu melanjutkan dengan rollback tanpa memulai ulang
-dari awal.
+### Periksa keputusan sebelum di-commit
+
+Aplikasi host tetap memiliki graph, role, atau tool-nya sendiri. `run_session`
+menjadi batas checkpoint: specialist menghasilkan langkah `ThoughtUnit` yang
+dapat diperiksa, supervisor memantaunya, dan tool atau jawaban hanya
+di-commit jika diizinkan. Gate pada output akhir tetap berguna; floor ini
+memberinya konteks yang lebih awal dan terstruktur.
+
+Dengan demikian, tersedia dua respons. Floor dapat **memblokir** tindakan
+tidak aman atau jawaban yang tidak didukung. Floor juga dapat **mengoreksi**
+jalurnya: membuang bagian akhir yang ditolak, menambahkan `Patch`, lalu
+melanjutkan dari langkah terakhir yang diterima tanpa memulai ulang seluruh
+tugas. Pola ini penting ketika host dapat membawa klaim yang salah ke turn
+chat berikutnya, panggilan tool, atau handoff bernama.
+
+“Penalaran” di sini berarti langkah tugas terstruktur yang memang dipilih
+aplikasi untuk dikeluarkan, misalnya plan, premise, claim, atau tool intent.
+Ini bukan mekanisme untuk membaca atau mengirim hidden chain-of-thought.
 
 Default setelah cut adalah **rollback**: sisipkan koreksi, buang bagian akhir
 yang tidak valid, lalu lanjutkan dari langkah terakhir yang diterima. Restart

@@ -78,7 +78,7 @@ Test suite saat ini mendukung klaim tingkat kontrak tentang:
 
 Ini adalah pemeriksaan kecil yang deterministik atau berada dalam sandbox.
 Keduanya bukan benchmark produksi, sertifikasi keamanan, atau perbandingan
-model bahasa.
+language model.
 
 ## Cakupan dan hal yang tidak dituju
 

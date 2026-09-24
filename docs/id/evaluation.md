@@ -14,7 +14,7 @@ Evaluasi saat ini mengajukan dua pertanyaan kontrak:
 > atau memulai ulang dari awal?
 
 Ini adalah verifikasi kontrak untuk library floor, bukan benchmark kualitas
-model bahasa, latency, throughput, atau performa agent secara umum.
+language model, latency, throughput, atau performa agent secara umum.
 
 Pemeriksaan kontrak tambahan mencakup penerima bernama. Escalation,
 konsultasi, dan takeover mempertahankan status `Ok` serta mencantumkan nama

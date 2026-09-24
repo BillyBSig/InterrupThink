@@ -4,7 +4,11 @@
 
 [English](README.md) · [Bahasa Indonesia](README.id.md)
 
-A supervisor can **interrupt** a specialist at **ThoughtUnit** boundaries and **correct** the reasoning path — not only cancel it, and not at raw tokens.
+A final-output check can hide a bad answer, but it cannot show which premise
+needs repair before that premise steers a tool, a handoff, or the next chat
+turn. InterrupThink lets a supervisor **interrupt** a specialist at
+checkable **ThoughtUnit** boundaries and **correct** the reasoning path — not
+only cancel it, and not at raw tokens.
 
 This is an experimental library, not a product or a hosted service.
 
@@ -65,13 +69,47 @@ uv build --wheel
 uv pip install --offline --no-index dist/interrupthink-0.0.1-py3-none-any.whl
 ```
 
+## Why this exists
+
+Language models can produce a convincing answer even when it rests on stale or
+missing information. That matters more when an answer does not end the work.
+In a chat, a wrong claim can become history that shapes the next turn. In a
+workflow, it can lead to a proposed tool action or be passed to another
+specialist.
+
+Imagine a release assistant that reads an old note saying a release is
+approved. It may prepare to publish, then report that publishing is safe. A
+final-output review can still reject the visible answer. However, by itself it
+does not give the application a clear checkpoint for the approval claim, the
+planned action, and the work that was already sound. The usual fallback is to
+discard the whole response and start again.
+
+InterrupThink adds those checkpoints before the application commits an answer
+or action. The application emits small, structured task steps; a supervisor
+checks them; and the application can either stop an unsupported path or supply
+the missing fact and continue from the last accepted step. The supervisor is
+not a truth oracle: it works from the evidence and policy the application
+provides, and `Unknown` remains the default when that evidence is insufficient.
+
 ## How it works
 
-The host application keeps its own graph, roles, or tools. The thinking floor
-is `run_session`: the specialist emits checkable `ThoughtUnit` steps, the
-supervisor monitors those steps, and a tool or answer is committed only when
-allowed. A cut can **block** an unsafe action **and correct** the path, then
-resume with rollback instead of restarting from scratch.
+### Check decisions before committing them
+
+The host application keeps its own graph, roles, or tools. `run_session` is
+the checkpoint boundary: the specialist emits checkable `ThoughtUnit` steps,
+the supervisor monitors them, and a tool or answer is committed only when
+allowed. A normal final-output gate remains useful too; this floor gives it
+earlier, structured context.
+
+This makes two responses possible. The floor can **block** an unsafe action or
+unsupported answer. Or it can **correct** the path: drop the rejected tail,
+add a `Patch`, and resume from the last accepted step instead of restarting
+the whole task. This is especially useful when the host would otherwise carry
+a wrong claim into a later chat turn, a tool call, or a named handoff.
+
+“Reasoning” here means structured task steps the application chooses to emit,
+such as a plan, premise, claim, or tool intent. It is not a mechanism for
+reading or transporting hidden chain-of-thought.
 
 The default after a cut is **rollback**: inject a correction, drop the invalid tail, and continue from the last accepted step. A full restart is the fallback. The monitor default is `Unknown` (do not cut). Import the package as `interrupthink`.
 
