@@ -1,4 +1,4 @@
-"""T4.82 longer prefix. No provider. No second model."""
+"""Longer prefix without a provider call. One model only."""
 
 from pathlib import Path
 

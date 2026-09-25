@@ -1,4 +1,4 @@
-"""T4.81 protocol lock. No provider call. Not a live referee."""
+"""Protocol lock for the live compare path. No provider call."""
 
 from pathlib import Path
 
