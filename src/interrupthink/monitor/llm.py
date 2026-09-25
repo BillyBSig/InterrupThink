@@ -8,9 +8,9 @@ import urllib.request
 from collections.abc import Callable
 from typing import Any
 
-from src.monitor.verdict import STATUSES, parse_supervisor_payload, supervisor_text_format
-from src.parse.steps import ThoughtUnit
-from src.runtime.events import Patch, Verdict
+from interrupthink.monitor.verdict import STATUSES, parse_supervisor_payload, supervisor_text_format
+from interrupthink.parse.steps import ThoughtUnit
+from interrupthink.runtime.events import Patch, Verdict
 
 ASKABLE = frozenset({"premise", "claim", "tool_intent", "answer_draft"})
 

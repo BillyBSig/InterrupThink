@@ -1,7 +1,7 @@
 import pytest
 
 from interrupthink import SessionError
-from src.parse.assemble import StepAssembler, answer_text, is_answer_fragment
+from interrupthink.parse.assemble import StepAssembler, answer_text, is_answer_fragment
 
 
 def test_assembler_yields_complete_steps_only():

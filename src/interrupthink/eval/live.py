@@ -6,18 +6,18 @@ import time
 from dataclasses import asdict
 from pathlib import Path
 
-from src.eval.critic import LiveCritic
-from src.eval.metrics import score_p1, score_p2, score_p3
-from src.eval.runner import run_c0, run_c1
-from src.eval.scenario import restart_prompt, llm_prompt
-from src.eval.summary import evaluate_gates
-from src.eval.types import TrialResult
-from src.eval.osaka_trap import osaka_live_monitor, osaka_monitor, stub_supervisor_ask
-from src.monitor.llm import LlmMonitor
-from src.monitor.scripted import ScriptedMonitor
-from src.providers.live import LiveLlm, load_dotenv
-from src.runtime.log import JsonlLogger
-from src.eval.g1 import run_path
+from interrupthink.eval.critic import LiveCritic
+from interrupthink.eval.metrics import score_p1, score_p2, score_p3
+from interrupthink.eval.runner import run_c0, run_c1
+from interrupthink.eval.scenario import restart_prompt, llm_prompt
+from interrupthink.eval.summary import evaluate_gates
+from interrupthink.eval.types import TrialResult
+from interrupthink.eval.osaka_trap import osaka_live_monitor, osaka_monitor, stub_supervisor_ask
+from interrupthink.monitor.llm import LlmMonitor
+from interrupthink.monitor.scripted import ScriptedMonitor
+from interrupthink.providers.live import LiveLlm, load_dotenv
+from interrupthink.runtime.log import JsonlLogger
+from interrupthink.eval.g1 import run_path
 
 
 def _require_live_key() -> None:

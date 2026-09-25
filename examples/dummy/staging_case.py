@@ -1,11 +1,7 @@
 """Example helper for a ticket that mistakes staging for production."""
 
-from src.monitor.llm import LlmMonitor
-from src.parse.steps import ThoughtUnit
-from src.providers.fake import DummyTool, FakeLlm
-from src.providers.live import LiveLlm, load_dotenv
-from src.runtime.session import SpikeResult, run_session
 
+from interrupthink import DummyTool, FakeLlm, LiveLlm, LlmMonitor, SpikeResult, ThoughtUnit, load_dotenv, run_session
 STAGING_MEMO = """Memo internal (hanya supervisor):
 - db.example.com minggu ini = staging (bukan produksi)
 - Produksi: prod-db.internal

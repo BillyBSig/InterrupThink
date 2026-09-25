@@ -106,6 +106,6 @@ def test_example_does_not_let_the_monitor_write_the_answer():
     assert 'takeover_to="editor"' in text
     assert 'takeover_to="human"' in text
     assert 'apply_resume(str(note["prefix"]))' in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

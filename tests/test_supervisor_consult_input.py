@@ -72,6 +72,6 @@ def test_checker_reads_the_package_and_the_same_specialist_continues():
 def test_example_keeps_composition_on_the_host():
     text = (REPO / "examples" / "dummy" / "supervisor_consult_input.py").read_text(encoding="utf-8")
     assert "def receiver_input" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

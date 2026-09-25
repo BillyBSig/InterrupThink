@@ -5,9 +5,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from xml.sax.saxutils import escape
 
-from src.parse.steps import ThoughtUnit
-from src.runtime.events import Patch, RuntimeEvent, Verdict
-from src.runtime.watermark import Watermarks
+from interrupthink.parse.steps import ThoughtUnit
+from interrupthink.runtime.events import Patch, RuntimeEvent, Verdict
+from interrupthink.runtime.watermark import Watermarks
 
 
 @dataclass

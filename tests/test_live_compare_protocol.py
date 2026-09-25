@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from src.eval import compare
-from src.eval.live_compare import (
+from interrupthink.eval import compare
+from interrupthink.eval.live_compare import (
     PROTOCOL,
     make_prefix_task,
     run_clean_condition,

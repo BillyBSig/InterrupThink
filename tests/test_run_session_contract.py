@@ -5,8 +5,8 @@ import json
 import pytest
 
 from interrupthink import DummyTool, FakeLlm, JsonlLogger, ScriptedMonitor, SessionError, run_session
-from src.eval.g1 import INTERRUPT_XML_1, INTERRUPT_XML_2, run_path
-from src.runtime.events import Patch, Verdict
+from interrupthink.eval.g1 import INTERRUPT_XML_1, INTERRUPT_XML_2, run_path
+from interrupthink.runtime.events import Patch, Verdict
 
 KEEP_PROMPT = "publish the changelog if approved"
 WRONG = """

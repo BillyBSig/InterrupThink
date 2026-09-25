@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from src.parse.steps import parse_steps
-from src.providers.fake import FakeLlm
-from src.runtime.log import JsonlLogger
-from src.eval.g1 import INTERRUPT_XML_1, INTERRUPT_XML_2, run_path
+from interrupthink.parse.steps import parse_steps
+from interrupthink.providers.fake import FakeLlm
+from interrupthink.runtime.log import JsonlLogger
+from interrupthink.eval.g1 import INTERRUPT_XML_1, INTERRUPT_XML_2, run_path
 
 
 @pytest.mark.parametrize("n", [1, 2])

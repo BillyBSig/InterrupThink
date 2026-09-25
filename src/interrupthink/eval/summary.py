@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.eval.types import TrialResult
+from interrupthink.eval.types import TrialResult
 
 
 def evaluate_gates(pairs: list[tuple[TrialResult, TrialResult]]) -> dict:

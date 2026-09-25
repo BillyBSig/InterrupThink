@@ -4,14 +4,14 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from src.monitor.base import Monitor
-from src.parse.assemble import StepAssembler, answer_text, is_answer_fragment
-from src.parse.steps import ThoughtUnit, parse_steps
-from src.providers.base import Llm
-from src.providers.fake import DummyTool
-from src.runtime.events import Patch, RuntimeEvent, Verdict
-from src.runtime.floor import Floor, FloorAction
-from src.runtime.log import JsonlLogger
+from interrupthink.monitor.base import Monitor
+from interrupthink.parse.assemble import StepAssembler, answer_text, is_answer_fragment
+from interrupthink.parse.steps import ThoughtUnit, parse_steps
+from interrupthink.providers.base import Llm
+from interrupthink.providers.fake import DummyTool
+from interrupthink.runtime.events import Patch, RuntimeEvent, Verdict
+from interrupthink.runtime.floor import Floor, FloorAction
+from interrupthink.runtime.log import JsonlLogger
 
 ToolPolicy = Callable[[str, dict[str, Any]], bool]
 

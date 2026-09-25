@@ -1,5 +1,5 @@
-from src.eval.metrics import score_false_interrupt, score_p1, score_p2, score_p3
-from src.eval.runner import run_c0, run_c1
+from interrupthink.eval.metrics import score_false_interrupt, score_p1, score_p2, score_p3
+from interrupthink.eval.runner import run_c0, run_c1
 
 
 def test_p1_accepts_delay_with_fy_rolling():

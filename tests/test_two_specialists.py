@@ -85,7 +85,7 @@ def test_two_sessions_two_tool_sets(tmp_path: Path):
 
 def test_case_is_native_host_not_framework_or_package_retriever():
     text = (REPO / "cases" / "two-specialists" / "run.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
     assert "run_session" in text

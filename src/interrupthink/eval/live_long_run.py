@@ -12,11 +12,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from interrupthink import JsonlLogger, SandboxWriteTool, run_session
-from src.eval.live_compare import PROTOCOL, PrefixTask
-from src.eval.live_prefix_run import _early_prefix_monitor
-from src.eval.live_provider_run import prose_correction
-from src.providers.live import LiveLlm, load_dotenv, sandbox_write_tool
-from src.runtime.session import SessionError
+from interrupthink.eval.live_compare import PROTOCOL, PrefixTask
+from interrupthink.eval.live_prefix_run import _early_prefix_monitor
+from interrupthink.eval.live_provider_run import prose_correction
+from interrupthink.providers.live import LiveLlm, load_dotenv, sandbox_write_tool
+from interrupthink.runtime.session import SessionError
 
 # Locked before the counted run. Reported separately. Not pooled.
 MODELS = ("gpt-5.4-mini", "gpt-5.6-luna", "gpt-5.6-terra")

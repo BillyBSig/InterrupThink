@@ -3,15 +3,15 @@ from __future__ import annotations
 import time
 from typing import Protocol
 
-from src.eval.metrics import score_p1, score_p2, score_p3
-from src.eval.scenario import C0_PASS1_XML, C0_PASS2_XML, C1_PASS1_XML, C1_PASS2_XML, STUB_CRITIQUE
-from src.eval.types import TrialResult
-from src.eval.osaka_trap import osaka_monitor, stub_supervisor_ask
-from src.monitor.llm import LlmMonitor
-from src.monitor.scripted import ScriptedMonitor
-from src.providers.fake import FakeLlm
-from src.runtime.log import JsonlLogger
-from src.eval.g1 import run_path
+from interrupthink.eval.metrics import score_p1, score_p2, score_p3
+from interrupthink.eval.scenario import C0_PASS1_XML, C0_PASS2_XML, C1_PASS1_XML, C1_PASS2_XML, STUB_CRITIQUE
+from interrupthink.eval.types import TrialResult
+from interrupthink.eval.osaka_trap import osaka_monitor, stub_supervisor_ask
+from interrupthink.monitor.llm import LlmMonitor
+from interrupthink.monitor.scripted import ScriptedMonitor
+from interrupthink.providers.fake import FakeLlm
+from interrupthink.runtime.log import JsonlLogger
+from interrupthink.eval.g1 import run_path
 
 
 class Critic(Protocol):

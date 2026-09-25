@@ -25,8 +25,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from interrupthink import JsonlLogger, LlmMonitor, Patch, Verdict, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import JsonlLogger, LiveLlm, LlmMonitor, Patch, Verdict, load_dotenv, run_session
 
 CASE_DIR = Path(__file__).resolve().parent
 DEFAULT_SANDBOX = CASE_DIR / "tmp"

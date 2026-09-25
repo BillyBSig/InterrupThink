@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from src.parse.steps import ThoughtUnit
-from src.runtime.events import Verdict
+from interrupthink.parse.steps import ThoughtUnit
+from interrupthink.runtime.events import Verdict
 
 
 class Monitor(Protocol):

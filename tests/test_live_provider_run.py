@@ -1,8 +1,8 @@
 """The live runner stays out of pytest. No provider call."""
 
-from src.eval import live_compare
-from src.eval.live_compare import make_tasks
-from src.eval.live_provider_run import STALE_PROMPT, EmphasizedLiveLlm
+from interrupthink.eval import live_compare
+from interrupthink.eval.live_compare import make_tasks
+from interrupthink.eval.live_provider_run import STALE_PROMPT, EmphasizedLiveLlm
 
 
 def test_prompt_is_locked_and_names_only_the_stale_file():

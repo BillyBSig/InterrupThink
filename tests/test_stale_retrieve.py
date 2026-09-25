@@ -78,7 +78,7 @@ def test_one_session_not_two_specialists(tmp_path: Path):
 
 def test_case_is_fixture_not_vector_db_or_package_retriever():
     text = (REPO / "cases" / "stale-retrieve" / "run.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "SandboxWriteTool" in text
     assert "LiveLlm" in text

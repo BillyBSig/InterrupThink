@@ -90,7 +90,7 @@ def test_example_does_not_open_a_second_agent():
     assert 'human_input_mode="NEVER"' in text
     assert "initiate_chat" not in text
     assert "GroupChat" not in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "autogen" not in pyproject
     assert 'name = "autogen"' not in lock

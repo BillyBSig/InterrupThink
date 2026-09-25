@@ -235,11 +235,7 @@ specialist yang sama seperti sesi pertama.
 
 Lokasi pemanggilan:
 [`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py).
-Demo live:
-[`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py),
-[`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py).
-Cookbook: [`cases/langchain-rule/`](cases/langchain-rule/),
-[`cases/llamaindex-page/`](cases/llamaindex-page/).
+Demo live: [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py), [`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py). Cookbook: [`cases/langchain-rule/`](cases/langchain-rule/), [`cases/llamaindex-page/`](cases/llamaindex-page/).
 
 ### Takeover
 

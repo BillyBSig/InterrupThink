@@ -1,7 +1,7 @@
-from src.eval.osaka_trap import uses_public_spike_as_demand
-from src.parse.steps import ThoughtUnit, parse_steps
-from src.runtime.events import Patch, Verdict
-from src.runtime.floor import Floor
+from interrupthink.eval.osaka_trap import uses_public_spike_as_demand
+from interrupthink.parse.steps import ThoughtUnit, parse_steps
+from interrupthink.runtime.events import Patch, Verdict
+from interrupthink.runtime.floor import Floor
 
 
 def _unit(seq: int, kind: str, text: str, parent: str = "tu_00") -> ThoughtUnit:

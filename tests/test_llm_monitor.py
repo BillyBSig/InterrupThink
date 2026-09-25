@@ -1,6 +1,6 @@
-from src.eval.osaka_trap import osaka_monitor, stub_supervisor_ask
-from src.monitor.llm import LlmMonitor
-from src.parse.steps import ThoughtUnit
+from interrupthink.eval.osaka_trap import osaka_monitor, stub_supervisor_ask
+from interrupthink.monitor.llm import LlmMonitor
+from interrupthink.parse.steps import ThoughtUnit
 
 
 def _osaka_stub() -> LlmMonitor:
@@ -125,7 +125,7 @@ def test_fy_rolling_already_used_is_unknown():
 
 
 def test_parse_supervisor_payload_accepts_fenced_json():
-    from src.monitor.verdict import parse_supervisor_payload
+    from interrupthink.monitor.verdict import parse_supervisor_payload
 
     payload = parse_supervisor_payload(
         """```json
@@ -138,7 +138,7 @@ def test_parse_supervisor_payload_accepts_fenced_json():
 
 
 def test_parse_supervisor_payload_garbage_and_bad_status_are_unknown():
-    from src.monitor.verdict import parse_supervisor_payload
+    from interrupthink.monitor.verdict import parse_supervisor_payload
 
     junk = parse_supervisor_payload("not json at all")
     assert junk["status"] == "Unknown"
@@ -147,7 +147,7 @@ def test_parse_supervisor_payload_garbage_and_bad_status_are_unknown():
 
 
 def test_supervisor_request_uses_json_schema_format():
-    from src.monitor.llm import responses_body
+    from interrupthink.monitor.llm import responses_body
 
     body = responses_body(
         model="x",
@@ -183,24 +183,24 @@ def test_pydantic_is_not_a_require_dependency():
 def test_llm_monitor_core_has_no_osaka_trap_defaults():
     from pathlib import Path
 
-    text = (Path(__file__).resolve().parents[1] / "src" / "monitor" / "llm.py").read_text(
+    text = (Path(__file__).resolve().parents[1] / "src" / "interrupthink" / "monitor" / "llm.py").read_text(
         encoding="utf-8"
     )
     assert "Osaka Q3" not in text
     assert "FY rolling -4%" not in text
     assert "uses_public_spike" not in text
     assert "stub_supervisor_ask" not in text
-    assert "from src.eval.scenario import" not in text
+    assert "from interrupthink.eval.scenario import" not in text
 
 
 def test_live_provider_has_no_osaka_or_eval_defaults():
     from pathlib import Path
 
-    text = (Path(__file__).resolve().parents[1] / "src" / "providers" / "live.py").read_text(
+    text = (Path(__file__).resolve().parents[1] / "src" / "interrupthink" / "providers" / "live.py").read_text(
         encoding="utf-8"
     )
     assert "osaka_trap" not in text
-    assert "from src.eval" not in text
+    assert "from interrupthink.eval" not in text
     assert "Osaka Q3" not in text
     assert "HAPPY_USER_PROMPT" not in text
     assert "INTERRUPT_USER_PROMPT" not in text
@@ -209,12 +209,12 @@ def test_live_provider_has_no_osaka_or_eval_defaults():
 def test_runtime_core_has_no_eval_or_osaka_trap():
     from pathlib import Path
 
-    root = Path(__file__).resolve().parents[1] / "src"
+    root = Path(__file__).resolve().parents[1] / "src" / "interrupthink"
     session = (root / "runtime" / "session.py").read_text(encoding="utf-8")
     floor = (root / "runtime" / "floor.py").read_text(encoding="utf-8")
     scripted = (root / "monitor" / "scripted.py").read_text(encoding="utf-8")
     for text in (session, floor, scripted):
-        assert "from src.eval" not in text
+        assert "from interrupthink.eval" not in text
         assert "osaka_trap" not in text
         assert "Q3 Japan" not in text
         assert "g1_live_interrupt_monitor" not in text

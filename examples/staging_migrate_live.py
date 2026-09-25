@@ -27,12 +27,13 @@ import json
 import sys
 from pathlib import Path
 
+from interrupthink import JsonlLogger
+
 _DUMMY = Path(__file__).resolve().parent / "dummy"
 if str(_DUMMY) not in sys.path:
     sys.path.insert(0, str(_DUMMY))
 
 from staging_case import run_staging_live  # noqa: E402
-from src.runtime.log import JsonlLogger  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:

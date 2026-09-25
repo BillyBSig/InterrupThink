@@ -24,13 +24,13 @@ PUBLIC_SCAN_ROOTS = (
     ".env.example",
     "cases",
     "examples",
-    "interrupthink",
     "tests",
     "src/README.md",
-    "src/parse",
-    "src/runtime",
-    "src/monitor",
-    "src/providers",
+    "src/interrupthink/__init__.py",
+    "src/interrupthink/parse",
+    "src/interrupthink/runtime",
+    "src/interrupthink/monitor",
+    "src/interrupthink/providers",
 )
 SKIP_CONTENT_CHECK = {"PUBLICATION_POLICY.md", "check_publication.py"}
 SKIP_PUBLIC_MARKER_PREFIXES = ("test_eval_",)
@@ -172,7 +172,7 @@ def audit_sync_monitor() -> list[str]:
             continue
         if claim.search(path.read_text(encoding="utf-8")):
             errors.append(f"async overlap claim: {path.relative_to(ROOT)}")
-    monitor = (REPO_ROOT / "src" / "monitor" / "llm.py").read_text(encoding="utf-8")
+    monitor = (REPO_ROOT / "src" / "interrupthink" / "monitor" / "llm.py").read_text(encoding="utf-8")
     if "urlopen" not in monitor:
         errors.append("live monitor is not blocking HTTP")
     if re.search(r"\b(asyncio|threading\.Thread|concurrent\.futures)\b", monitor):
@@ -183,7 +183,7 @@ def audit_sync_monitor() -> list[str]:
 def audit_live_background() -> list[str]:
     """Live specialist must not request background continuation."""
     errors: list[str] = []
-    live = (REPO_ROOT / "src" / "providers" / "live.py").read_text(encoding="utf-8")
+    live = (REPO_ROOT / "src" / "interrupthink" / "providers" / "live.py").read_text(encoding="utf-8")
     fn = re.search(r"def _responses_request\([\s\S]+?\n\ndef ", live)
     body = fn.group(0) if fn else ""
     if re.search(r'"background"\s*:\s*(stream|True|true)\b', body):
@@ -245,7 +245,7 @@ def audit_unknown_commit() -> list[str]:
             continue
         if claim.search(path.read_text(encoding="utf-8")):
             errors.append(f"Unknown routed with Ok to commit: {path.relative_to(ROOT)}")
-    live = (REPO_ROOT / "src" / "providers" / "live.py").read_text(encoding="utf-8")
+    live = (REPO_ROOT / "src" / "interrupthink" / "providers" / "live.py").read_text(encoding="utf-8")
     fn = re.search(r"def _cancel_response\([\s\S]+?\n\ndef ", live)
     body = fn.group(0) if fn else ""
     if body.count("urlopen") != 1:

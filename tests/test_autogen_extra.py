@@ -115,7 +115,7 @@ def test_case_is_two_session_agents_not_package_or_mesh(tmp_path: Path):
     from autogen import ConversableAgent
 
     text = (CASE / "graph.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     adr = (REPO / "plan" / "decisions" / "0008-multi-specialist-pipeline.md").read_text(
         encoding="utf-8"
     )

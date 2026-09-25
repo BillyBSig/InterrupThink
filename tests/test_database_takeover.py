@@ -67,6 +67,6 @@ def test_example_uses_the_live_model_only():
     assert "LiveLlm" in text
     assert "FakeLlm" not in text
     assert "def receiver_input" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "langgraph" not in text.lower()

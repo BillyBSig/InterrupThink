@@ -1,6 +1,6 @@
 import pytest
 
-from src.parse.steps import ParseError, parse_steps
+from interrupthink.parse.steps import ParseError, parse_steps
 
 
 def test_happy_xml_sequential_ids_and_answer():

@@ -27,8 +27,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import JsonlLogger, LiveLlm, LlmMonitor, SandboxWriteTool, load_dotenv, run_session
 
 CASE_DIR = Path(__file__).resolve().parent
 FIXTURES = CASE_DIR.parent / "two-specialists" / "fixtures" / "policy"

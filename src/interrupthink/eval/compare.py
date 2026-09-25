@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Callable
 
 from interrupthink import FakeLlm, JsonlLogger, Patch, SandboxWriteTool, ScriptedMonitor, run_session
-from src.runtime.session import SessionError
+from interrupthink.runtime.session import SessionError
 
 # Locked 2026-09-21 before FakeLlm numbers. Do not change after results.
 PROTOCOL = {

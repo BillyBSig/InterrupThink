@@ -101,7 +101,7 @@ def test_langgraph_skip_or_t1_if_present(tmp_path: Path):
 
 def test_native_host_not_smtp_or_required_langgraph():
     text = (REPO / "cases" / "deny-answer-pipeline" / "run.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "run_session" in text
     assert "SandboxWriteTool" in text

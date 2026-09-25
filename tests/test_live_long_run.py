@@ -1,7 +1,7 @@
 """The three-note live runner stays out of pytest. No provider call."""
 
-from src.eval.live_compare import PROTOCOL
-from src.eval.live_long_run import MODELS, long_prompt, make_long_tasks
+from interrupthink.eval.live_compare import PROTOCOL
+from interrupthink.eval.live_long_run import MODELS, long_prompt, make_long_tasks
 
 
 def test_long_prompt_names_three_notes_before_the_stale_claim():
@@ -23,9 +23,9 @@ def test_three_models_are_locked_and_run_separately(monkeypatch, tmp_path):
     def capture(**kwargs):
         seen.append((kwargs["llm"].model, kwargs["monitor"].trigger_kinds, kwargs["llm"].user_prompt))
 
-    monkeypatch.setattr("src.eval.live_long_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_long_run.load_dotenv", lambda: None)
-    from src.eval.live_long_run import run_models
+    monkeypatch.setattr("interrupthink.eval.live_long_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_long_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_long_run import run_models
 
     summary = run_models(sandbox=tmp_path, n=1, models=MODELS)
     assert [item[0] for item in seen] == [
@@ -46,7 +46,7 @@ def test_three_models_are_locked_and_run_separately(monkeypatch, tmp_path):
 
 
 def test_resume_tells_the_model_the_notes_are_already_written(tmp_path):
-    from src.eval.live_long_run import LongProseLlm
+    from interrupthink.eval.live_long_run import LongProseLlm
 
     task = make_long_tasks(1)[0]
     llm = LongProseLlm(

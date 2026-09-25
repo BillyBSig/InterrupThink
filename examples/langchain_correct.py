@@ -29,8 +29,7 @@ from pathlib import Path
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import LiveLlm, LlmMonitor, SandboxWriteTool, load_dotenv, run_session
 
 TICKET = ChatPromptTemplate.from_messages(
     [

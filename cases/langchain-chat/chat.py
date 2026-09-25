@@ -8,8 +8,7 @@ from typing import Any
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from interrupthink import DummyTool, JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveLlm
+from interrupthink import DummyTool, JsonlLogger, LiveLlm, LlmMonitor, run_session
 
 from config import (
     ALLOWED,

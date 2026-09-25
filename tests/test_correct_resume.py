@@ -4,7 +4,7 @@ import importlib.util
 from pathlib import Path
 
 from interrupthink import DummyTool, FakeLlm, JsonlLogger, ScriptedMonitor, run_session
-from src.runtime.events import Patch, Verdict
+from interrupthink.runtime.events import Patch, Verdict
 
 REPO = Path(__file__).resolve().parents[1]
 

@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from src.eval.live_compare import PROTOCOL, _prefix_first
-from src.eval.live_prefix_run import (
+from interrupthink.eval.live_compare import PROTOCOL, _prefix_first
+from interrupthink.eval.live_prefix_run import (
     ProsePrefixLlm,
     clean_prompt,
     make_prefix_tasks,
@@ -11,7 +11,7 @@ from src.eval.live_prefix_run import (
     prose_wedge_prompt,
     wedge_prompt,
 )
-from src.eval.live_provider_run import STALE_PROMPT, prose_correction
+from interrupthink.eval.live_provider_run import STALE_PROMPT, prose_correction
 
 
 def test_wedge_prompt_writes_the_draft_before_the_stale_claim():
@@ -74,9 +74,9 @@ def test_explicit_model_is_forwarded_without_a_provider_call(monkeypatch, tmp_pa
     def capture(**kwargs):
         seen.append(kwargs["llm"].model)
 
-    monkeypatch.setattr("src.eval.live_prefix_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_prefix_run.load_dotenv", lambda: None)
-    from src.eval.live_prefix_run import run_family
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_prefix_run import run_family
 
     summary = run_family(
         sandbox=tmp_path,
@@ -91,8 +91,8 @@ def test_explicit_model_is_forwarded_without_a_provider_call(monkeypatch, tmp_pa
 
 
 def test_early_guard_fires_on_a_tool_intent_that_names_the_forbidden_path():
-    from src.eval.live_prefix_run import _early_prefix_monitor
-    from src.parse.steps import parse_steps
+    from interrupthink.eval.live_prefix_run import _early_prefix_monitor
+    from interrupthink.parse.steps import parse_steps
 
     task = make_prefix_tasks(1)[0]
     monitor = _early_prefix_monitor(task)
@@ -107,8 +107,8 @@ def test_early_guard_fires_on_a_tool_intent_that_names_the_forbidden_path():
 
 
 def test_early_guard_does_not_fire_on_the_draft_write():
-    from src.eval.live_prefix_run import _early_prefix_monitor
-    from src.parse.steps import parse_steps
+    from interrupthink.eval.live_prefix_run import _early_prefix_monitor
+    from interrupthink.parse.steps import parse_steps
 
     task = make_prefix_tasks(1)[0]
     monitor = _early_prefix_monitor(task)
@@ -126,9 +126,9 @@ def test_early_guard_is_opt_in_on_the_family_runner(monkeypatch, tmp_path):
     def capture(**kwargs):
         seen.append(kwargs["monitor"].trigger_kinds)
 
-    monkeypatch.setattr("src.eval.live_prefix_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_prefix_run.load_dotenv", lambda: None)
-    from src.eval.live_prefix_run import run_family
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_prefix_run import run_family
 
     run_family(
         sandbox=tmp_path / "old",
@@ -157,9 +157,9 @@ def test_only_clean_skips_the_contrast_and_hides_the_forbidden_name(monkeypatch,
     def capture(**kwargs):
         seen.append((kwargs["llm"].user_prompt, kwargs["monitor"].trigger_kinds))
 
-    monkeypatch.setattr("src.eval.live_prefix_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_prefix_run.load_dotenv", lambda: None)
-    from src.eval.live_prefix_run import run_family
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_prefix_run import run_family
 
     summary = run_family(
         sandbox=tmp_path,
@@ -207,9 +207,9 @@ def test_comparators_keep_the_prose_protocol_and_do_not_call_the_provider(monkey
         monitor = kwargs["monitor"]
         seen.append((kwargs["llm"].model, kwargs["llm"].user_prompt, monitor.trigger_kind, monitor.trigger_contains, kwargs["tool_policy"]))
 
-    monkeypatch.setattr("src.eval.live_prefix_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_prefix_run.load_dotenv", lambda: None)
-    from src.eval.live_prefix_run import run_comparators
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_prefix_run import run_comparators
 
     summary = run_comparators(sandbox=tmp_path, n=1, model="gpt-5.6-luna")
     assert [item[0] for item in seen] == ["gpt-5.6-luna", "gpt-5.6-luna", "gpt-5.6-luna"]
@@ -230,9 +230,9 @@ def test_contrast_can_omit_the_clean_twin(monkeypatch, tmp_path):
     def capture(**kwargs):
         seen.append(kwargs["llm"].user_prompt)
 
-    monkeypatch.setattr("src.eval.live_prefix_run.run_session", capture)
-    monkeypatch.setattr("src.eval.live_prefix_run.load_dotenv", lambda: None)
-    from src.eval.live_prefix_run import run_family
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.run_session", capture)
+    monkeypatch.setattr("interrupthink.eval.live_prefix_run.load_dotenv", lambda: None)
+    from interrupthink.eval.live_prefix_run import run_family
 
     summary = run_family(
         sandbox=tmp_path,

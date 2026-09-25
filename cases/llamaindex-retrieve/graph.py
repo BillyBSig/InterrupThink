@@ -6,8 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from interrupthink import JsonlLogger, LlmMonitor, run_session
-from src.providers.live import LiveLlm
+from interrupthink import JsonlLogger, LiveLlm, LlmMonitor, run_session
 
 from config import (
     CURRENT_TICKET,

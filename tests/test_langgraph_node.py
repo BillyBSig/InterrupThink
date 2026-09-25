@@ -75,7 +75,7 @@ def test_without_interrupt_tools_node_writes_hotfix(tmp_path: Path):
 
 def test_case_is_one_node_not_a_framework_package():
     text = (REPO / "cases" / "langgraph-node" / "run.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "LiveLlm" in text
     assert "execute_tools_when_ok=False" in text
     assert 'add_node("specialist"' in text

@@ -2,16 +2,16 @@ import pytest
 
 from pathlib import Path
 
-from src.cli.eval import main
-from src.eval.runner import run_c1
-from src.eval.summary import evaluate_gates
-from src.eval.types import TrialResult
+from interrupthink.cli.eval import main
+from interrupthink.eval.runner import run_c1
+from interrupthink.eval.summary import evaluate_gates
+from interrupthink.eval.types import TrialResult
 
 
-def test_eval_cli_stays_on_src_eval():
-    source = Path(__file__).resolve().parents[1] / "src" / "cli" / "eval.py"
+def test_eval_cli_imports_the_eval_package():
+    source = Path(__file__).resolve().parents[1] / "src" / "interrupthink" / "cli" / "eval.py"
     body = source.read_text(encoding="utf-8")
-    assert "from src.eval" in body
+    assert "from interrupthink.eval" in body
     assert "from interrupthink import run_path" not in body
     assert "interrupthink.run_path" not in body
 

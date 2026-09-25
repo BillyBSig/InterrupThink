@@ -1,4 +1,4 @@
-from src.eval.scenario import (
+from interrupthink.eval.scenario import (
     A_MEMO,
     STUB_CRITIQUE,
     interrupt_restart_prompt,
@@ -6,8 +6,8 @@ from src.eval.scenario import (
     resume_llm_prompt,
     llm_prompt,
 )
-from src.eval.summary import evaluate_gates
-from src.eval.types import TrialResult
+from interrupthink.eval.summary import evaluate_gates
+from interrupthink.eval.types import TrialResult
 
 
 def _trial(condition: str, p1: int, p2: int, p3: int, p4: float, fi: int = 0) -> TrialResult:

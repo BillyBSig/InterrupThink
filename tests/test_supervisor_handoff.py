@@ -66,6 +66,6 @@ def test_example_keeps_composition_on_the_host():
     text = (REPO / "examples" / "dummy" / "supervisor_handoff.py").read_text(encoding="utf-8")
     assert "def writer_input" in text
     assert "Write the public release note." in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

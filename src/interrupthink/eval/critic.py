@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 
-from src.eval.scenario import A_MEMO
-from src.monitor.llm import complete_text
+from interrupthink.eval.scenario import A_MEMO
+from interrupthink.monitor.llm import complete_text
 
 _CRITIC_INSTRUCTIONS = """You are supervisor A. You see ONLY B's final answer, not B's steps.
 You have an internal memo B does not have.

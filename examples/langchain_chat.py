@@ -28,8 +28,7 @@ from pathlib import Path
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from interrupthink import DummyTool, LlmMonitor, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import DummyTool, LiveLlm, LlmMonitor, load_dotenv, run_session
 
 TURN = ChatPromptTemplate.from_messages(
     [

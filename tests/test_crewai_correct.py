@@ -117,7 +117,7 @@ def test_case_is_one_role_not_pipe_or_kickoff(tmp_path: Path):
     from crewai import Process
 
     text = (CASE / "graph.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     pipe = (REPO / "cases" / "crewai-pipe" / "graph.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "LiveLlm" in text

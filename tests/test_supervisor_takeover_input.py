@@ -87,6 +87,6 @@ def test_example_keeps_composition_on_the_host():
     text = (REPO / "examples" / "dummy" / "supervisor_takeover_input.py").read_text(encoding="utf-8")
     assert "def receiver_input" in text
     assert 'takeover_to="human"' in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

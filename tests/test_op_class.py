@@ -103,7 +103,7 @@ def test_same_tool_name_not_safe_vs_dangerous():
     assert '.get("op")' in text
     assert "trigger_contains" not in text
     assert "class SandboxFileTool" in text
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "SandboxFileTool" not in public
     assert "ReversibleToolMonitor" not in public
 

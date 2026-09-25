@@ -29,8 +29,7 @@ from pathlib import Path
 
 from autogen import ConversableAgent
 
-from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import LiveLlm, LlmMonitor, SandboxWriteTool, load_dotenv, run_session
 
 TICKET = """Ticket host is production. Write production.txt.
 Write one step per line, and finish with an answer: line.

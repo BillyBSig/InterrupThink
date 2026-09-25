@@ -55,7 +55,7 @@ def test_from_result_reads_the_floor_event():
 
 
 def test_package_objects_do_not_open_a_session():
-    text = (REPO / "src" / "runtime" / "handoff.py").read_text(encoding="utf-8")
+    text = (REPO / "src" / "interrupthink" / "runtime" / "handoff.py").read_text(encoding="utf-8")
     assert "run_session" not in text
     assert "class Consult" in text
     assert "class Escalation" in text

@@ -50,7 +50,7 @@ class StepAssembler:
         if not _has_xml_tag(self.buf):
             lines, self.buf = _complete_lines(self.buf)
             if len(self.buf) > self.max_bytes:
-                from src.runtime.session import SessionError
+                from interrupthink.runtime.session import SessionError
 
                 raise SessionError(
                     f"stream assembler exceeded buffer cap ({self.max_bytes} bytes)"
@@ -74,7 +74,7 @@ class StepAssembler:
             out.append(taken.group(0))
             self.buf = text[taken.end() :]
         if len(self.buf) > self.max_bytes:
-            from src.runtime.session import SessionError
+            from interrupthink.runtime.session import SessionError
 
             raise SessionError(
                 f"stream assembler exceeded buffer cap ({self.max_bytes} bytes)"

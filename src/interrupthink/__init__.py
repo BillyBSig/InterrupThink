@@ -7,19 +7,19 @@ mid-stream. Restart is the fallback. The export list is not a frozen contract.
 Licensed under the Apache License, Version 2.0.
 """
 
-from src.monitor.base import Monitor
-from src.monitor.llm import ASKABLE, LlmMonitor
-from src.monitor.scripted import ScriptedMonitor
-from src.parse.steps import ParseError, ParsedDocument, ThoughtUnit, parse_steps
-from src.providers.base import Llm
-from src.providers.fake import DummyTool, FakeLlm
-from src.providers.live import LiveLlm
-from src.providers.sandbox import SandboxWriteTool
-from src.runtime.events import Patch, Verdict
-from src.runtime.handoff import Consult, Escalation, Takeover
-from src.runtime.floor import Floor
-from src.runtime.log import JsonlLogger
-from src.runtime.session import SessionError, SpikeResult, run_session
+from interrupthink.monitor.base import Monitor
+from interrupthink.monitor.llm import ASKABLE, LlmMonitor
+from interrupthink.monitor.scripted import ScriptedMonitor
+from interrupthink.parse.steps import ParseError, ParsedDocument, ThoughtUnit, parse_steps
+from interrupthink.providers.base import Llm
+from interrupthink.providers.fake import DummyTool, FakeLlm
+from interrupthink.providers.live import LiveLlm, load_dotenv
+from interrupthink.providers.sandbox import SandboxWriteTool
+from interrupthink.runtime.events import Patch, Verdict
+from interrupthink.runtime.handoff import Consult, Escalation, Takeover
+from interrupthink.runtime.floor import Floor
+from interrupthink.runtime.log import JsonlLogger
+from interrupthink.runtime.session import SessionError, SpikeResult, run_session
 
 # Export names for the package facade.
 PUBLIC_API = (
@@ -44,6 +44,7 @@ PUBLIC_API = (
     "Takeover",
     "ThoughtUnit",
     "Verdict",
+    "load_dotenv",
     "parse_steps",
     "run_session",
 )

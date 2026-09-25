@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.eval.scenario import A_MEMO
-from src.monitor.llm import LlmMonitor
-from src.parse.steps import ThoughtUnit
+from interrupthink.eval.scenario import A_MEMO
+from interrupthink.monitor.llm import LlmMonitor
+from interrupthink.parse.steps import ThoughtUnit
 
 OSAKA_SUPERVISOR_INSTRUCTIONS = """You are supervisor A. You have an internal memo the specialist B does not have.
 B only has public data (Osaka Q3 +42%). You know FY rolling 12-month volume is -4%, Q3 is a 6-week event, and warehouse decisions must use FY rolling.

@@ -117,7 +117,7 @@ def test_case_is_one_agent_not_pipe_or_userproxy(tmp_path: Path):
     from autogen import ConversableAgent
 
     text = (CASE / "graph.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     pipe = (REPO / "cases" / "autogen-pipe" / "graph.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "LiveLlm" in text

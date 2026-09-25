@@ -120,7 +120,7 @@ def test_example_crew_does_not_own_the_route():
     assert "allow_delegation=False" in text
     assert "Process.sequential" in text
     assert "kickoff(" not in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "crewai" not in pyproject
     assert 'name = "crewai"' not in lock

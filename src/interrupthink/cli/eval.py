@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from src.eval.live import run_paired_trials, run_stub_pairs
+from interrupthink.eval.live import run_paired_trials, run_stub_pairs
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -161,7 +161,7 @@ def test_example_graph_does_not_own_the_route():
     assert "def route(" in text
     assert 'add_node("dealer"' in text
     assert 'add_node("policy"' in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "from langgraph.checkpoint" not in text
     assert "ToolNode" not in text

@@ -43,6 +43,6 @@ def test_example_needs_no_key_and_names_the_policy():
     assert '"name":"publish"' in text
     assert "tool_policy=host_allows" in text
     assert "trigger_kind=None" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "OPENAI" not in text
     assert "subprocess" not in text

@@ -5,7 +5,7 @@ from examples.dummy.staging_case import (
     staging_monitor,
     stub_staging_ask,
 )
-from src.parse.steps import ThoughtUnit
+from interrupthink.parse.steps import ThoughtUnit
 
 
 def test_stub_staging_cuts_production_premise():

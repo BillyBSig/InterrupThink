@@ -3,10 +3,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from src.eval.g1 import G1_HAPPY_USER_PROMPT, run_path
-from src.eval.osaka_trap import OSAKA_INTERRUPT_B_PROMPT
-from src.providers.live import LiveLlm, load_dotenv
-from src.runtime.log import JsonlLogger
+from interrupthink.eval.g1 import G1_HAPPY_USER_PROMPT, run_path
+from interrupthink.eval.osaka_trap import OSAKA_INTERRUPT_B_PROMPT
+from interrupthink.providers.live import LiveLlm, load_dotenv
+from interrupthink.runtime.log import JsonlLogger
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -11,9 +11,9 @@ import time
 from pathlib import Path
 
 from interrupthink import JsonlLogger, Patch, SandboxWriteTool, ScriptedMonitor, run_session
-from src.eval.live_compare import PROTOCOL, WriteTask, make_tasks
-from src.providers.live import LiveLlm, load_dotenv
-from src.runtime.session import SessionError
+from interrupthink.eval.live_compare import PROTOCOL, WriteTask, make_tasks
+from interrupthink.providers.live import LiveLlm, load_dotenv
+from interrupthink.runtime.session import SessionError
 
 # Locked before the provider run. Do not edit after the first counted task.
 # Recycled after two probes. The first produced no claim or tool. The second

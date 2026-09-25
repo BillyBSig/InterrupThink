@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from interrupthink import FakeLlm, SandboxWriteTool, ScriptedMonitor
-from src.providers.live import load_dotenv
+from interrupthink.providers.live import load_dotenv
 
 REPO = Path(__file__).resolve().parents[1]
 

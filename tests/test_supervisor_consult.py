@@ -113,6 +113,6 @@ def test_unchecked_consult_does_not_resume_the_specialist():
 def test_example_does_not_let_the_specialist_call_its_peer():
     text = (REPO / "examples" / "dummy" / "supervisor_consult.py").read_text(encoding="utf-8")
     assert "consult_to=\"checker\"" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

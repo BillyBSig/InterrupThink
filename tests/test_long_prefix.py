@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from src.eval import compare
-from src.eval import live_compare
-from src.eval.long_prefix import PROTOCOL, make_task, run_condition
+from interrupthink.eval import compare
+from interrupthink.eval import live_compare
+from interrupthink.eval.long_prefix import PROTOCOL, make_task, run_condition
 
 
 def test_long_prefix_does_not_change_earlier_protocols():

@@ -95,7 +95,7 @@ def test_without_interrupt_tool_node_writes_hotfix(tmp_path: Path):
 
 def test_case_uses_official_tool_node_not_host_copy():
     text = (CASE / "graph.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     host = (REPO / "cases" / "langgraph-node" / "run.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "execute_tools_when_ok=False" in text

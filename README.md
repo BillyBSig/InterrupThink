@@ -218,10 +218,7 @@ if result.consult_to:
 `checker_llm` should see `package.text()`. `assistant` is the same specialist as the first session.
 
 Call site: [`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py).
-Live demos: [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py),
-[`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py).
-Cookbooks: [`cases/langchain-rule/`](cases/langchain-rule/),
-[`cases/llamaindex-page/`](cases/llamaindex-page/).
+Live demos: [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py), [`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py). Cookbooks: [`cases/langchain-rule/`](cases/langchain-rule/), [`cases/llamaindex-page/`](cases/llamaindex-page/).
 
 ### Takeover
 

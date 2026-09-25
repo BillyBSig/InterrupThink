@@ -120,7 +120,7 @@ def test_without_interrupt_toolnode_writes_production(tmp_path: Path):
 
 def test_case_uses_official_tool_node_and_is_not_freeze_hold():
     text = (CASE / "graph.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     apply_graph = (REPO / "cases" / "langgraph-apply" / "graph.py").read_text(encoding="utf-8")
     assert "from interrupthink import" in text
     assert "execute_tools_when_ok=False" in text

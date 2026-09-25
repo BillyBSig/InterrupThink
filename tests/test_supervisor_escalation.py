@@ -118,6 +118,6 @@ def test_handoff_note_lists_the_call_that_must_not_repeat():
 def test_example_does_not_let_the_specialist_call_its_peer():
     text = (REPO / "examples" / "dummy" / "supervisor_escalation.py").read_text(encoding="utf-8")
     assert "escalate_to=\"writer\"" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "OPENAI" not in text

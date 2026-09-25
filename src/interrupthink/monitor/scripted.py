@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from src.runtime.events import Patch, Verdict
-from src.parse.steps import ThoughtUnit
+from interrupthink.runtime.events import Patch, Verdict
+from interrupthink.parse.steps import ThoughtUnit
 
 
 class ScriptedMonitor:

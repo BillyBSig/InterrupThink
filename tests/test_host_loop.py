@@ -34,7 +34,7 @@ def test_without_interrupt_host_approves_then_dummy_push():
 
 def test_example_is_library_host_not_framework():
     text = (REPO / "examples" / "dummy" / "host_loop_dummy.py").read_text(encoding="utf-8")
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "import langgraph" not in text
     assert "from langgraph" not in text
     assert "import langchain" not in text

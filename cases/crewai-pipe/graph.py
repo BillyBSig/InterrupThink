@@ -14,8 +14,7 @@ from typing import Any
 
 from crewai import Agent, Crew, LLM, Process, Task
 
-from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm
+from interrupthink import JsonlLogger, LiveLlm, LlmMonitor, SandboxWriteTool, run_session
 
 from config import (
     DEFAULT_SANDBOX,

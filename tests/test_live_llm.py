@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 import pytest
 
-from src.eval.g1 import run_path
-from src.parse.steps import parse_steps
-from src.providers.live import (
+from interrupthink.eval.g1 import run_path
+from interrupthink.parse.steps import parse_steps
+from interrupthink.providers.live import (
     STEP_INSTRUCTIONS,
     TOOL_INSTRUCTIONS,
     LiveLlmError,
@@ -20,7 +20,7 @@ from src.providers.live import (
     sandbox_write_tool,
     tool_call_step,
 )
-from src.runtime.log import JsonlLogger
+from interrupthink.runtime.log import JsonlLogger
 
 
 class _FakeHTTP:
@@ -105,7 +105,7 @@ def test_tool_call_step_never_discards_a_malformed_call():
     step = tool_call_step("write", '{"path": truncated')
     assert step is not None
     assert "malformed tool call" in step
-    from src.parse.steps import parse_steps
+    from interrupthink.parse.steps import parse_steps
 
     doc = parse_steps(step)
     assert doc.units[0].kind == "claim"
@@ -119,7 +119,7 @@ def test_live_llm_generate_mocked():
         {"type": "response.completed", "response": {"usage": {"output_tokens": 9}}},
     ]
     llm = LiveLlm(user_prompt="q", api_key="sk-test", base_url="https://example.test/v1")
-    with patch("src.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
         text = llm.generate()
     assert "<step kind=\"plan\">p</step>" in text
 
@@ -159,7 +159,7 @@ def test_live_llm_abort_posts_cancel():
         api_key="sk-test",
         base_url="https://example.test/v1",
     )
-    with patch("src.providers.live.urllib.request.urlopen", side_effect=fake_open):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", side_effect=fake_open):
         result = run_path("interrupt", llm=llm, logger=JsonlLogger())
     assert result.request_count == 2
     assert result.interrupt_ids
@@ -171,7 +171,7 @@ def test_live_llm_abort_posts_cancel():
 
 def test_cancel_response_success():
     with patch(
-        "src.providers.live.urllib.request.urlopen",
+        "interrupthink.providers.live.urllib.request.urlopen",
         return_value=_FakeHTTP({"status": "cancelled"}),
     ):
         assert _cancel_response("https://example.test/v1", "sk-test", "resp_1") is True
@@ -189,13 +189,13 @@ def test_cancel_response_http_error():
     def fake_open(req, timeout=0):
         raise err
 
-    with patch("src.providers.live.urllib.request.urlopen", side_effect=fake_open):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", side_effect=fake_open):
         assert _cancel_response("https://example.test/v1", "sk-test", "resp_1") is False
 
 
 def test_cancel_response_os_error():
     with patch(
-        "src.providers.live.urllib.request.urlopen",
+        "interrupthink.providers.live.urllib.request.urlopen",
         side_effect=OSError("down"),
     ):
         assert _cancel_response("https://example.test/v1", "sk-test", "resp_1") is False
@@ -214,13 +214,13 @@ def test_cancel_response_malformed_json():
         def __exit__(self, *args):
             return False
 
-    with patch("src.providers.live.urllib.request.urlopen", return_value=_Bad()):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", return_value=_Bad()):
         assert _cancel_response("https://example.test/v1", "sk-test", "resp_1") is False
 
 
 def test_cancel_response_has_single_urlopen():
     text = (
-        Path(__file__).resolve().parents[1] / "src" / "providers" / "live.py"
+        Path(__file__).resolve().parents[1] / "src" / "interrupthink" / "providers" / "live.py"
     ).read_text(encoding="utf-8")
     start = text.index("def _cancel_response")
     end = text.index("\ndef ", start + 1)
@@ -327,7 +327,7 @@ def test_native_function_call_becomes_one_write_step():
         base_url="https://example.test/v1",
         tools=[sandbox_write_tool()],
     )
-    with patch("src.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
         text = llm.generate()
     parsed = parse_steps(text)
     assert len(parsed.units) == 1
@@ -348,7 +348,7 @@ def test_tools_switch_the_specialist_instructions():
         ])
 
     plain = LiveLlm(user_prompt="q", api_key="sk-test", base_url="https://example.test/v1")
-    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", fake_open):
         plain.generate()
     assert seen["body"]["instructions"] == STEP_INSTRUCTIONS
     assert "tools" not in seen["body"]
@@ -359,7 +359,7 @@ def test_tools_switch_the_specialist_instructions():
         base_url="https://example.test/v1",
         tools=[sandbox_write_tool()],
     )
-    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", fake_open):
         armed.generate()
     assert seen["body"]["instructions"] == TOOL_INSTRUCTIONS
     assert "tool_intent" not in TOOL_INSTRUCTIONS
@@ -404,7 +404,7 @@ def test_tool_result_starts_another_model_turn():
         base_url="https://example.test/v1",
         tools=[sandbox_write_tool()],
     )
-    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+    with patch("interrupthink.providers.live.urllib.request.urlopen", fake_open):
         chunks = []
         stream = llm.iter_deltas()
         chunks.append(next(stream))

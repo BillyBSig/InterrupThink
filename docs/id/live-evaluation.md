@@ -63,9 +63,9 @@ pengujian, bukan ranking produk. Untuk mencoba model lain, gunakan nama
 model tersebut pada call yang sama.
 
 Untuk mengulang task pendek, panggil
-`src/eval/live_prefix_run.py::run_family` dengan `early_guard=True`
+`src/interrupthink/eval/live_prefix_run.py::run_family` dengan `early_guard=True`
 (monitor juga perlu memeriksa langkah menulis file). Untuk task panjang,
-panggil `src/eval/live_long_run.py::run_models`. Keduanya membutuhkan
+panggil `src/interrupthink/eval/live_long_run.py::run_models`. Keduanya membutuhkan
 `OPENAI_API_KEY` atau `LLM_API_KEY` pada `.env`.
 
 ## Task pendek: mulai ulang atau koreksi lalu lanjutkan
@@ -97,7 +97,7 @@ sehingga RD `1,00`. Patch menggunakan token lebih banyak pada kedua model.
 Latency rata-rata juga lebih rendah untuk patch pada run ini. Satu run
 belum cukup untuk menyimpulkan bahwa patch selalu lebih cepat.
 
-Sumber: `src/eval/live_prefix_run.py`. Test di
+Sumber: `src/interrupthink/eval/live_prefix_run.py`. Test di
 `tests/test_live_prefix_run.py` memeriksa pembentukan teks task dan tidak
 memanggil Language Model. Batasnya: satu task pendek, satu file terlarang,
 satu file yang diizinkan, 20 task per sel, dan satu run per model.
@@ -120,7 +120,7 @@ diizinkan berhasil ditulis setiap kali. Ini hanya diperiksa pada satu bentuk
 prompt yang aman. Hasilnya tidak menunjukkan seberapa sering monitor akan
 menginterupsi task aman yang lain.
 
-Sumber: clean-task path di `src/eval/live_prefix_run.py`, dengan format check
+Sumber: clean-task path di `src/interrupthink/eval/live_prefix_run.py`, dengan format check
 di `tests/test_live_prefix_run.py`.
 
 ## Task panjang: tiga catatan sudah tersimpan
@@ -176,7 +176,7 @@ tinggi: 8292 ms dibanding 7295 ms.
 Pada setiap model dan kedua reaksi, tiga catatan tetap ada di disk. Cancel
 tidak menghapusnya, dan patch juga tidak menghapusnya.
 
-Sumber: `src/eval/live_long_run.py`, dengan format check di
+Sumber: `src/interrupthink/eval/live_long_run.py`, dengan format check di
 `tests/test_live_long_run.py`. Batasnya: tiga model, satu task panjang, dan
 satu run per model. Pada task ini, `gpt-5.6-luna` sering berhenti sebelum
 mencoba menulis file terlarang. Itu tidak berarti model yang sama akan

@@ -124,7 +124,7 @@ def test_example_index_does_not_continue_the_chat():
     assert "as_retriever" in text
     assert "as_chat_engine" not in text
     assert "QueryEngine" not in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "llama-index" not in pyproject
     assert "llama_index" not in pyproject

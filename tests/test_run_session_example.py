@@ -34,7 +34,7 @@ def test_user_wires_without_interrupt_publishes():
 
 def test_example_imports_only_interruptible():
     text = (REPO / "examples" / "dummy" / "run_session_dummy.py").read_text(encoding="utf-8")
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "run_staging_case" not in text
     assert "OPENAI" not in text
     assert "from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session" in text

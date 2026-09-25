@@ -30,7 +30,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.providers.live import load_dotenv
+from interrupthink import load_dotenv
+
 
 _CASE = Path(__file__).resolve().parent
 if str(_CASE) not in sys.path:

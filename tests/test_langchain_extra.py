@@ -112,7 +112,7 @@ def test_cookbook_does_not_present_fake_llm():
     readme = (CASE / "README.md").read_text(encoding="utf-8")
     example = (REPO / "examples" / "langchain_specialist.py").read_text(encoding="utf-8")
     tools = (CASE / "tools.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     for text in (agents, run, readme):
         assert "FakeLlm" not in text
         assert "ScriptedMonitor" not in text

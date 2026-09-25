@@ -124,7 +124,7 @@ def test_one_session_not_query_engine_think(tmp_path: Path):
 
 def test_case_is_llamaindex_extra_not_package_retriever():
     tools = (CASE / "tools.py").read_text(encoding="utf-8")
-    public = (REPO / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
+    public = (REPO / "src" / "interrupthink" / "__init__.py").read_text(encoding="utf-8")
     assert "from llama_index.core import Document, VectorStoreIndex" in tools
     assert "LlamaIndexRetrieveTool" not in public
     assert "build_policy_retriever" not in public

@@ -29,8 +29,7 @@ from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from interrupthink import LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm, load_dotenv
+from interrupthink import LiveLlm, LlmMonitor, SandboxWriteTool, load_dotenv, run_session
 
 REPO = Path(__file__).resolve().parents[1]
 FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"

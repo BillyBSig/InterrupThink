@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from interrupthink import JsonlLogger, Patch, SandboxWriteTool, ScriptedMonitor, run_session
-from src.runtime.session import SessionError
+from interrupthink.runtime.session import SessionError
 
 # Locked 2026-09-24 before live numbers. Do not change after a provider run.
 PROTOCOL = {

@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from src.eval.osaka_trap import uses_public_spike_as_demand
-from src.eval.scenario import interrupt_restart_prompt, resume_llm_prompt
-from src.monitor.base import Monitor
-from src.monitor.scripted import ScriptedMonitor
-from src.providers.base import Llm
-from src.providers.fake import DummyTool, FakeLlm
-from src.providers.live import LiveLlm
-from src.runtime.events import Patch
-from src.runtime.log import JsonlLogger
-from src.runtime.session import SpikeResult, _run_session
+from interrupthink.eval.osaka_trap import uses_public_spike_as_demand
+from interrupthink.eval.scenario import interrupt_restart_prompt, resume_llm_prompt
+from interrupthink.monitor.base import Monitor
+from interrupthink.monitor.scripted import ScriptedMonitor
+from interrupthink.providers.base import Llm
+from interrupthink.providers.fake import DummyTool, FakeLlm
+from interrupthink.providers.live import LiveLlm
+from interrupthink.runtime.events import Patch
+from interrupthink.runtime.log import JsonlLogger
+from interrupthink.runtime.session import SpikeResult, _run_session
 
 HAPPY_XML = """
 <step kind="plan">outline the FY revenue claim</step>

@@ -136,7 +136,7 @@ def test_example_chat_does_not_own_the_consult():
     assert "MessagesPlaceholder" in text
     assert "from langchain_core.prompts import" in text
     assert "AgentExecutor" not in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "transfer_to_" not in text
     assert "langchain" not in pyproject
     assert 'name = "langchain-core"' not in lock

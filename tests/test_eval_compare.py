@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from src.eval import compare
+from interrupthink.eval import compare
 
 
 def test_primary_metric_locked_before_numbers():

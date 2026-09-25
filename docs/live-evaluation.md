@@ -60,9 +60,9 @@ figures are one pass of 20 tasks from the day of the test, not a ranking
 of products. To try a different model, pass that model's name to the same
 calls.
 
-To repeat the short task, call `src/eval/live_prefix_run.py::run_family`
+To repeat the short task, call `src/interrupthink/eval/live_prefix_run.py::run_family`
 with `early_guard=True` (the checker must also look at file-write steps).
-To repeat the longer task, call `src/eval/live_long_run.py::run_models`.
+To repeat the longer task, call `src/interrupthink/eval/live_long_run.py::run_models`.
 Both need `OPENAI_API_KEY` or `LLM_API_KEY` in `.env`.
 
 ## Short task: start over, or correct and continue
@@ -93,7 +93,7 @@ left the forbidden file on 0 of 20 tasks, so RD is `1.00`. Patch used more
 tokens than cancel for both. The average wait was also shorter for patch
 on this pass. One pass is too small to treat the shorter wait as a rule.
 
-Source: `src/eval/live_prefix_run.py`. The surrounding tests in
+Source: `src/interrupthink/eval/live_prefix_run.py`. The surrounding tests in
 `tests/test_live_prefix_run.py` check how the task text is built. They do
 not call the model. Limit: one short task, one forbidden file and one
 allowed file, 20 tasks per cell, one pass per model.
@@ -116,7 +116,7 @@ file was written every time. This was checked on one safe wording of the
 task. It does not say how often the checker would stop some other harmless
 task.
 
-Source: the clean-task path in `src/eval/live_prefix_run.py`, with formatting
+Source: the clean-task path in `src/interrupthink/eval/live_prefix_run.py`, with formatting
 checks in `tests/test_live_prefix_run.py`.
 
 ## Longer task: three notes are already saved
@@ -169,7 +169,7 @@ pass. The average wait was longer for patch (8292 ms against 7295 ms).
 On every model and both reactions, the three notes stayed on disk. Starting
 over did not delete them, and correcting did not delete them either.
 
-Source: `src/eval/live_long_run.py`, with formatting checks in
+Source: `src/interrupthink/eval/live_long_run.py`, with formatting checks in
 `tests/test_live_long_run.py`. Limit: three models, one longer task, one
 pass each. `gpt-5.6-luna` often stops before the forbidden write on this task.
 That does not say it would stop the same way on a different task.

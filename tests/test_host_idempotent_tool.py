@@ -33,7 +33,7 @@ def test_example_is_host_store_not_package_durability():
     text = (REPO / "examples" / "dummy" / "host_idempotent_tool.py").read_text(encoding="utf-8")
     assert "class IdempotentNote" in text
     assert "def step_key" in text
-    assert "from src." not in text
+    assert "from interrupthink." not in text
     assert "OPENAI" not in text
     assert "subprocess" not in text
     assert "langgraph" not in text.lower()

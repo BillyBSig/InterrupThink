@@ -8,8 +8,7 @@ from typing import Any
 
 from autogen import ConversableAgent
 
-from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
-from src.providers.live import LiveLlm
+from interrupthink import JsonlLogger, LiveLlm, LlmMonitor, SandboxWriteTool, run_session
 
 from config import (
     DEFAULT_SANDBOX,
