@@ -1,4 +1,4 @@
-from examples.staging_case import (
+from examples.dummy.staging_case import (
     STAGING_MEMO,
     STAGING_TICKET_PROMPT,
     run_staging_case,

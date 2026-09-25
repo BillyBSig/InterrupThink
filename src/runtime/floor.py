@@ -295,7 +295,7 @@ class Floor:
         a second copy of the patch.
 
         Returns:
-            XML for the kept steps, separated by newlines. An empty
+            Plain lines for the kept steps, separated by newlines. An empty
             string when nothing was kept and there is no patch fact.
         """
         fact = self.binding_fact()
@@ -304,11 +304,11 @@ class Floor:
         for unit in self.units:
             if unit.id in self.dropped_ids:
                 continue
-            parts.append(_unit_xml(unit))
+            parts.append(_unit_line(unit))
             if fact and fact in unit.text:
                 wrote_fact = True
         if fact and not wrote_fact:
-            parts.append(_step_xml("premise", fact))
+            parts.append(f"premise: {fact}")
         return "\n".join(parts)
 
     def kept_texts(self) -> list[str]:
@@ -348,6 +348,22 @@ class Floor:
                 unit.state = "checked_ok"
                 self.watermarks.checked_ok = unit_id
                 return
+
+
+def _unit_line(unit: ThoughtUnit) -> str:
+    """Serialize one kept step as a plain line.
+
+    Args:
+        unit: Step to serialize.
+
+    Returns:
+        One ``kind: text`` line. A reversible tool uses
+        ``tool_intent reversible:``.
+    """
+    text = " ".join(unit.text.split())
+    if unit.kind == "tool_intent" and unit.reversible:
+        return f"tool_intent reversible: {text}"
+    return f"{unit.kind}: {text}"
 
 
 def _unit_xml(unit: ThoughtUnit) -> str:

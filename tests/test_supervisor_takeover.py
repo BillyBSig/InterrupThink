@@ -15,7 +15,7 @@ HANDRAISE = """
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_takeover.py"
+    path = REPO / "examples" / "dummy" / "supervisor_takeover.py"
     spec = importlib.util.spec_from_file_location("supervisor_takeover", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -102,7 +102,7 @@ def test_unknown_does_not_take_over():
 
 
 def test_example_does_not_let_the_monitor_write_the_answer():
-    text = (REPO / "examples" / "supervisor_takeover.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_takeover.py").read_text(encoding="utf-8")
     assert 'takeover_to="editor"' in text
     assert 'takeover_to="human"' in text
     assert 'apply_resume(str(note["prefix"]))' in text

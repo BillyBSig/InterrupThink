@@ -47,6 +47,15 @@ class StepAssembler:
         self.buf = _FENCE.sub("", self.buf.lstrip())
         if self.buf.endswith("```"):
             self.buf = self.buf[: -3].rstrip()
+        if not _has_xml_tag(self.buf):
+            lines, self.buf = _complete_lines(self.buf)
+            if len(self.buf) > self.max_bytes:
+                from src.runtime.session import SessionError
+
+                raise SessionError(
+                    f"stream assembler exceeded buffer cap ({self.max_bytes} bytes)"
+                )
+            return lines
         out: list[str] = []
         while True:
             text = _lstrip_to_tag(self.buf)
@@ -80,9 +89,10 @@ def is_answer_fragment(xml: str) -> bool:
         xml: One block from the assembler.
 
     Returns:
-        True when the block starts with ``<answer``.
+        True when the block is an answer line or an ``<answer`` tag.
     """
-    return xml.lstrip().lower().startswith("<answer")
+    stripped = xml.lstrip().lower()
+    return stripped.startswith("<answer") or stripped.startswith("answer:")
 
 
 def answer_text(xml: str) -> str:
@@ -95,12 +105,49 @@ def answer_text(xml: str) -> str:
     Returns:
         The inner text of ``<answer>``.
     """
+    stripped = xml.strip()
+    if stripped.lower().startswith("answer:"):
+        return stripped.split(":", 1)[1].strip()
     match = _ANSWER.search(xml)
     if not match:
-        return xml.strip()
+        return stripped
     inner = re.sub(r"^<answer\b[^>]*>", "", match.group(0), flags=re.IGNORECASE)
     inner = re.sub(r"</answer>\s*$", "", inner, flags=re.IGNORECASE)
     return inner.strip()
+
+
+def _has_xml_tag(buf: str) -> bool:
+    """Return whether the buffer still uses a step or answer tag."""
+    lower = buf.lower()
+    return "<step" in lower or "<answer" in lower
+
+
+def _complete_lines(buf: str) -> tuple[list[str], str]:
+    """Split finished plain lines and keep a trailing partial line.
+
+    Args:
+        buf: Specialist text that does not contain a step tag.
+
+    Returns:
+        Complete non-empty lines, and the unfinished tail.
+    """
+    if "\n" not in buf:
+        return [], buf
+    finished, tail = buf.rsplit("\n", 1)
+    blocks: list[str] = []
+    current: str | None = None
+    for line in finished.split("\n"):
+        if not line.strip():
+            continue
+        if line[0].isspace() and current is not None:
+            current = f"{current}\n{line.rstrip()}"
+            continue
+        if current is not None:
+            blocks.append(current)
+        current = line.strip()
+    if current is not None:
+        blocks.append(current)
+    return blocks, tail
 
 
 def _lstrip_to_tag(buf: str) -> str | None:

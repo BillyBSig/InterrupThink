@@ -13,7 +13,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_handoff.py
+    python3 examples/dummy/supervisor_handoff.py
 """
 
 from interrupthink import Escalation, FakeLlm, ScriptedMonitor, run_session
@@ -21,9 +21,9 @@ from interrupthink import Escalation, FakeLlm, ScriptedMonitor, run_session
 TASK = "Write the public release note."
 
 HANDRAISE = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">this needs the writer</step>
-<answer>I will finish the note myself.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: this needs the writer
+answer: I will finish the note myself.
 """
 
 
@@ -35,14 +35,20 @@ def writer_input(task: str, note: dict, role: str, reason: str) -> str:
     return Escalation.from_note(task, noted).text()
 
 
+def _quoted_claim(text: str) -> str:
+    """Keep a package inside one claim so later lines stay quoted context."""
+    lines = text.splitlines() or [""]
+    body = lines[0] + "".join(f"\n  {line}" for line in lines[1:])
+    return f"claim: {body}"
+
+
 def writer_document(composed: str) -> str:
     """The first visible step is the handoff. Angle brackets in the prefix are escaped."""
     visible = composed.replace("<", "[").replace(">", "]")
     tool = (
-        '<step kind="tool_intent" reversible="true">'
-        '{"name":"write_note","args":{"text":"draft"}}</step>'
+        'tool_intent reversible: ' '{"name":"write_note","args":{"text":"draft"}}'
     )
-    return f'<step kind="claim">{visible}</step>\n{tool}\n<answer>Wrote the note.</answer>'
+    return _quoted_claim(visible) + f"\n{tool}\nanswer: Wrote the note.\n"
 
 
 def run_named_handoff(monitor: ScriptedMonitor):

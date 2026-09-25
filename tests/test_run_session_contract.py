@@ -24,7 +24,7 @@ STOPPED = """
 def test_missing_resume_document_is_session_error():
     llm = FakeLlm([WRONG])
     monitor = ScriptedMonitor(trigger_kind="premise", trigger_contains="already approved")
-    with pytest.raises(SessionError, match="second XML"):
+    with pytest.raises(SessionError, match="second document"):
         run_session(llm=llm, monitor=monitor, tool=DummyTool())
 
 
@@ -175,6 +175,36 @@ class _FalseOnAnswerNoAnchor:
 
 
 ANSWER_ONLY_FALSE = "<answer>Published the changelog.</answer>"
+
+ANSWER_ONLY_PLAIN = "answer: Published the changelog."
+
+
+class _UnknownOnAnswer:
+    """Unknown on every step, including the answer. Never fires, never approves."""
+
+    def __init__(self) -> None:
+        self.held_tool_ids: list[str] = []
+
+    def verdict(self, unit):
+        return Verdict(unit_id=unit.id, status="Unknown", reason="no rule for this")
+
+    def release_tool(self, unit_id: str):
+        return Verdict(unit_id=unit_id, status="Ok", reason="release")
+
+
+def test_answer_only_turn_with_unknown_verdict_does_not_crash():
+    """A turn that is just one answer line, held Unknown, must not raise
+    "llm produced no complete step" — the specialist did produce content,
+    the monitor just never said Ok (found 2026-09-25, live multi-agent
+    examples with no preceding plan/claim line)."""
+    result = run_session(
+        llm=FakeLlm([ANSWER_ONLY_PLAIN]),
+        monitor=_UnknownOnAnswer(),
+        tool=DummyTool(),
+    )
+    assert result.committed_answer is None
+    assert not result.interrupt_ids
+    assert not any(r["event"] == "answer.commit" for r in result.log_records)
 
 
 def test_false_on_answer_without_anchor_holds():

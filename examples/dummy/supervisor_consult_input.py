@@ -13,7 +13,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_consult_input.py
+    python3 examples/dummy/supervisor_consult_input.py
 """
 
 from interrupthink import Consult, FakeLlm, Patch, ScriptedMonitor, run_session
@@ -21,15 +21,15 @@ from interrupthink import Consult, FakeLlm, Patch, ScriptedMonitor, run_session
 TASK = "Write the public release note."
 
 HANDRAISE = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">ask the checker</step>
-<answer>I will finish without a check.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: ask the checker
+answer: I will finish without a check.
 """
 
 CONTINUATION = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">the note can be finished</step>
-<answer>Finished after the check.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: the note can be finished
+answer: Finished after the check.
 """
 
 
@@ -41,13 +41,19 @@ def receiver_input(task: str, note: dict, role: str, reason: str) -> str:
     return Consult.from_note(task, noted).text()
 
 
+def _quoted_claim(text: str) -> str:
+    """Keep a package inside one claim so later lines stay quoted context."""
+    lines = text.splitlines() or [""]
+    body = lines[0] + "".join(f"\n  {line}" for line in lines[1:])
+    return f"claim: {body}"
+
+
 def receiver_document(composed: str, answer: str) -> str:
     visible = composed.replace("<", "[").replace(">", "]")
     tool = (
-        '<step kind="tool_intent" reversible="true">'
-        '{"name":"write_note","args":{"text":"draft"}}</step>'
+        'tool_intent reversible: ' '{"name":"write_note","args":{"text":"draft"}}'
     )
-    return f'<step kind="claim">{visible}</step>\n{tool}\n<answer>{answer}</answer>'
+    return _quoted_claim(visible) + f"\n{tool}\nanswer: {answer}\n"
 
 
 def run_consult_input(monitor: ScriptedMonitor):

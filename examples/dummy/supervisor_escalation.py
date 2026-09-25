@@ -12,19 +12,19 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_escalation.py
+    python3 examples/dummy/supervisor_escalation.py
 """
 
 from interrupthink import FakeLlm, ScriptedMonitor, run_session
 
 HANDRAISE = """
-<step kind="claim">this needs the writer</step>
-<answer>I will finish the note myself.</answer>
+claim: this needs the writer
+answer: I will finish the note myself.
 """
 
 WRITER = """
-<step kind="claim">the note is ready for the reader</step>
-<answer>Wrote the note.</answer>
+claim: the note is ready for the reader
+answer: Wrote the note.
 """
 
 

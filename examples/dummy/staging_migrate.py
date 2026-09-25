@@ -15,7 +15,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/staging_migrate.py
+    python3 examples/dummy/staging_migrate.py
 """
 
 from staging_case import run_staging_case

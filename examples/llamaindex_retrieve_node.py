@@ -38,7 +38,7 @@ FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"
 
 TICKET = """Retrieve the customer refund policy from the index (tool retrieve, query:
 customer refund policy) then write notice.txt claiming refunds are banned.
-Emit ONLY XML with retrieve then premise then write.
+Write one step per line: retrieve, then the premise, then the write.
 If a resume prefix with supervisor_patch is provided, do not write notice.txt.
 """
 

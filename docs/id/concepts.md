@@ -4,8 +4,8 @@
 
 ## Thinking floor 1:1
 
-InterrupThink memisahkan siklus penalaran dari aplikasi host. Specialist
-menghasilkan dokumen terstruktur, monitor mengamati langkah semantik, dan
+InterrupThink memisahkan reasoning loop dari aplikasi host. Specialist
+menghasilkan langkah terstruktur, monitor mengamati batas semantik, dan
 thinking floor menentukan apakah tool atau jawaban boleh di-commit.
 
 Host dapat berupa fungsi Python biasa atau graph framework. Host tidak
@@ -26,25 +26,28 @@ flowchart LR
 
 ## Batas ThoughtUnit
 
-Batas interupsi adalah `ThoughtUnit`, direpresentasikan oleh `<step>` pada
-dokumen XML saat ini. Jenis langkah yang umum mencakup:
+Batas interupsi adalah `ThoughtUnit`. Kanal model-facing menggunakan baris
+plain text seperti `plan:`, `claim:`, `tool_intent:`, dan `answer:`. Parser
+tetap menerima XML lama agar bukti yang sudah tercatat bisa direproduksi.
+Jenis langkah yang umum mencakup:
 
-- `plan` — urutan kerja yang direncanakan;
+- `plan` — rencana kerja;
 - `premise` — kondisi yang menjadi dasar rencana;
 - `claim` — pernyataan yang dapat diperiksa;
-- `tool_intent` — usulan pemanggilan tool dan sifat reversibilitasnya.
+- `tool_intent` — usulan tool call dan status reversibilitasnya.
 
-Ini bukan protokol pembatalan pada setiap token mentah. Floor menunggu unit
-yang bisa diperiksa, mencatatnya, lalu menerapkan verdict monitor. `LlmMonitor`
-live mengirim HTTP request blocking untuk unit tersebut. Hanya jenis askable
-(`premise`, `claim`, `tool_intent`, dan `answer_draft`) yang melakukan request
-itu, dan `max_requests` yang habis tanpa jawaban di-commit menimbulkan
-`SessionError`, hasil yang valid ketika sesi tidak selesai.
-Specialist tidak terus melakukan generate di latar belakang saat supervisor
-menjawab. Request Responses specialist live melakukan streaming di foreground
-(`background` adalah false). Interupsi menutup stream tersebut lalu melakukan
-POST cancel. Test mock mengunci mode request itu; respons HTTP cancel yang
-berhasil bukan bukti bahwa provider telah menghentikan generate.
+Ini bukan protokol cancel pada setiap raw token. Floor menunggu unit yang
+dapat diperiksa, mencatatnya, lalu menerapkan verdict dari monitor.
+`LlmMonitor` live mengirim blocking HTTP request untuk unit tersebut. Hanya
+jenis askable (`premise`, `claim`, `tool_intent`, dan `answer_draft`) yang
+membuat request itu. Jika `max_requests` habis tanpa jawaban di-commit,
+`SessionError` adalah hasil yang valid karena sesi belum selesai.
+Specialist tidak terus melakukan generate di background (latar belakang)
+ketika supervisor memberikan jawaban. Request Responses untuk specialist live
+melakukan stream di foreground (`background` bernilai false). Interupsi
+menutup stream lalu mengirim POST cancel. Mock test mengunci mode request
+ini; respons cancel HTTP yang berhasil belum membuktikan provider sudah
+menghentikan generate.
 
 ## Verdict monitor
 
@@ -58,7 +61,7 @@ berhasil bukan bukti bahwa provider telah menghentikan generate.
   Jejak mencatat `answer.rejected`.
 
 Default netral ini penting. Respons supervisor yang hilang atau malformed tidak
-boleh otomatis menjadi interupsi agresif. Parser saat ini memetakan state
+boleh otomatis berubah menjadi interupsi agresif. Parser memetakan state
 supervisor yang malformed atau tidak dikenal menjadi `Unknown`.
 
 ## Interupsi, koreksi, dan rollback
@@ -70,25 +73,25 @@ Floor bukan sekadar tombol cancel:
    specialist diminta melanjutkan dari `ThoughtUnit` terakhir yang diterima.
 
 Interupsi membatalkan request aktif. Resume adalah request baru yang membawa
-prefix dengan watermark dan, jika tersedia, patch. Ini adalah context replay,
-bukan rewind state model provider. Specialist harus mengimplementasikan
-`apply_resume`; model yang hanya bisa generate tidak dapat diam-diam melewati
-envelope. Mode resume default adalah `rollback`: lanjutkan proses penalaran di
-tengah aliran, bukan restart seluruh tugas dari awal.
+prefix dengan watermark dan, bila tersedia, patch. Ini adalah context replay,
+bukan rewind state pada provider. Specialist harus mengimplementasikan
+`apply_resume`; model yang hanya dapat generate tidak dapat diam-diam
+melewati envelope. Mode resume default adalah `rollback`: reasoning
+dilanjutkan dari tengah alur, bukan me-restart seluruh task.
 
-Hasil sesi menyediakan cukup informasi agar host dapat memeriksa outcome,
-termasuk output yang di-commit, identifier interupsi, unit yang dibuang, jumlah
-request, dan pemanggilan tool.
+Session result menyediakan cukup informasi agar host dapat memeriksa outcome,
+termasuk output yang di-commit, interrupt identifier, unit yang dibuang, jumlah
+request, dan tool call.
 
 ## Handoff bernama
 
 Monitor dapat mengakhiri specialist saat ini walau verdict tetap `Ok`. Verdict
 tersebut menyebut satu penerima:
 
-- `escalate_to` — specialist lain seharusnya menyelesaikan tugas;
+- `escalate_to` — specialist lain seharusnya menyelesaikan task;
 - `consult_to` — checker seharusnya menjawab, lalu jawabannya kembali kepada
   specialist yang sama;
-- `takeover_to` — owner seharusnya menerima tugas.
+- `takeover_to` — owner seharusnya menerima task.
 
 `Unknown` tidak membuka rute. Nama kosong tidak membuka rute. Jika verdict
 membawa lebih dari satu nama, sesi memakai escalation, lalu consultation, lalu
@@ -104,12 +107,12 @@ dimulai.
 Ketiganya tidak memanggil `run_session`. Ketiga object ini menggunakan satu
 bentuk paket yang sama:
 
-- tugas asli;
+- task asli;
 - nama penerima (`role`);
 - alasan supervisor;
 - prefix langkah yang dipertahankan;
-- baris `result {name}: {result}` untuk setiap pemanggilan tool yang mencatat hasil;
-- baris penutup yang menyebut pemanggilan tool yang tidak boleh diulang.
+- baris `result {name}: {result}` untuk setiap tool call yang mencatat hasil;
+- baris penutup yang menyebut tool call yang tidak boleh diulang.
 
 `from_result(task, result)` membaca event floor yang cocok (`floor.escalate`,
 `floor.consult`, atau `floor.takeover`). `from_note(task, note)` membaca note
@@ -136,20 +139,20 @@ meneruskan `Escalation.from_result(task, result).text()` sebagai request baru.
 Graph, crew, atau daftar agent tidak menentukan specialist. Host membuka sesi
 berikutnya hanya ketika nama penerima ada.
 
-Lihat [`examples/supervisor_escalation.py`](../../examples/supervisor_escalation.py)
+Lihat [`examples/dummy/supervisor_escalation.py`](../../examples/dummy/supervisor_escalation.py)
 dan [`cases/langgraph-offer/`](../../cases/langgraph-offer/).
 
 ### Consultation
 
 `result.consult_to` menyebut checker. Host menjalankan checker tersebut dengan
 `Consult.from_result(task, result).text()`. Jawaban checker yang sudah
-di-commit kembali kepada specialist yang sama sebagai `Patch` pada
-`run_session(..., resume_patch=...)` baru. Owner tugas tetap sama.
+di-commit kembali ke specialist yang sama sebagai `Patch` pada
+`run_session(..., resume_patch=...)` baru. Owner task tetap sama.
 
 Riwayat chat yang sama, atau object assistant yang sama, melanjutkan dari
 prefix yang dipertahankan ditambah patch. Checker tidak menjadi owner baru.
 
-Lihat [`examples/supervisor_consult.py`](../../examples/supervisor_consult.py)
+Lihat [`examples/dummy/supervisor_consult.py`](../../examples/dummy/supervisor_consult.py)
 dan [`cases/langchain-rule/`](../../cases/langchain-rule/).
 
 ### Takeover
@@ -164,7 +167,7 @@ melanjutkan.
 kedua tidak dimulai, dan monitor tidak menulis balasan yang akan dilihat orang
 tersebut.
 
-Lihat [`examples/supervisor_takeover.py`](../../examples/supervisor_takeover.py)
+Lihat [`examples/dummy/supervisor_takeover.py`](../../examples/dummy/supervisor_takeover.py)
 dan [`cases/autogen-support/`](../../cases/autogen-support/).
 
 ## Keamanan tool
@@ -178,16 +181,16 @@ tool yang berkonsekuensi. Mengembalikan `False` melewati execute bahkan jika
 model memberi label intent sebagai reversible. `reversible` dari model hanya
 menunjukkan intent.
 
-Tiga pemeriksaan ini berlangsung berurutan:
+Tiga check ini berlangsung berurutan:
 
 1. Verdict monitor pada `ThoughtUnit`.
 2. `tool_policy(name, args)` milik host. Verdict `Ok` dan
    `reversible="true"` tetap tidak dapat mengizinkan nama tool yang ditolak
    host.
-   [`examples/tool_policy_deny.py`](../../examples/tool_policy_deny.py)
+   [`examples/dummy/tool_policy_deny.py`](../../examples/dummy/tool_policy_deny.py)
    menunjukkan alur ini tanpa API key: `publish` ditolak, sedangkan
    `save_draft` tetap dijalankan.
-3. Manusia di batas tool, jika host menambahkan pemeriksaan itu. Pemeriksaan
+3. Manusia di batas tool, jika host menambahkan check itu. Check
    ini tidak menggantikan monitor atau kebijakan host.
 
 Contoh saat ini mencakup:
@@ -201,9 +204,9 @@ Contoh saat ini mencakup:
 Contoh hanya menggunakan dummy tool dan file sandbox. Tidak ada database, Git,
 email, atau sistem deployment yang dikendalikan oleh contoh ini.
 
-## Batas penalaran yang terlihat
+## Batas reasoning yang terlihat
 
-Protokol memakai langkah tugas yang dapat diperiksa sebagai media komunikasi
+Protokol memakai langkah task yang dapat diperiksa sebagai media komunikasi
 aplikasi. Ini bukan mekanisme untuk mengirim hidden chain-of-thought.
 Aplikasi sebaiknya hanya mengeluarkan informasi terstruktur yang dibutuhkan
-untuk pemeriksaan, koordinasi, dan jawaban akhir.
+untuk check, koordinasi, dan jawaban akhir.

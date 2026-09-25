@@ -152,9 +152,11 @@ resume path is not the intended default.
 
 - **Method:** deterministic monitor and runtime tests.
 - **Observed result:** strict JSON-shaped supervisor output is accepted,
-  malformed or unknown status values become `Unknown`, and the specialist XML
-  channel remains unchanged. The runtime does not inject the lab's evaluation
-  prompt.
+  malformed or unknown status values become `Unknown`, and the neutral
+  runtime core carries no lab-specific defaults. The specialist step channel
+  is plain labeled lines (`plan:`, `claim:`, `tool_intent:`, `answer:`); the
+  parser still accepts the older `<step>`/`<answer>` XML shape so already
+  recorded evidence stays reproducible.
 - **Evidence:** `tests/test_llm_monitor.py`,
   `tests/test_run_session_contract.py`,
   `tests/test_spike_paths.py`.

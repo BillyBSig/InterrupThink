@@ -35,7 +35,7 @@ to PyPI.
 
 ```bash
 uv pip install -e .
-python3 examples/run_session_dummy.py
+python3 examples/dummy/run_session_dummy.py
 ```
 
 The public import surface is deliberately small:
@@ -53,7 +53,8 @@ Start with [Getting started](getting-started.md), then read
 - [Concepts](concepts.md) — semantic units, verdicts, correction, rollback, named handoffs, and tool safety.
 - [Integrations](integrations.md) — native hosts and optional framework examples.
 - [Evaluation protocol](evaluation.md) — how claims are tested and compared.
-- [Results](results.md) — the current public evidence summary.
+- [Results](results.md) — the current public evidence summary (deterministic tests).
+- [Live evaluation](live-evaluation.md) — opt-in checks against a real hosted model.
 - [Limitations](limitations.md) — scope boundaries and open questions.
 - [Reproducibility](reproducibility.md) — commands, environments, and reporting.
 - [Publication policy](PUBLICATION_POLICY.md) — what belongs in this public directory.

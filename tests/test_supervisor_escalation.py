@@ -14,7 +14,7 @@ HANDRAISE = """
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_escalation.py"
+    path = REPO / "examples" / "dummy" / "supervisor_escalation.py"
     spec = importlib.util.spec_from_file_location("supervisor_escalation", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -116,7 +116,7 @@ def test_handoff_note_lists_the_call_that_must_not_repeat():
 
 
 def test_example_does_not_let_the_specialist_call_its_peer():
-    text = (REPO / "examples" / "supervisor_escalation.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_escalation.py").read_text(encoding="utf-8")
     assert "escalate_to=\"writer\"" in text
     assert "from src." not in text
     assert "transfer_to_" not in text

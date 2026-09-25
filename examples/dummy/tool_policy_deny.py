@@ -17,16 +17,16 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/tool_policy_deny.py
+    python3 examples/dummy/tool_policy_deny.py
 """
 
 from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session
 
 DRAFT_THEN_PUBLISH = """
-<step kind="plan">save a draft, then publish the changelog</step>
-<step kind="tool_intent" reversible="true">{"name":"save_draft","args":{"doc":"changelog"}}</step>
-<step kind="tool_intent" reversible="true">{"name":"publish","args":{"doc":"changelog"}}</step>
-<answer>Changelog is ready to publish.</answer>
+plan: save a draft, then publish the changelog
+tool_intent reversible: {"name":"save_draft","args":{"doc":"changelog"}}
+tool_intent reversible: {"name":"publish","args":{"doc":"changelog"}}
+answer: Changelog is ready to publish.
 """
 
 

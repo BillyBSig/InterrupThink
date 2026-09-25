@@ -36,7 +36,7 @@ TICKET = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are specialist B. Emit ONLY XML with <step> and <answer>. "
+            "You are specialist B. Write one step per line, and finish with an answer: line. "
             "kind whitelist: plan, premise, claim, evidence, tool_intent, doubt, answer_draft.",
         ),
         (

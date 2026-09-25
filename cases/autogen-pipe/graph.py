@@ -77,10 +77,10 @@ def _write_xml(forwarded: str) -> str:
         ensure_ascii=False,
     )
     return f"""
-<step kind="plan">write the refund decision using retrieved policy</step>
-<step kind="premise">retrieved current policy forwarded by host; refunds allowed</step>
-<step kind="tool_intent" reversible="false">{payload}</step>
-<answer>Wrote decision.txt from retrieved policy.</answer>
+plan: write the refund decision using retrieved policy
+premise: retrieved current policy forwarded by host; refunds allowed
+tool_intent: {payload}
+answer: Wrote decision.txt from retrieved policy.
 """
 
 
@@ -185,7 +185,7 @@ def run_autogen_pipe(
             llm = _live_llm(
                 "Host forwarded this retrieved policy. Write decision.txt with exactly that text.\n"
                 f"Policy:\n{forwarded}\n"
-                "Emit ONLY XML with tool_intent write path=decision.txt and that content."
+                "Write one step per line with tool_intent write path=decision.txt and that content."
             )
         write_result = run_session(
             llm=llm,

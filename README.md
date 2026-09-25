@@ -12,7 +12,7 @@ only cancel it, and not at raw tokens.
 
 This is an experimental library, not a product or a hosted service.
 
-[Getting started](docs/getting-started.md) · [Examples](examples/) · [Cases](cases/) · [Concepts](docs/concepts.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[Getting started](docs/getting-started.md) · [Examples](examples/) · [Cases](cases/) · [Concepts](docs/concepts.md) · [Results](docs/results.md) · [Live evaluation](docs/live-evaluation.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 ## Quickstart
 
@@ -46,7 +46,7 @@ The same floor accepts a scripted specialist. This path needs no API key
 and returns the same result on every run.
 
 ```bash
-python3 examples/run_session_dummy.py
+python3 examples/dummy/run_session_dummy.py
 ```
 
 ```python
@@ -58,7 +58,7 @@ monitor = ScriptedMonitor(trigger_kind="premise", trigger_contains="already appr
 result = run_session(llm=llm, monitor=monitor, tool=tool)
 ```
 
-Host policy is a separate check. [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) refuses `publish` after the monitor returns `Ok`.
+Host policy is a separate check. [`examples/dummy/tool_policy_deny.py`](examples/dummy/tool_policy_deny.py) refuses `publish` after the monitor returns `Ok`.
 
 After an interrupt, `FakeLlm` must supply a second XML document or the session reports an error. `run_session` does not add application-specific prompts to the request.
 
@@ -180,7 +180,7 @@ if result.escalate_to:
     # Pass package.text() into a new run_session for the policy specialist.
 ```
 
-Call site: [`examples/supervisor_escalation.py`](examples/supervisor_escalation.py).
+Call site: [`examples/dummy/supervisor_escalation.py`](examples/dummy/supervisor_escalation.py).
 Live demo: [`examples/langgraph_offer_escalation.py`](examples/langgraph_offer_escalation.py).
 Cookbook: [`cases/langgraph-offer/`](cases/langgraph-offer/).
 
@@ -217,7 +217,7 @@ if result.consult_to:
 
 `checker_llm` should see `package.text()`. `assistant` is the same specialist as the first session.
 
-Call site: [`examples/supervisor_consult.py`](examples/supervisor_consult.py).
+Call site: [`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py).
 Live demos: [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py),
 [`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py).
 Cookbooks: [`cases/langchain-rule/`](cases/langchain-rule/),
@@ -243,7 +243,7 @@ if result.takeover_to == "human":
     # Return package.text() to the person. Do not open another run_session.
 ```
 
-Call site: [`examples/supervisor_takeover.py`](examples/supervisor_takeover.py).
+Call site: [`examples/dummy/supervisor_takeover.py`](examples/dummy/supervisor_takeover.py).
 Live demo: [`examples/autogen_support_takeover.py`](examples/autogen_support_takeover.py).
 Editor shape: [`examples/database_takeover.py`](examples/database_takeover.py).
 Cookbook: [`cases/autogen-support/`](cases/autogen-support/).
@@ -254,14 +254,14 @@ Short call sites after `pip install -e .`. Full stories live in [`cases/`](cases
 
 | File | Calls |
 |------|--------|
-| [`examples/run_session_dummy.py`](examples/run_session_dummy.py) | `run_session` |
-| [`examples/staging_migrate.py`](examples/staging_migrate.py) | canned staging-migrate example (local helper) |
-| [`examples/freeze_push_dummy.py`](examples/freeze_push_dummy.py) | freeze + dummy `push` |
-| [`examples/host_loop_dummy.py`](examples/host_loop_dummy.py) | host loop; HITL at the tool boundary |
-| [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) | host denies `publish` after monitor `Ok` |
-| [`examples/supervisor_escalation.py`](examples/supervisor_escalation.py) | `Escalation`: next specialist receives the package |
-| [`examples/supervisor_consult.py`](examples/supervisor_consult.py) | `Consult`: patch returns to the same specialist |
-| [`examples/supervisor_takeover.py`](examples/supervisor_takeover.py) | `Takeover`: editor or human receives the package |
+| [`examples/dummy/run_session_dummy.py`](examples/dummy/run_session_dummy.py) | `run_session`, no API key |
+| [`examples/dummy/staging_migrate.py`](examples/dummy/staging_migrate.py) | staging-migrate example, no API key (local helper) |
+| [`examples/dummy/freeze_push_dummy.py`](examples/dummy/freeze_push_dummy.py) | freeze + dummy `push`, no API key |
+| [`examples/dummy/host_loop_dummy.py`](examples/dummy/host_loop_dummy.py) | host loop; HITL at the tool boundary, no API key |
+| [`examples/dummy/tool_policy_deny.py`](examples/dummy/tool_policy_deny.py) | host denies `publish` after monitor `Ok` |
+| [`examples/dummy/supervisor_escalation.py`](examples/dummy/supervisor_escalation.py) | `Escalation`: next specialist receives the package |
+| [`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py) | `Consult`: patch returns to the same specialist |
+| [`examples/dummy/supervisor_takeover.py`](examples/dummy/supervisor_takeover.py) | `Takeover`: editor or human receives the package |
 | [`examples/langgraph_offer_escalation.py`](examples/langgraph_offer_escalation.py) | LangGraph escalation |
 | [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py) | LangChain consultation |
 | [`examples/crewai_order_escalation.py`](examples/crewai_order_escalation.py) | CrewAI escalation |
@@ -270,7 +270,7 @@ Short call sites after `pip install -e .`. Full stories live in [`cases/`](cases
 
 Framework demos install the framework in the venv with `pip`, not as a core dependency. The full list is [`examples/README.md`](examples/README.md).
 
-Case runners use `LiveLlm` and `LlmMonitor` with a personal `.env`. Do not commit keys. Dummy `examples/*_dummy.py` files stay scripted.
+Case runners use `LiveLlm` and `LlmMonitor` with a personal `.env`. Do not commit keys. Deterministic, no-key call sites live in [`examples/dummy/`](examples/dummy/).
 
 ## Integrations
 
@@ -307,7 +307,9 @@ python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py -x --
 
 The library is experimental. It is not a product or a
 multi-agent mesh. Public claims are limited to the checks in
-[`docs/results.md`](docs/results.md).
+[`docs/results.md`](docs/results.md) (deterministic tests) and
+[`docs/live-evaluation.md`](docs/live-evaluation.md) (opt-in live-model
+checks).
 
 ## License
 

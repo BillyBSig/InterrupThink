@@ -7,7 +7,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "tool_policy_deny.py"
+    path = REPO / "examples" / "dummy" / "tool_policy_deny.py"
     spec = importlib.util.spec_from_file_location("tool_policy_deny", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -38,7 +38,7 @@ def test_ok_monitor_still_denies_publish_name():
 
 
 def test_example_needs_no_key_and_names_the_policy():
-    text = (REPO / "examples" / "tool_policy_deny.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "tool_policy_deny.py").read_text(encoding="utf-8")
     assert 'reversible="true"' in text
     assert '"name":"publish"' in text
     assert "tool_policy=host_allows" in text

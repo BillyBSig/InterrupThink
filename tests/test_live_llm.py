@@ -7,13 +7,18 @@ from unittest.mock import patch
 import pytest
 
 from src.eval.g1 import run_path
+from src.parse.steps import parse_steps
 from src.providers.live import (
+    STEP_INSTRUCTIONS,
+    TOOL_INSTRUCTIONS,
     LiveLlmError,
     LiveLlm,
     _cancel_response,
     _output_text,
     _responses_request,
     _strip_fences,
+    sandbox_write_tool,
+    tool_call_step,
 )
 from src.runtime.log import JsonlLogger
 
@@ -82,6 +87,28 @@ def test_strip_fences_and_output_text():
         ]
     }
     assert "<step kind=\"plan\">x</step>" in _strip_fences(_output_text(payload))
+
+
+def test_tool_call_step_starts_on_its_own_line():
+    """The plain text channel has no tag boundary. A leading newline stops
+    this line fusing onto an unterminated text line already in the
+    stream assembler's buffer (the fusion bug found on 2026-09-25)."""
+    step = tool_call_step("write", '{"path":"x.txt","content":"y"}')
+    assert step.startswith("\n")
+    assert step == '\ntool_intent: {"name": "write", "args": {"path": "x.txt", "content": "y"}}\n'
+
+
+def test_tool_call_step_never_discards_a_malformed_call():
+    """A completed function-call event must always produce a step, or a
+    request can end with zero steps and the session raises ValueError
+    (the silent-discard bug found on 2026-09-25)."""
+    step = tool_call_step("write", '{"path": truncated')
+    assert step is not None
+    assert "malformed tool call" in step
+    from src.parse.steps import parse_steps
+
+    doc = parse_steps(step)
+    assert doc.units[0].kind == "claim"
 
 
 def test_live_llm_generate_mocked():
@@ -256,6 +283,158 @@ def test_responses_request_is_foreground_stream():
     )
     body = json.loads(req.data.decode("utf-8"))
     assert body["stream"] is True
+    assert body["background"] is False
+
+
+def test_native_function_call_becomes_one_write_step():
+    events = [
+        {"type": "response.created", "response": {"id": "resp_tool"}},
+        {
+            "type": "response.output_item.added",
+            "item": {
+                "type": "function_call",
+                "id": "fc_1",
+                "call_id": "call_1",
+                "name": "write",
+                "arguments": "",
+            },
+        },
+        {"type": "response.function_call_arguments.delta", "item_id": "fc_1", "delta": '{"path":'},
+        {
+            "type": "response.function_call_arguments.delta",
+            "item_id": "fc_1",
+            "delta": '"draft-0.txt","content":"reviewed draft"}',
+        },
+        {
+            "type": "response.function_call_arguments.done",
+            "item_id": "fc_1",
+            "arguments": '{"path":"draft-0.txt","content":"reviewed draft"}',
+        },
+        {
+            "type": "response.output_item.done",
+            "item": {
+                "type": "function_call",
+                "id": "fc_1",
+                "name": "write",
+                "arguments": '{"path":"draft-0.txt","content":"reviewed draft"}',
+            },
+        },
+        {"type": "response.completed", "response": {"usage": {"output_tokens": 4}}},
+    ]
+    llm = LiveLlm(
+        user_prompt="q",
+        api_key="sk-test",
+        base_url="https://example.test/v1",
+        tools=[sandbox_write_tool()],
+    )
+    with patch("src.providers.live.urllib.request.urlopen", return_value=_SSE(events)):
+        text = llm.generate()
+    parsed = parse_steps(text)
+    assert len(parsed.units) == 1
+    assert parsed.units[0].kind == "tool_intent"
+    assert parsed.units[0].tool["name"] == "write"
+    assert parsed.units[0].tool["args"]["path"] == "draft-0.txt"
+
+
+def test_tools_switch_the_specialist_instructions():
+    seen = {}
+
+    def fake_open(req, timeout=0):
+        seen["body"] = json.loads(req.data.decode("utf-8"))
+        return _SSE([
+            {"type": "response.created", "response": {"id": "resp_instr"}},
+            {"type": "response.output_text.delta", "delta": "<answer>ok</answer>"},
+            {"type": "response.completed", "response": {"usage": {"output_tokens": 1}}},
+        ])
+
+    plain = LiveLlm(user_prompt="q", api_key="sk-test", base_url="https://example.test/v1")
+    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+        plain.generate()
+    assert seen["body"]["instructions"] == STEP_INSTRUCTIONS
+    assert "tools" not in seen["body"]
+
+    armed = LiveLlm(
+        user_prompt="q",
+        api_key="sk-test",
+        base_url="https://example.test/v1",
+        tools=[sandbox_write_tool()],
+    )
+    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+        armed.generate()
+    assert seen["body"]["instructions"] == TOOL_INSTRUCTIONS
+    assert "tool_intent" not in TOOL_INSTRUCTIONS
+    assert seen["body"]["tools"][0]["name"] == "write"
+
+
+def test_tool_result_starts_another_model_turn():
+    streams = [
+        _SSE([
+            {"type": "response.created", "response": {"id": "resp_1"}},
+            {
+                "type": "response.output_item.added",
+                "item": {
+                    "type": "function_call",
+                    "id": "fc_1",
+                    "call_id": "call_1",
+                    "name": "write",
+                    "arguments": "",
+                },
+            },
+            {
+                "type": "response.function_call_arguments.done",
+                "item_id": "fc_1",
+                "arguments": '{"path":"draft-0.txt","content":"reviewed draft"}',
+            },
+        ]),
+        _SSE([
+            {"type": "response.created", "response": {"id": "resp_2"}},
+            {"type": "response.output_text.delta", "delta": '<step kind="claim">next</step>'},
+            {"type": "response.completed", "response": {"usage": {"output_tokens": 2}}},
+        ]),
+    ]
+    bodies = []
+
+    def fake_open(req, timeout=0):
+        bodies.append(json.loads(req.data.decode("utf-8")))
+        return streams.pop(0)
+
+    llm = LiveLlm(
+        user_prompt="write the draft",
+        api_key="sk-test",
+        base_url="https://example.test/v1",
+        tools=[sandbox_write_tool()],
+    )
+    with patch("src.providers.live.urllib.request.urlopen", fake_open):
+        chunks = []
+        stream = llm.iter_deltas()
+        chunks.append(next(stream))
+        llm.submit_tool_result("wrote draft-0.txt")
+        chunks.extend(stream)
+    assert "draft-0.txt" in chunks[0]
+    assert "claim" in "".join(chunks[1:])
+    assert len(bodies) == 2
+    follow = bodies[1]["input"]
+    assert follow[-1]["type"] == "function_call_output"
+    assert follow[-1]["call_id"] == "call_1"
+    assert follow[-1]["output"] == "wrote draft-0.txt"
+    assert follow[-2]["type"] == "function_call"
+
+
+def test_responses_request_sends_tools_when_present():
+    tool = sandbox_write_tool()
+    req = _responses_request(
+        base_url="https://example.test/v1",
+        api_key="sk-test",
+        model="gpt-test",
+        effort="none",
+        instructions="instr",
+        user="q",
+        stream=True,
+        tools=[tool],
+    )
+    body = json.loads(req.data.decode("utf-8"))
+    assert body["tools"] == [tool]
+    assert body["tool_choice"] == "auto"
     assert body["background"] is False
 
 

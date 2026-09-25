@@ -150,12 +150,11 @@ def test_default_floor_does_not_rewrite_q3_text():
     assert floor.units[-1].text == "Q3 +42% is demand"
 
 
-def test_resume_prefix_escapes_xml_special_chars():
+def test_resume_prefix_keeps_plain_text():
     floor = Floor()
     floor.ingest(_unit(1, "plan", "keep a < b & c"))
     prefix = floor.resume_prefix()
-    assert "< b" not in prefix
-    assert "&amp;" in prefix
-    assert "&lt;" in prefix
+    assert "plan: keep a < b & c" in prefix
+    assert "&amp;" not in prefix
     doc = parse_steps(prefix)
     assert doc.units[0].text == "keep a < b & c"

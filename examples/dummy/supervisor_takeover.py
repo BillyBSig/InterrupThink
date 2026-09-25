@@ -13,26 +13,26 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_takeover.py
+    python3 examples/dummy/supervisor_takeover.py
 """
 
 from interrupthink import FakeLlm, ScriptedMonitor, run_session
 
 HANDRAISE = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">the supervisor should take this</step>
-<answer>I will finish it myself.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: the supervisor should take this
+answer: I will finish it myself.
 """
 
 LEFT_UNREAD = """
-<step kind="claim">I resume the same draft</step>
-<answer>Still me.</answer>
+claim: I resume the same draft
+answer: Still me.
 """
 
 EDITOR = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">the note is now with the editor</step>
-<answer>The editor holds the rest.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: the note is now with the editor
+answer: The editor holds the rest.
 """
 
 

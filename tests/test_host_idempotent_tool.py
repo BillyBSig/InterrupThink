@@ -7,7 +7,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "host_idempotent_tool.py"
+    path = REPO / "examples" / "dummy" / "host_idempotent_tool.py"
     spec = importlib.util.spec_from_file_location("host_idempotent_tool", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -30,7 +30,7 @@ def test_same_step_key_writes_once_and_rollback_keeps_store():
 
 
 def test_example_is_host_store_not_package_durability():
-    text = (REPO / "examples" / "host_idempotent_tool.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "host_idempotent_tool.py").read_text(encoding="utf-8")
     assert "class IdempotentNote" in text
     assert "def step_key" in text
     assert "from src." not in text

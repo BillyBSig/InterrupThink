@@ -35,7 +35,7 @@ TURN = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are specialist B, a support agent. Emit ONLY XML with <step> and <answer>. "
+            "You are specialist B, a support agent. Write one step per line, and finish with an answer: line. "
             "kind whitelist: plan, premise, claim, evidence, tool_intent, doubt, answer_draft.",
         ),
         MessagesPlaceholder("history", optional=True),

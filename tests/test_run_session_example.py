@@ -9,7 +9,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "run_session_dummy.py"
+    path = REPO / "examples" / "dummy" / "run_session_dummy.py"
     spec = importlib.util.spec_from_file_location("run_session_dummy", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -33,7 +33,7 @@ def test_user_wires_without_interrupt_publishes():
 
 
 def test_example_imports_only_interruptible():
-    text = (REPO / "examples" / "run_session_dummy.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "run_session_dummy.py").read_text(encoding="utf-8")
     assert "from src." not in text
     assert "run_staging_case" not in text
     assert "OPENAI" not in text

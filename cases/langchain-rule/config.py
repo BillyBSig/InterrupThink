@@ -12,12 +12,11 @@ RUNS = CASE_DIR / "runs"
 BAD = "You may skip the posted city rule."
 CONTINUED = "The shop must follow the posted city rule."
 SHOP_DOCUMENT = (
-    '<step kind="tool_intent" reversible="true">'
-    '{"name":"read_rule","args":{"topic":"posted city rule"}}</step>\n'
-    '<step kind="claim">ask the checker</step>\n'
-    "<answer>" + BAD + "</answer>\n"
+    'tool_intent reversible: ' '{"name":"read_rule","args":{"topic":"posted city rule"}}\n'
+    'claim: ask the checker\n'
+    "answer: " + BAD + "\n"
 )
 CONTINUATION = (
-    '<step kind="claim">the reply can be finished</step>\n'
-    "<answer>" + CONTINUED + "</answer>\n"
+    'claim: the reply can be finished\n'
+    "answer: " + CONTINUED + "\n"
 )

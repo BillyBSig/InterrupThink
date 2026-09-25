@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from src.parse.steps import ParseError, parse_steps
+from src.parse.steps import parse_steps
 from src.providers.fake import FakeLlm
 from src.runtime.log import JsonlLogger
 from src.eval.g1 import INTERRUPT_XML_1, INTERRUPT_XML_2, run_path
@@ -63,6 +63,7 @@ def test_tool_path_waits_for_ok(n, tmp_path: Path):
     assert result.committed_answer == "Baseline is ready."
 
 
-def test_parser_rejects_text_without_step():
-    with pytest.raises(ParseError):
-        parse_steps("just prose, no steps")
+def test_plain_sentence_is_one_claim():
+    doc = parse_steps("just prose, no steps")
+    assert doc.units[0].kind == "claim"
+    assert doc.units[0].text == "just prose, no steps"

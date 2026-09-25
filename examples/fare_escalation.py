@@ -34,9 +34,8 @@ LIVE_TASK = (
     TASK
     + "\n\nEmit only XML. Read the policy, then one claim that asks policy, then an answer.\n"
     + "The lookup body is JSON on one line:\n"
-    + '<step kind="tool_intent" reversible="true">'
-    + '{"name":"read_policy","args":{"topic":"bereavement fare"}}</step>\n'
-    + '<step kind="claim">ask policy</step>\n'
+    + 'tool_intent reversible: ' + '{"name":"read_policy","args":{"topic":"bereavement fare"}}\n'
+    + 'claim: ask policy\n'
 )
 
 

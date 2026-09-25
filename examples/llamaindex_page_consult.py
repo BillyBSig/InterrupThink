@@ -38,9 +38,8 @@ LIVE_QUESTION = (
     QUESTION
     + "\n\nEmit only XML. Retrieve the page, then one claim that asks the checker, then an answer.\n"
     + "The retrieve body is JSON on one line:\n"
-    + '<step kind="tool_intent" reversible="true">'
-    + '{"name":"retrieve_page","args":{"query":"exchange after 30 days"}}</step>\n'
-    + '<step kind="claim">ask the checker</step>\n'
+    + 'tool_intent reversible: ' + '{"name":"retrieve_page","args":{"query":"exchange after 30 days"}}\n'
+    + 'claim: ask the checker\n'
 )
 
 

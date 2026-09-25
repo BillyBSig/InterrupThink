@@ -24,9 +24,9 @@ the user-facing examples.
 Dummy examples (no `.env`):
 
 ```bash
-python3 examples/run_session_dummy.py
-python3 examples/freeze_push_dummy.py
-python3 examples/staging_migrate.py
+python3 examples/dummy/run_session_dummy.py
+python3 examples/dummy/freeze_push_dummy.py
+python3 examples/dummy/staging_migrate.py
 ```
 
 Live cookbooks under `cases/` need a personal `.env`. Do not commit it or copy

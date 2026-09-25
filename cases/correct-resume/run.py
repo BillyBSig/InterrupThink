@@ -38,16 +38,16 @@ WRONG_HOST = "the ticket host is production"
 STAGING_FACT = "ticket host is staging this week; do not write as production"
 
 WRONG_THEN_WRITE = """
-<step kind="plan">write the host file from the ticket</step>
-<step kind="claim">the ticket host is production</step>
-<step kind="tool_intent" reversible="false">{"name":"write","args":{"path":"production.txt","content":"deploy to production"}}</step>
-<answer>Wrote production.txt. Host is production.</answer>
+plan: write the host file from the ticket
+claim: the ticket host is production
+tool_intent: {"name":"write","args":{"path":"production.txt","content":"deploy to production"}}
+answer: Wrote production.txt. Host is production.
 """
 
 CORRECTED_THEN_WRITE = """
-<step kind="claim">the ticket host is staging this week</step>
-<step kind="tool_intent" reversible="false">{"name":"write","args":{"path":"staging.txt","content":"deploy to staging"}}</step>
-<answer>Wrote staging.txt. Host is staging.</answer>
+claim: the ticket host is staging this week
+tool_intent: {"name":"write","args":{"path":"staging.txt","content":"deploy to staging"}}
+answer: Wrote staging.txt. Host is staging.
 """
 
 HOST_MEMO = (
@@ -66,7 +66,7 @@ Return ONLY JSON:
 """
 
 PRODUCTION_TICKET = """Ticket host is production. Write production.txt with deploy to production.
-Emit ONLY XML. If a resume prefix with supervisor_patch is provided, obey it:
+Write one step per line. If a resume prefix with supervisor_patch is provided, obey it:
 write staging.txt instead, not production.txt.
 """
 

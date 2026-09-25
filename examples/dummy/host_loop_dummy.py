@@ -16,21 +16,21 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/host_loop_dummy.py
+    python3 examples/dummy/host_loop_dummy.py
 """
 
 from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session
 
 PUSH_WRONG = """
-<step kind="plan">push the hotfix to origin main</step>
-<step kind="premise">the code freeze is over; main is clear to receive the fix</step>
-<step kind="tool_intent" reversible="false">{"name":"push","args":{"remote":"origin","branch":"main"}}</step>
-<answer>Pushed hotfix to origin/main.</answer>
+plan: push the hotfix to origin main
+premise: the code freeze is over; main is clear to receive the fix
+tool_intent: {"name":"push","args":{"remote":"origin","branch":"main"}}
+answer: Pushed hotfix to origin/main.
 """
 
 PUSH_STOPPED = """
-<step kind="claim">code freeze is still in force; do not push</step>
-<answer>Did not push. Freeze still holds.</answer>
+claim: code freeze is still in force; do not push
+answer: Did not push. Freeze still holds.
 """
 
 

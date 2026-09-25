@@ -2,44 +2,43 @@
 
 [English](../results.md) · [Bahasa Indonesia](results.md)
 
-Halaman ini adalah ringkasan publik atas bukti kontrak saat ini. Cakupannya
-sengaja lebih sempit daripada benchmark produk: setiap hasil menjelaskan
-fixture, jalur kontrol, dan efek samping yang dilindungi.
+Halaman ini adalah ringkasan public evidence untuk contract saat ini.
+Scope-nya sengaja lebih sempit daripada product benchmark: setiap hasil
+menjelaskan fixture, control path, dan side effect yang dilindungi.
 
-Dua kontrak muncul berulang kali: **memblokir** efek samping yang salah, dan
-**memperbaiki** proses penalaran lalu **melanjutkannya** (`rollback`).
-Pembatalan tanpa jalur lanjut bukan perilaku default yang dituju.
+Dua contract muncul berulang kali: **memblokir** side effect yang salah dan
+**memperbaiki** reasoning lalu **melanjutkannya** (`rollback`). Cancel tanpa
+resume path bukan default behavior yang dituju.
 
 ## Ringkasan
 
-### Pipeline dua sesi native
+### Native two-session pipeline
 
-- **Metode:** `FakeLlm` deterministik dan monitor scripted; satu sesi retrieval
-  diikuti sesi writer bersyarat.
-- **Hasil yang diamati:** klaim retrieval yang sudah usang diinterupsi sebelum
-  writer dimulai; jalur kontrol yang bersih menjalankan dua sesi dan membuat
-  satu file keputusan.
-- **Bukti:** `tests/test_two_specialists.py`,
+- **Metode:** deterministic `FakeLlm` dan scripted monitor; satu retrieval
+  session diikuti conditional writer session.
+- **Hasil yang diamati:** stale retrieval claim diinterupsi sebelum writer
+  dimulai; clean control path menjalankan dua session dan membuat satu
+  decision file.
+- **Evidence:** `tests/test_two_specialists.py`,
   `cases/two-specialists/`.
-- **Batas:** data retrieval adalah fixture lokal, bukan vector database
-  produksi atau basis pengetahuan live.
+- **Batas:** retrieval data adalah local fixture, bukan production vector
+  database atau live knowledge base.
 
-### Pengaman penulisan sandbox
+### Sandbox write guard
 
-- **Metode:** sesi deterministik dengan sandbox filesystem nyata.
-- **Hasil yang diamati:** jalur yang diinterupsi tidak membuat file; jalur yang
-  diizinkan menulis satu file di dalam sandbox; traversal keluar sandbox
-  ditolak.
-- **Bukti:** `tests/test_sandbox_write.py`,
+- **Metode:** deterministic session dengan sandbox filesystem nyata.
+- **Hasil yang diamati:** interrupted path tidak membuat file; allow path
+  menulis satu file di dalam sandbox; traversal keluar sandbox ditolak.
+- **Evidence:** `tests/test_sandbox_write.py`,
   `cases/freeze-write/`.
-- **Batas:** sandbox bukan batas keamanan bagi proses yang tidak tepercaya.
+- **Batas:** sandbox bukan security boundary bagi proses yang tidak tepercaya.
 
-### Memperbaiki dan melanjutkan
+### Correct and resume
 
-- **Metode:** sesi deterministik dengan dua request dan premis yang dikoreksi.
-- **Hasil yang diamati:** file produksi yang keliru tidak ada, event resume
+- **Metode:** deterministic session dengan dua request dan premise yang dikoreksi.
+- **Hasil yang diamati:** file produksi yang keliru tidak ada, resume event
   mencatat `rollback`, dan file staging yang sudah diperbaiki dapat ditulis.
-- **Bukti:** `tests/test_correct_resume.py`,
+- **Evidence:** `tests/test_correct_resume.py`,
   `cases/correct-resume/`,
   `tests/test_langchain_correct.py`,
   `cases/langchain-correct/`,
@@ -49,9 +48,9 @@ Pembatalan tanpa jalur lanjut bukan perilaku default yang dituju.
   `cases/crewai-correct/`,
   `tests/test_autogen_correct.py`,
   `cases/autogen-correct/`.
-- **Batas:** contoh ini memverifikasi watermark dan alur request pada floor;
-  contoh ini tidak menyediakan durabilitas checkpoint umum atau pemulihan
-  proses.
+- **Batas:** example ini memverifikasi watermark dan request flow pada floor;
+  example ini tidak menyediakan general checkpoint durability atau process
+  recovery.
 
 ### Pipeline penolakan jawaban
 
@@ -132,7 +131,7 @@ Pembatalan tanpa jalur lanjut bukan perilaku default yang dituju.
   Folder framework opsional mengulang bentuk paket yang sama, masing-masing
   dalam satu host.
 - **Hasil yang diamati:** jawaban yang belum selesai tidak di-commit. Paket
-  mempertahankan tugas awal, penerima, alasan supervisor, langkah yang
+  mempertahankan task awal, receiver, alasan supervisor, langkah yang
   dipertahankan, hasil tool yang tercatat, serta panggilan yang tidak boleh
   diulang. `Escalation` tidak melanjutkan specialist pertama. `Consult`
   mengembalikan patch kepada specialist yang sama. Pengambilalihan manusia
@@ -153,9 +152,11 @@ Pembatalan tanpa jalur lanjut bukan perilaku default yang dituju.
 
 - **Metode:** test monitor dan runtime deterministik.
 - **Hasil yang diamati:** output supervisor berbentuk JSON yang ketat diterima,
-  nilai status yang malformed atau tidak dikenal menjadi `Unknown`, dan kanal
-  XML specialist tidak berubah. Runtime tidak menyuntikkan prompt evaluasi
-  laboratorium.
+  nilai status yang malformed atau tidak dikenal menjadi `Unknown`, dan inti
+  runtime netral tidak membawa default khusus laboratorium. Kanal langkah
+  specialist adalah baris berlabel biasa (`plan:`, `claim:`, `tool_intent:`,
+  `answer:`); parser tetap menerima bentuk XML `<step>`/`<answer>` yang lama
+  agar bukti yang sudah tercatat tetap bisa direproduksi.
 - **Bukti:** `tests/test_llm_monitor.py`,
   `tests/test_run_session_contract.py`,
   `tests/test_spike_paths.py`.
@@ -169,14 +170,14 @@ Pembatalan tanpa jalur lanjut bukan perilaku default yang dituju.
   tanpa akses PyPI.
 - **Bukti:** `tests/test_wheel_install.py`,
   `tests/test_library_packaging.py`.
-- **Batas:** ini adalah pemeriksaan packaging lokal, bukan rilis publik atau
-  janji kompatibilitas untuk semua distribusi Python.
+- **Batas:** ini adalah local packaging check, bukan rilis publik atau
+  compatibility promise untuk semua distribusi Python.
 
 ## Interpretasi
 
-Bukti ini mendukung floor yang dapat digunakan kembali untuk **menginterupsi**,
-**memperbaiki**, dan **melanjutkan** (`rollback`) pada beberapa pola
-penyambungan host. Bukti ini tidak membuktikan bahwa interupsi meningkatkan
-akurasi, biaya, latensi, atau pengalaman pengguna. Pertanyaan tersebut
-memerlukan eksperimen terpisah dengan baseline, dataset, model, metrik, dan
-laporan ketidakpastian yang dinyatakan.
+Evidence ini mendukung reusable floor untuk **menginterupsi**, **memperbaiki**,
+dan **melanjutkan** (`rollback`) pada beberapa host integration pattern.
+Evidence ini tidak membuktikan bahwa interupsi meningkatkan accuracy, cost,
+latency, atau user experience. Pertanyaan tersebut memerlukan eksperimen
+terpisah dengan baseline, dataset, model, metric, dan uncertainty report yang
+dinyatakan.

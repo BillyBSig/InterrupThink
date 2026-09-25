@@ -14,7 +14,7 @@ HANDRAISE = """
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_consult.py"
+    path = REPO / "examples" / "dummy" / "supervisor_consult.py"
     spec = importlib.util.spec_from_file_location("supervisor_consult", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -111,7 +111,7 @@ def test_unchecked_consult_does_not_resume_the_specialist():
 
 
 def test_example_does_not_let_the_specialist_call_its_peer():
-    text = (REPO / "examples" / "supervisor_consult.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_consult.py").read_text(encoding="utf-8")
     assert "consult_to=\"checker\"" in text
     assert "from src." not in text
     assert "transfer_to_" not in text

@@ -13,7 +13,7 @@ membatalkan proses, dan bukan pula pada batas token mentah.
 
 InterrupThink adalah library eksperimental, bukan produk atau layanan hosted.
 
-[Mulai cepat](docs/id/getting-started.md) · [Contoh](examples/) · [Kasus](cases/) · [Konsep](docs/id/concepts.md) · [Berkontribusi](CONTRIBUTING.md) · [Lisensi](LICENSE)
+[Mulai cepat](docs/id/getting-started.md) · [Contoh](examples/) · [Kasus](cases/) · [Konsep](docs/id/concepts.md) · [Hasil](docs/id/results.md) · [Evaluasi live](docs/id/live-evaluation.md) · [Berkontribusi](CONTRIBUTING.md) · [Lisensi](LICENSE)
 
 ## Mulai cepat
 
@@ -48,7 +48,7 @@ Thinking floor yang sama juga menerima specialist scripted. Jalur ini tidak
 memerlukan API key dan selalu menghasilkan output yang sama.
 
 ```bash
-python3 examples/run_session_dummy.py
+python3 examples/dummy/run_session_dummy.py
 ```
 
 ```python
@@ -61,7 +61,7 @@ result = run_session(llm=llm, monitor=monitor, tool=tool)
 ```
 
 Kebijakan host diperiksa secara terpisah.
-[`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) menolak
+[`examples/dummy/tool_policy_deny.py`](examples/dummy/tool_policy_deny.py) menolak
 `publish` setelah monitor mengembalikan `Ok`.
 
 Setelah interupsi, `FakeLlm` harus menyediakan dokumen XML kedua. `run_session`
@@ -193,7 +193,7 @@ if result.escalate_to:
 ```
 
 Lokasi pemanggilan:
-[`examples/supervisor_escalation.py`](examples/supervisor_escalation.py).
+[`examples/dummy/supervisor_escalation.py`](examples/dummy/supervisor_escalation.py).
 Demo live:
 [`examples/langgraph_offer_escalation.py`](examples/langgraph_offer_escalation.py).
 Cookbook: [`cases/langgraph-offer/`](cases/langgraph-offer/).
@@ -234,7 +234,7 @@ if result.consult_to:
 specialist yang sama seperti sesi pertama.
 
 Lokasi pemanggilan:
-[`examples/supervisor_consult.py`](examples/supervisor_consult.py).
+[`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py).
 Demo live:
 [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py),
 [`examples/llamaindex_page_consult.py`](examples/llamaindex_page_consult.py).
@@ -263,7 +263,7 @@ if result.takeover_to == "human":
 ```
 
 Lokasi pemanggilan:
-[`examples/supervisor_takeover.py`](examples/supervisor_takeover.py).
+[`examples/dummy/supervisor_takeover.py`](examples/dummy/supervisor_takeover.py).
 Demo live:
 [`examples/autogen_support_takeover.py`](examples/autogen_support_takeover.py).
 Bentuk editor:
@@ -277,14 +277,14 @@ Lokasi pemanggilan singkat setelah `pip install -e .`. Cerita lengkap ada di
 
 | File | Pemanggilan |
 |------|--------|
-| [`examples/run_session_dummy.py`](examples/run_session_dummy.py) | `run_session` |
-| [`examples/staging_migrate.py`](examples/staging_migrate.py) | contoh staging-migrate siap pakai (helper lokal) |
-| [`examples/freeze_push_dummy.py`](examples/freeze_push_dummy.py) | freeze + `push` dummy |
-| [`examples/host_loop_dummy.py`](examples/host_loop_dummy.py) | host loop; HITL di batas tool |
-| [`examples/tool_policy_deny.py`](examples/tool_policy_deny.py) | host menolak `publish` setelah monitor `Ok` |
-| [`examples/supervisor_escalation.py`](examples/supervisor_escalation.py) | `Escalation`: specialist berikutnya menerima paket |
-| [`examples/supervisor_consult.py`](examples/supervisor_consult.py) | `Consult`: patch kembali ke specialist yang sama |
-| [`examples/supervisor_takeover.py`](examples/supervisor_takeover.py) | `Takeover`: editor atau manusia menerima paket |
+| [`examples/dummy/run_session_dummy.py`](examples/dummy/run_session_dummy.py) | `run_session`, tanpa API key |
+| [`examples/dummy/staging_migrate.py`](examples/dummy/staging_migrate.py) | contoh staging-migrate siap pakai, tanpa API key (helper lokal) |
+| [`examples/dummy/freeze_push_dummy.py`](examples/dummy/freeze_push_dummy.py) | freeze + `push` dummy, tanpa API key |
+| [`examples/dummy/host_loop_dummy.py`](examples/dummy/host_loop_dummy.py) | host loop; HITL di batas tool, tanpa API key |
+| [`examples/dummy/tool_policy_deny.py`](examples/dummy/tool_policy_deny.py) | host menolak `publish` setelah monitor `Ok` |
+| [`examples/dummy/supervisor_escalation.py`](examples/dummy/supervisor_escalation.py) | `Escalation`: specialist berikutnya menerima paket |
+| [`examples/dummy/supervisor_consult.py`](examples/dummy/supervisor_consult.py) | `Consult`: patch kembali ke specialist yang sama |
+| [`examples/dummy/supervisor_takeover.py`](examples/dummy/supervisor_takeover.py) | `Takeover`: editor atau manusia menerima paket |
 | [`examples/langgraph_offer_escalation.py`](examples/langgraph_offer_escalation.py) | escalation LangGraph |
 | [`examples/langchain_rule_consult.py`](examples/langchain_rule_consult.py) | consultation LangChain |
 | [`examples/crewai_order_escalation.py`](examples/crewai_order_escalation.py) | escalation CrewAI |
@@ -296,7 +296,8 @@ sebagai dependency inti. Daftar lengkapnya ada di
 [`examples/README.md`](examples/README.md).
 
 Runner case menggunakan `LiveLlm` dan `LlmMonitor` dengan `.env` pribadi.
-Jangan commit key. File dummy `examples/*_dummy.py` tetap scripted.
+Jangan commit key. Call site deterministik tanpa key ada di
+[`examples/dummy/`](examples/dummy/).
 
 ## Integrasi
 
@@ -335,7 +336,9 @@ python3 -m pytest tests/test_public_api.py tests/test_library_packaging.py -x --
 ```
 
 Library ini eksperimental. Ini bukan produk atau mesh multi-agent. Klaim publik
-terbatas pada pemeriksaan dalam [`docs/results.md`](docs/results.md).
+terbatas pada pemeriksaan dalam [`docs/results.md`](docs/results.md) (test
+deterministik) dan [`docs/live-evaluation.md`](docs/live-evaluation.md)
+(pemeriksaan model live opt-in).
 
 ## Lisensi
 

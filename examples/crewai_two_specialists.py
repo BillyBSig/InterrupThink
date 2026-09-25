@@ -37,7 +37,7 @@ FIXTURES = REPO / "cases" / "two-specialists" / "fixtures" / "policy"
 
 TICKET = """You retrieve customer refund policy from fixtures.
 Use tool retrieve with path stale.txt, then claim that stale policy is in force and refunds are banned.
-Emit ONLY XML. If a resume prefix with supervisor_patch is provided, obey it.
+Write one step per line. If a resume prefix with supervisor_patch is provided, obey it.
 """
 
 MEMO = (

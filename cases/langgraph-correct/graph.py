@@ -6,7 +6,6 @@ intent to ToolNode. Do not skip tools merely because interrupt_ids is non-empty.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any, TypedDict
@@ -88,18 +87,17 @@ def _clear(sandbox: Path) -> None:
 
 
 def _pending_tool(result) -> dict | None:
-    """Last kept tool_intent (dropped production intents must not reach ToolNode)."""
+    """Last kept tool intent. Dropped production intents stay out of ToolNode."""
     dropped = set(result.dropped_ids or [])
     pending = None
-    for rec in result.log_records:
-        if rec.get("event") != "thought.unit" or rec.get("kind") != "tool_intent":
+    for event in result.events:
+        if event.type != "tool.intent":
             continue
-        if rec.get("unit_id") in dropped:
+        if event.payload.get("unit_id") in dropped:
             continue
-        try:
-            pending = json.loads(rec.get("text") or "")
-        except json.JSONDecodeError:
-            pending = None
+        name = event.payload.get("name")
+        if name:
+            pending = {"name": name, "args": event.payload.get("args") or {}}
     return pending
 
 

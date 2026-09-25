@@ -19,7 +19,7 @@ def test_public_core_symbols_are_importable():
 
 
 def test_example_does_not_import_src():
-    text = (REPO / "examples" / "staging_migrate.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "staging_migrate.py").read_text(encoding="utf-8")
     assert "from src." not in text
     assert "PYTHONPATH" not in text
     assert "from staging_case import" in text

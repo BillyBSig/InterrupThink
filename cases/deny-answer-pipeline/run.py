@@ -38,20 +38,20 @@ FALSE_POLICY = "one device per subscription"
 ALLOWED = "multi-device is allowed on this plan"
 
 FALSE_CLAIM = """
-<step kind="plan">answer the customer about how many devices they may use</step>
-<step kind="claim">one device per subscription</step>
-<answer>You may use only one device per subscription.</answer>
+plan: answer the customer about how many devices they may use
+claim: one device per subscription
+answer: You may use only one device per subscription.
 """
 
 FALSE_STOPPED = """
-<step kind="claim">multi-device is allowed; do not send the one-device policy</step>
-<answer>Did not send. Multi-device is allowed.</answer>
+claim: multi-device is allowed; do not send the one-device policy
+answer: Did not send. Multi-device is allowed.
 """
 
 TRUE_CLAIM = """
-<step kind="plan">answer the customer about how many devices they may use</step>
-<step kind="claim">multi-device is allowed on this plan</step>
-<answer>multi-device is allowed on this plan</answer>
+plan: answer the customer about how many devices they may use
+claim: multi-device is allowed on this plan
+answer: multi-device is allowed on this plan
 """
 
 POLICY_MEMO = (
@@ -69,11 +69,11 @@ Return ONLY JSON:
 """
 
 ANSWER_TICKET_FALSE = """Customer asks how many devices they may use. Claim one device per subscription.
-Emit ONLY XML with a claim step. If a resume prefix with supervisor_patch is provided, do not repeat the one-device claim.
+Write one step per line, including the claim. If a resume prefix with supervisor_patch is provided, do not repeat the one-device claim.
 """
 
 ANSWER_TICKET_TRUE = """Customer asks how many devices they may use. Claim multi-device is allowed on this plan.
-Emit ONLY XML. The <answer> body must be exactly: multi-device is allowed on this plan
+Write one step per line. The answer: line must be exactly: multi-device is allowed on this plan
 """
 
 
@@ -148,10 +148,10 @@ def _send_xml(forwarded: str) -> str:
         ensure_ascii=False,
     )
     return f"""
-<step kind="plan">send the checked answer to the customer outbox</step>
-<step kind="premise">host forwarded a checked answer</step>
-<step kind="tool_intent" reversible="false">{payload}</step>
-<answer>Sent to outbox.</answer>
+plan: send the checked answer to the customer outbox
+premise: host forwarded a checked answer
+tool_intent: {payload}
+answer: Sent to outbox.
 """
 
 
@@ -192,7 +192,7 @@ def run_send_specialist(
         llm = _live_llm(
             "Host forwarded this checked answer. Write it to outbox.txt.\n"
             f"Answer:\n{forwarded}\n"
-            "Emit ONLY XML with tool_intent write path=outbox.txt and that content."
+            "Write one step per line with tool_intent write path=outbox.txt and that content."
         )
     result = run_session(
         llm=llm,

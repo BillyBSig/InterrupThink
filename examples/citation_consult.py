@@ -35,9 +35,8 @@ LIVE_TASK = (
     TASK
     + "\n\nEmit only XML. One lookup, then one claim that asks the checker, then an answer.\n"
     + "The lookup body is JSON on one line:\n"
-    + '<step kind="tool_intent" reversible="true">'
-    + '{"name":"lookup_citation","args":{"query":"' + CITATION + '"}}</step>\n'
-    + '<step kind="claim">ask the checker</step>\n'
+    + 'tool_intent reversible: ' + '{"name":"lookup_citation","args":{"query":"' + CITATION + '"}}\n'
+    + 'claim: ask the checker\n'
 )
 
 

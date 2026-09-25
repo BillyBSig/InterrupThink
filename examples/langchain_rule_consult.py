@@ -38,9 +38,8 @@ LIVE_QUESTION = (
     QUESTION
     + "\n\nEmit only XML. Read the rule, then one claim that asks the checker, then an answer.\n"
     + "The rule body is JSON on one line:\n"
-    + '<step kind="tool_intent" reversible="true">'
-    + '{"name":"read_rule","args":{"topic":"posted city rule"}}</step>\n'
-    + '<step kind="claim">ask the checker</step>\n'
+    + 'tool_intent reversible: ' + '{"name":"read_rule","args":{"topic":"posted city rule"}}\n'
+    + 'claim: ask the checker\n'
 )
 TURN = ChatPromptTemplate.from_messages(
     [

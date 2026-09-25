@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 
 from interrupthink import JsonlLogger, LlmMonitor, SandboxWriteTool, run_session
 from src.providers.live import LiveLlm
@@ -78,6 +78,7 @@ def _role_crew() -> tuple[Agent, Crew]:
         backstory="You write one sandbox file. You do not delegate.",
         allow_delegation=False,
         verbose=False,
+        llm=LLM(model="gpt-4o-mini", api_key="offline-not-used"),
     )
     task = Task(
         description="Write the host file from the ticket (production unless corrected to staging).",

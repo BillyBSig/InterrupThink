@@ -22,7 +22,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 
 from interrupthink import Escalation, LiveLlm, ScriptedMonitor, Verdict, run_session
 
@@ -35,9 +35,8 @@ LIVE_TASK = (
     + TRANSCRIPT
     + "\n\nEmit only XML. Read the order, then one claim that asks counter, then an answer.\n"
     + "The order body is JSON on one line:\n"
-    + '<step kind="tool_intent" reversible="true">'
-    + '{"name":"read_order","args":{"transcript":"cone with bacon"}}</step>\n'
-    + '<step kind="claim">ask counter</step>\n'
+    + 'tool_intent reversible: ' + '{"name":"read_order","args":{"transcript":"cone with bacon"}}\n'
+    + 'claim: ask counter\n'
 )
 
 
@@ -136,12 +135,14 @@ def run_order_crew(monitor, taker_llm, make_counter, desk=None, task: str = TASK
     """Two roles. The counter task receives the host package. The crew does not kick off."""
     desk = desk or OrderDesk()
     result = OrderCrewResult()
+    shell = LLM(model="gpt-4o-mini", api_key="offline-not-used")
     taker = Agent(
         role="Order Taker",
         goal="Read the transcript and stop before a mismatched order is placed.",
         backstory="You only read the written transcript.",
         allow_delegation=False,
         verbose=False,
+        llm=shell,
     )
     counter = Agent(
         role="Counter",
@@ -149,6 +150,7 @@ def run_order_crew(monitor, taker_llm, make_counter, desk=None, task: str = TASK
         backstory="You do not take the route yourself.",
         allow_delegation=False,
         verbose=False,
+        llm=shell,
     )
     taker_task = Task(description=TRANSCRIPT, expected_output="Order note.", agent=taker)
     counter_task = Task(

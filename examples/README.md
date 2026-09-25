@@ -2,6 +2,10 @@
 
 After `pip install -e .`, these files show **how to call** `interrupthink` / `src`. They are not full use-case solutions.
 
+Every file below calls `LiveLlm` and needs a personal API key in a local
+`.env` file (never committed). For deterministic, no-key call sites, see
+[`dummy/`](dummy/).
+
 Three call sites name a receiver while the verdict stays `Ok`. Escalation
 (`escalate_to`) gives the package to the next specialist. Consultation
 (`consult_to`) returns a patch to the same specialist. Takeover
@@ -13,19 +17,10 @@ Solutions (ticket, sandbox, `tmp/` / `runs/` traces): [`cases/`](../cases/).
 
 | File | Calls | Scenario |
 |------|-------|----------|
-| [`run_session_dummy.py`](run_session_dummy.py) | `run_session` | Stop an unsafe planned action using deterministic local components |
-| [`tool_policy_deny.py`](tool_policy_deny.py) | `run_session` + `tool_policy` | Refuse `publish` after the monitor returns Ok |
-| [`host_idempotent_tool.py`](host_idempotent_tool.py) | host tool + `run_session` | Same step key writes once; rollback keeps the store |
-| [`supervisor_escalation.py`](supervisor_escalation.py) | host + `run_session` | Next specialist starts only after the supervisor names them |
-| [`supervisor_handoff.py`](supervisor_handoff.py) | host + `run_session` | Named specialist receives the task, kept steps, and calls not to repeat |
-| [`supervisor_consult.py`](supervisor_consult.py) | host + `run_session` | A checked consult returns as a patch to the same specialist |
-| [`supervisor_consult_input.py`](supervisor_consult_input.py) | host + `run_session` | The checker reads the same package, then the same specialist continues |
 | [`citation_consult.py`](citation_consult.py) | host + `LiveLlm` | A citation checker returns a patch and the same drafter continues |
 | [`fare_escalation.py`](fare_escalation.py) | host + `LiveLlm` | A policy specialist receives the fare result and the front agent stops |
 | [`database_takeover.py`](database_takeover.py) | host + `LiveLlm` | A human receives the blocked-delete package and the agent does not resume |
-| [`supervisor_takeover.py`](supervisor_takeover.py) | host + `run_session` | A named owner continues from the kept steps; the first specialist does not |
-| [`supervisor_takeover_input.py`](supervisor_takeover_input.py) | host + `run_session` | Editor and human receive the same package; the first specialist does not resume |
-| [`staging_migrate.py`](staging_migrate.py) | Local staging-migration helper | Prevent a migration to production when the ticket host is staging |
+| [`staging_migrate_live.py`](staging_migrate_live.py) | `LiveLlm` + paired seeds | Live smoke check for the dummy staging-migration story |
 | [`langchain_specialist.py`](langchain_specialist.py) | `run_session` + `LiveLlm` | Check a release-freeze claim before a LangChain file write |
 | [`langchain_correct.py`](langchain_correct.py) | `run_session` + `LiveLlm` | Correct a wrong deployment host and continue with LangChain |
 | [`langchain_chat.py`](langchain_chat.py) | `run_session` per chat turn | Check a support-policy claim before publishing an answer |
@@ -44,6 +39,5 @@ Solutions (ticket, sandbox, `tmp/` / `runs/` traces): [`cases/`](../cases/).
 | [`autogen_support_takeover.py`](autogen_support_takeover.py) | One AutoGen agent + `LiveLlm` | A human receives the support package and no second agent continues |
 | [`autogen_correct.py`](autogen_correct.py) | `run_session` in one AutoGen agent | Correct a deployment host and continue with AutoGen |
 
-Older dummy files (`*_dummy.py`, `host_loop_dummy.py`, and
-`staging_migrate_live.py`) are local call sites for learning and regression
-checks. They are not full use-case solutions.
+Deterministic, no-API-key call sites (`FakeLlm`, `DummyTool`) live in
+[`dummy/`](dummy/), not in this list.

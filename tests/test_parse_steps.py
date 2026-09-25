@@ -33,6 +33,39 @@ def test_start_n_continues_ids():
     assert doc.units[0].id == "tu_03"
 
 
+def test_plain_lines_and_reversible_tool():
+    doc = parse_steps(
+        "\n".join(
+            [
+                "plan: first",
+                "claim: the host is staging",
+                'tool_intent reversible: {"name":"write","args":{"path":"staging.txt"}}',
+                "answer: Wrote staging.",
+            ]
+        )
+    )
+    assert [unit.kind for unit in doc.units] == ["plan", "claim", "tool_intent"]
+    assert doc.units[2].reversible is True
+    assert doc.units[2].tool["args"]["path"] == "staging.txt"
+    assert doc.answer == "Wrote staging."
+
+
+def test_hallucinated_tool_intent_line_falls_back_to_claim():
+    """A narrative line that merely starts with the reserved word must not
+    crash the session. Only a well-formed JSON body is a real tool call
+    (real calls are built by src.providers.live.tool_call_step)."""
+    doc = parse_steps("plan: outline\ntool_intent:\nanswer: done")
+    assert [u.kind for u in doc.units] == ["plan", "claim"]
+    assert doc.units[1].text == "tool_intent:"
+    assert doc.answer == "done"
+
+
+def test_tool_intent_with_bad_json_falls_back_to_claim():
+    doc = parse_steps('tool_intent: not json at all')
+    assert doc.units[0].kind == "claim"
+    assert doc.units[0].text == "tool_intent: not json at all"
+
+
 def test_tool_intent_json_and_reversible():
     doc = parse_steps(
         '<step kind="tool_intent" reversible="false">{"name":"fetch","args":{"q":1}}</step>'

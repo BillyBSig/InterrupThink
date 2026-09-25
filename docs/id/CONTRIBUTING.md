@@ -29,7 +29,7 @@ Untuk setiap klaim baru, sertakan:
 
 Jika bukti belum tersedia, tulis `not evaluated`, jangan menerka.
 
-## Pemeriksaan lokal
+## Local check
 
 Dari root repository sumber:
 
@@ -49,7 +49,7 @@ tersebut tidak boleh dijelaskan sebagai hasil framework yang lulus.
 - Utamakan bagian singkat dan perintah yang dapat dijalankan.
 - Jelaskan istilah saat pertama kali muncul.
 - Nyatakan hal yang tidak ditunjukkan oleh bukti.
-- Hindari nomor tugas internal dan bahasa status proyek.
+- Hindari internal task number dan bahasa status proyek.
 
 ## Pull request
 
@@ -58,7 +58,7 @@ Perubahan dokumentasi perlu menjelaskan:
 - pembaca publik yang dilayaninya;
 - kode sumber atau test yang mendukungnya;
 - hal yang sengaja tidak disertakan;
-- pemeriksaan lokal yang telah dijalankan.
+- local check yang telah dijalankan.
 
 Jangan menyertakan kredensial, trace mentah, prompt privat, atau artefak case
 yang dihasilkan dalam pull request.

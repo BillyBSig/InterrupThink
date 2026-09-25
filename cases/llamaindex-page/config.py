@@ -12,12 +12,11 @@ RUNS = CASE_DIR / "runs"
 BAD = "Yes, exchanges are available any time."
 CONTINUED = "Exchanges after 30 days are not offered."
 PAGE_DOCUMENT = (
-    '<step kind="tool_intent" reversible="true">'
-    '{"name":"retrieve_page","args":{"query":"exchange after 30 days"}}</step>\n'
-    '<step kind="claim">ask the checker</step>\n'
-    "<answer>" + BAD + "</answer>\n"
+    'tool_intent reversible: ' '{"name":"retrieve_page","args":{"query":"exchange after 30 days"}}\n'
+    'claim: ask the checker\n'
+    "answer: " + BAD + "\n"
 )
 CONTINUATION = (
-    '<step kind="claim">the reply can be finished</step>\n'
-    "<answer>" + CONTINUED + "</answer>\n"
+    'claim: the reply can be finished\n'
+    "answer: " + CONTINUED + "\n"
 )

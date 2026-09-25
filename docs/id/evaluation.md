@@ -9,55 +9,56 @@ Evaluasi saat ini mengajukan dua pertanyaan kontrak:
 > Dapatkah host **menghentikan** langkah semantik yang tidak didukung sebelum
 > efek sampingnya di-commit?
 >
-> Setelah pemutusan, dapatkah host **mengoreksi** proses penalaran (patch +
+> Setelah pemutusan, dapatkah host **mengoreksi** reasoning process (patch +
 > watermark) dan **melanjutkan** dengan rollback, alih-alih hanya membatalkan
 > atau memulai ulang dari awal?
 
-Ini adalah verifikasi kontrak untuk library floor, bukan benchmark kualitas
-language model, latency, throughput, atau performa agent secara umum.
+Ini adalah contract verification untuk library floor, bukan benchmark
+Language Model quality, latency, throughput, atau agent performance secara
+umum.
 
-Pemeriksaan kontrak tambahan mencakup penerima bernama. Escalation,
-konsultasi, dan takeover mempertahankan status `Ok` serta mencantumkan nama
-pada hasil. Test memeriksa siapa yang menerima paket, langkah mana yang tetap
-ada di dalamnya, dan apakah jawaban pertama di-commit. Test tidak menilai
-prosa penerima.
+Contract check tambahan mencakup named receiver. Escalation, consultation,
+dan takeover mempertahankan status `Ok` serta menyertakan nama pada hasil.
+Test memeriksa siapa yang menerima paket, langkah mana yang tetap ada di
+dalamnya, dan apakah jawaban pertama di-commit. Test tidak menilai prosa
+penerima.
 
 ## Desain perbandingan
 
 Setiap case dengan efek samping memiliki jalur kontrol:
 
-- **jalur interupsi** — premise yang salah atau tidak didukung terdeteksi
+- **interrupt path** — premise yang salah atau tidak didukung terdeteksi
   sebelum tool, sink jawaban, atau sesi downstream;
-- **jalur koreksi-dan-lanjut** — setelah pemutusan, patch diterapkan dan
+- **correct-and-resume path** — setelah pemutusan, patch diterapkan dan
   specialist melanjutkan dari checkpoint (`rollback`);
-- **jalur izinkan** — tugas dengan bentuk yang sama berjalan saat tidak ada
+- **allow path** — task dengan bentuk yang sama berjalan saat tidak ada
   interupsi.
 
-Jalur izinkan adalah perbandingan serial/kontrol lokal. Klaim dibatasi pada
-efek samping dan perilaku sesi yang diamati dalam fixture.
+Allow path adalah serial/local control comparison. Claim dibatasi pada side
+effect dan session behavior yang diamati dalam fixture.
 
 ## Kelas bukti
 
-### Test kontrak deterministik
+### Deterministic contract test
 
-Bukti utama menggunakan `FakeLlm`, monitor scripted, sandbox tool, dan fixture
-kecil. Test ini dapat diulang dan tidak memerlukan API key.
+Evidence utama menggunakan `FakeLlm`, scripted monitor, sandbox tool, dan
+fixture kecil. Test ini dapat diulang dan tidak memerlukan API key.
 
 Test memverifikasi:
 
-- unit semantik yang diparse dan verdict monitor;
+- semantic unit yang di-parse dan monitor verdict;
 - urutan interupsi;
-- ada atau tidaknya efek samping sandbox;
-- field event rollback;
-- perilaku dependency opsional;
-- instalasi wheel lokal.
+- ada atau tidaknya sandbox side effect;
+- field rollback event;
+- behavior optional dependency;
+- instalasi local wheel.
 
-### Jalur smoke live
+### Live smoke path
 
-Runner case command-line dapat menggunakan `LiveLlm` dan `LlmMonitor` dengan
-file environment pribadi. Setiap verdict monitor live menunggu provider
-sebelum sesi berlanjut. Run ini menunjukkan wiring terhadap model live, tetapi
-tidak deterministik dan tidak digunakan untuk mengklaim akurasi model.
+Command-line case runner dapat menggunakan `LiveLlm` dan `LlmMonitor` dengan
+environment file pribadi. Setiap live monitor verdict menunggu provider
+sebelum sesi berlanjut. Run ini menunjukkan wiring ke live model, tetapi
+bersifat nondeterministic dan tidak digunakan untuk mengklaim model accuracy.
 
 Tidak ada API key proyek yang diperlukan ataupun disimpan. Kredensial tidak
 boleh di-commit.
@@ -76,8 +77,8 @@ python3 -m pytest tests/test_two_specialists.py tests/test_false_policy.py tests
 python3 -m pytest tests/test_llm_monitor.py tests/test_run_session_contract.py -x --tb=short -q
 ```
 
-Test framework opsional akan di-skip dengan benar ketika package-nya tidak
-ada. Jika framework terpasang di environment, jalankan file test terkait:
+Optional framework test akan di-skip dengan benar ketika package-nya tidak
+ada. Jika framework terpasang di environment, jalankan test file terkait:
 
 ```bash
 python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py tests/test_langgraph_correct.py -q
@@ -90,29 +91,29 @@ Versi Python yang tepat, keadaan package, dan revisi source harus disertakan
 pada setiap hasil yang dilaporkan secara eksternal. Lihat
 [Reproducibility](reproducibility.md).
 
-## Kriteria lulus
+## Kriteria pass
 
-Skenario hanya dilaporkan lulus apabila kontrak utamanya diamati:
+Skenario hanya dilaporkan pass apabila kontrak utamanya diamati:
 
 - interupsi terjadi sebelum efek samping yang dilindungi;
 - setelah koreksi, resume melanjutkan dari watermark, bukan hanya membatalkan
   sesi;
-- jalur izinkan/kontrol menghasilkan efek samping terbatas yang diharapkan;
+- allow/control path menghasilkan side effect terbatas yang diharapkan;
 - hasil sesi mencatat data interupsi atau rollback yang diharapkan;
-- package host opsional tidak menjadi dependency inti;
+- optional host package tidak menjadi core dependency;
 - test dapat dipetakan ke source test atau case yang di-commit.
 
 Jika dependency tidak tersedia, hasilnya adalah `not evaluated` atau
-`skipped`, bukan keberhasilan yang disimpulkan dari inspeksi source.
+`skipped`, bukan status pass yang disimpulkan dari inspeksi source.
 
 ## Disiplin pelaporan
 
 Hasil publik membedakan:
 
-- bukti test deterministik dari bukti smoke live;
-- kontrak skenario dari jaminan produksi;
-- perbandingan kontrol lokal dari benchmark baseline;
-- test yang lulus dari framework atau mode deployment yang belum diuji.
+- deterministic test evidence dari live smoke evidence;
+- kontrak skenario dari production guarantee;
+- local control comparison dari benchmark baseline;
+- test yang pass dari framework atau deployment mode yang belum diuji.
 
 Hasil tidak menyertakan prompt privat, respons model mentah, nilai environment,
 trace yang dihasilkan, atau identifier riset internal.

@@ -5,7 +5,7 @@
 ## Persyaratan
 
 - Python 3.11 atau lebih baru;
-- `uv` atau alat lain untuk membuat virtual environment;
+- `uv` atau tool lain untuk membuat virtual environment;
 - contoh deterministik tidak membutuhkan API key.
 
 Source repository saat ini menjadi sumber instalasi. Package belum
@@ -25,20 +25,20 @@ opsional diinstal terpisah saat menjalankan contoh terkait.
 ## Jalankan contoh deterministik
 
 ```bash
-python3 examples/run_session_dummy.py
+python3 examples/dummy/run_session_dummy.py
 ```
 
 Contoh ini menggunakan `FakeLlm`, `ScriptedMonitor`, dan `DummyTool`. Saat
-terjadi interupsi, pemanggilan tool `publish` yang tidak dapat dibatalkan tidak
-dieksekusi; tanpa interupsi, alur kontrol mencapai dummy tool.
+terjadi interupsi, tool call `publish` yang tidak dapat dibatalkan tidak
+dieksekusi; tanpa interupsi, control flow mencapai dummy tool.
 
 Itu baru setengah dari floor. **Koreksi** adalah request kedua setelah cut:
 specialist melanjutkan dari watermark dengan premise yang sudah di-patch,
-bukan memulai ulang seluruh tugas. Lihat
+bukan me-restart seluruh task. Lihat
 [`cases/correct-resume/`](../../cases/correct-resume/) dan
 `python3 cases/correct-resume/run.py`.
 
-Tool mencatat pemanggilan di memori; tool tidak memublikasikan apa pun.
+Tool menyimpan tool call di memori; tool tidak memublikasikan apa pun.
 
 ## Menyusun sesi
 
@@ -49,17 +49,15 @@ opsional:
 from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session
 
 wrong = """
-<step kind="plan">publish the changelog</step>
-<step kind="premise">the changelog is already approved</step>
-<step kind="tool_intent" reversible="false">
-{"name":"publish","args":{"doc":"changelog"}}
-</step>
-<answer>Published the changelog.</answer>
+plan: publish the changelog
+premise: the changelog is already approved
+tool_intent: {"name":"publish","args":{"doc":"changelog"}}
+answer: Published the changelog.
 """
 
 stopped = """
-<step kind="claim">the changelog is not approved</step>
-<answer>Did not publish.</answer>
+claim: the changelog is not approved
+answer: Did not publish.
 """
 
 tool = DummyTool()
@@ -77,15 +75,15 @@ assert tool.calls == []
 ```
 
 `run_session` meminta dokumen kedua dari LLM setelah interupsi. Dengan
-`FakeLlm`, dokumen itu harus tersedia; jika tidak, sesi menimbulkan
-`SessionError`. Ini disengaja: request yang diinterupsi dibatalkan dan
+`FakeLlm`, dokumen itu harus tersedia; jika tidak, sesi menghasilkan
+`SessionError`. Ini disengaja: request yang diinterupsi dibatalkan lalu
 dilanjutkan dengan request baru, bukan diam-diam meneruskan request lama.
 `Patch` dapat membawa fakta pengganti pada request berikutnya agar specialist
-melanjutkan proses penalaran, bukan hanya berhenti. Lihat
+melanjutkan reasoning, bukan hanya berhenti. Lihat
 [Konsep](concepts.md) dan
 [`cases/correct-resume/`](../../cases/correct-resume/).
 
-## Serahkan tugas kepada penerima bernama
+## Serahkan task kepada penerima bernama
 
 Hasil sesi yang sama dapat menyebut penerima tanpa melakukan commit pada
 jawaban specialist yang belum selesai. Import `Escalation`, `Consult`, atau
@@ -116,8 +114,8 @@ sama. Takeover menggunakan `Takeover`. Untuk `takeover_to="human"`, kembalikan
 
 ## Gagal yang diharapkan
 
-Kedua kegagalan ini memang bagian dari kontrak. Perbaiki daftar dokumen skrip
-atau keluaran model; jangan melonggarkan parser.
+Kedua failure ini memang bagian dari kontrak. Perbaiki daftar dokumen skrip
+atau output model; jangan melonggarkan parser.
 
 `FakeLlm` yang hanya memiliki dokumen pertama setelah interupsi:
 
@@ -136,42 +134,45 @@ except SessionError as exc:
     print(exc)
 ```
 
-`SessionError: llm has no further output for this request; after an interrupt, FakeLlm needs a second XML document`
+`SessionError: llm has no further output for this request; after an interrupt, FakeLlm needs a second document`
 
-Teks yang tidak memuat `<step>` akan gagal di parser:
+Prosa biasa tanpa label bukan error; itu menjadi satu langkah `claim`:
 
 ```python
-from interrupthink import ParseError, parse_steps
+from interrupthink import parse_steps
 
-parse_steps("The changelog is already approved. Publish it.")
+doc = parse_steps("The changelog is already approved. Publish it.")
+# doc.units[0].kind == "claim"
 ```
 
-`ParseError: no <step> element in llm output`
+Badan langkah tanpa label tetap harus tidak kosong. Output kosong yang gagal:
 
-Jika teks prosa yang sama dikirim lewat `run_session`, yang muncul adalah
-`ValueError: llm produced no complete <step>`. Assembler tidak pernah
-menyerahkan satu langkah pun ke parser.
+```python
+parse_steps("")
+```
+
+`ParseError: empty llm output`
 
 ## Panduan rujukan
 
 | Jika Anda melihat ini | Buka ini lebih dulu |
 |---|---|
-| Tool berjalan sebelum premise diterima | [`examples/run_session_dummy.py`](../../examples/run_session_dummy.py) |
-| Premise salah dan tugas tidak boleh restart dari kosong | [`cases/correct-resume/`](../../cases/correct-resume/) |
+| Tool berjalan sebelum premise diterima | [`examples/dummy/run_session_dummy.py`](../../examples/dummy/run_session_dummy.py) |
+| Premise salah dan task tidak boleh di-restart dari kosong | [`cases/correct-resume/`](../../cases/correct-resume/) |
 | Penulisan file harus tetap di dalam sandbox | [`cases/freeze-write/`](../../cases/freeze-write/) |
 | Chunk atau catatan retrieval yang kedaluwarsa | [`cases/stale-retrieve/`](../../cases/stale-retrieve/) |
 | Jawaban mengutip kebijakan yang tidak ada dalam source | [`cases/false-policy/`](../../cases/false-policy/) |
 | Read diizinkan, delete tidak | [`cases/op-class/`](../../cases/op-class/) |
 | Specialist kedua tidak boleh dimulai | [`cases/two-specialists/`](../../cases/two-specialists/) |
-| Specialist berikutnya harus menerima pekerjaan yang dipertahankan | [`examples/supervisor_escalation.py`](../../examples/supervisor_escalation.py), [`cases/langgraph-offer/`](../../cases/langgraph-offer/) |
-| Specialist yang sama harus melanjutkan setelah checker | [`examples/supervisor_consult.py`](../../examples/supervisor_consult.py), [`cases/langchain-rule/`](../../cases/langchain-rule/) |
-| Manusia harus menerima paket tanpa agent kedua | [`examples/supervisor_takeover.py`](../../examples/supervisor_takeover.py), [`cases/autogen-support/`](../../cases/autogen-support/) |
-| `publish` tetap diminta setelah monitor `Ok` | [`examples/tool_policy_deny.py`](../../examples/tool_policy_deny.py) |
-| Langkah tool berulang tidak boleh menulis lagi | [`examples/host_idempotent_tool.py`](../../examples/host_idempotent_tool.py) |
+| Specialist berikutnya harus menerima work yang dipertahankan | [`examples/dummy/supervisor_escalation.py`](../../examples/dummy/supervisor_escalation.py), [`cases/langgraph-offer/`](../../cases/langgraph-offer/) |
+| Specialist yang sama harus melanjutkan setelah checker | [`examples/dummy/supervisor_consult.py`](../../examples/dummy/supervisor_consult.py), [`cases/langchain-rule/`](../../cases/langchain-rule/) |
+| Manusia harus menerima paket tanpa agent kedua | [`examples/dummy/supervisor_takeover.py`](../../examples/dummy/supervisor_takeover.py), [`cases/autogen-support/`](../../cases/autogen-support/) |
+| `publish` tetap diminta setelah monitor `Ok` | [`examples/dummy/tool_policy_deny.py`](../../examples/dummy/tool_policy_deny.py) |
+| Langkah tool berulang tidak boleh menulis lagi | [`examples/dummy/host_idempotent_tool.py`](../../examples/dummy/host_idempotent_tool.py) |
 | Graph atau role yang sudah ada | [Integrasi](integrations.md) |
 
-Case command-line yang memanggil `LiveLlm` membutuhkan file environment
-pribadi. Dokumen scripted di atas adalah bentuk tanpa key.
+Case command-line yang memanggil `LiveLlm` membutuhkan environment file
+pribadi. Dokumen scripted di atas adalah bentuk tanpa API key.
 
 ## Build wheel lokal
 
@@ -183,13 +184,13 @@ uv build --wheel
 uv pip install --offline --no-index dist/interrupthink-0.0.1-py3-none-any.whl
 ```
 
-Ini adalah pemeriksaan packaging lokal, bukan rilis ke PyPI.
+Ini adalah local packaging check, bukan rilis ke PyPI.
 
 ## Jalankan sebuah case
 
 Direktori [`../cases/`](../../cases/) berisi contoh host dalam sandbox. Test
-deterministik menginjeksikan double; case command-line dapat menggunakan
-`LiveLlm` dengan file environment pribadi.
+deterministik menginjeksikan test double; case command-line dapat menggunakan
+`LiveLlm` dengan environment file pribadi.
 
 Contohnya:
 

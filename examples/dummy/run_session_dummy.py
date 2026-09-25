@@ -15,7 +15,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/run_session_dummy.py
+    python3 examples/dummy/run_session_dummy.py
 
 Full sandbox cookbooks: ``cases/freeze-write/``, ``cases/correct-resume/``.
 """
@@ -23,15 +23,15 @@ Full sandbox cookbooks: ``cases/freeze-write/``, ``cases/correct-resume/``.
 from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session
 
 PUBLISH_WRONG = """
-<step kind="plan">publish the changelog now</step>
-<step kind="premise">the changelog is already approved</step>
-<step kind="tool_intent" reversible="false">{"name":"publish","args":{"doc":"changelog"}}</step>
-<answer>Published the changelog.</answer>
+plan: publish the changelog now
+premise: the changelog is already approved
+tool_intent: {"name":"publish","args":{"doc":"changelog"}}
+answer: Published the changelog.
 """
 
 PUBLISH_STOPPED = """
-<step kind="claim">changelog is not approved; do not publish</step>
-<answer>Did not publish.</answer>
+claim: changelog is not approved; do not publish
+answer: Did not publish.
 """
 
 

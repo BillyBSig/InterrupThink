@@ -9,7 +9,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_takeover_input.py"
+    path = REPO / "examples" / "dummy" / "supervisor_takeover_input.py"
     spec = importlib.util.spec_from_file_location("supervisor_takeover_input", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -84,7 +84,7 @@ def test_human_receives_the_same_package_without_another_specialist():
 
 
 def test_example_keeps_composition_on_the_host():
-    text = (REPO / "examples" / "supervisor_takeover_input.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_takeover_input.py").read_text(encoding="utf-8")
     assert "def receiver_input" in text
     assert 'takeover_to="human"' in text
     assert "from src." not in text

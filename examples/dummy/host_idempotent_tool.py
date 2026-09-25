@@ -17,7 +17,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/host_idempotent_tool.py
+    python3 examples/dummy/host_idempotent_tool.py
 """
 
 import hashlib
@@ -26,15 +26,15 @@ import json
 from interrupthink import FakeLlm, ScriptedMonitor, run_session
 
 FIRST = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"doc":"changelog"}}</step>
-<step kind="premise">the changelog is already approved</step>
-<answer>Published the changelog.</answer>
+tool_intent reversible: {"name":"write_note","args":{"doc":"changelog"}}
+premise: the changelog is already approved
+answer: Published the changelog.
 """
 
 SECOND = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"doc":"changelog"}}</step>
-<step kind="claim">the note is already stored; do not publish</step>
-<answer>Did not publish. The note stays.</answer>
+tool_intent reversible: {"name":"write_note","args":{"doc":"changelog"}}
+claim: the note is already stored; do not publish
+answer: Did not publish. The note stays.
 """
 
 

@@ -2,13 +2,13 @@
 
 [English](../integrations.md) · [Bahasa Indonesia](integrations.md)
 
-InterrupThink berintegrasi pada batas host. Framework dapat menyediakan pesan,
-node, agent, task, atau retrieval; floor penalaran semantik tetap berupa
+InterrupThink berintegrasi pada batas host. Framework dapat menyediakan message,
+node, agent, task, atau retrieval; semantic reasoning floor tetap berupa
 `run_session`.
 
-Framework opsional bukan dependency inti. Instal dengan `pip` di environment
-terisolasi saat menjalankan contoh tertentu. Instalasi library dan suite test
-default harus tetap dapat digunakan tanpa framework tersebut.
+Optional framework bukan core dependency. Instal dengan `pip` di isolated
+environment saat menjalankan example tertentu. Library installation dan
+default test suite harus tetap dapat digunakan tanpa framework tersebut.
 
 ## Host Python native
 
@@ -20,18 +20,18 @@ from interrupthink import LlmMonitor, run_session
 result = run_session(llm=specialist_llm, monitor=LlmMonitor(), tool=tool)
 ```
 
-Untuk pipeline dua specialist, host menjalankan satu sesi untuk retrieval dan
-hanya memulai sesi writer ketika sesi pertama diizinkan untuk melanjutkan. Host
-meneruskan konteks yang disetujui; host tidak membuat saluran interupsi
-simetris antarspecialist.
+Untuk pipeline dua specialist, host menjalankan satu session untuk retrieval
+dan hanya memulai writer session ketika session pertama diizinkan untuk
+melanjutkan. Host meneruskan context yang disetujui; host tidak membuat
+saluran interupsi simetris antar-specialist.
 
 Lihat [`../../cases/two-specialists/`](../../cases/two-specialists/).
 
 ## LangGraph
 
-Letakkan `run_session` di node agent atau specialist dan pertahankan graph host
-serta `ToolNode` pada batas normalnya. Interupsi batas tool graph dapat tetap
-menjadi lapisan pertahanan kedua, tetapi bukan floor penalaran semantik.
+Letakkan `run_session` di agent atau specialist node dan pertahankan host graph
+serta `ToolNode` pada batas normalnya. Interupsi di tool boundary graph dapat
+tetap menjadi second layer of defense, tetapi bukan semantic reasoning floor.
 
 ```bash
 pip install langgraph
@@ -47,9 +47,9 @@ koreksi-lalu-lanjut.
 
 ## LangChain
 
-Gunakan LangChain untuk prompt, riwayat pesan, atau wrapper tool, dan panggil
-`run_session` untuk slot penalaran. Contoh tidak menggunakan `AgentExecutor`
-sebagai pengganti floor.
+Gunakan LangChain untuk prompt, message history, atau tool wrapper, lalu
+panggil `run_session` untuk reasoning slot. Example tidak menggunakan
+`AgentExecutor` sebagai pengganti floor.
 
 ```bash
 pip install langchain
@@ -64,9 +64,9 @@ Lihat [`../../cases/langchain-specialist/`](../../cases/langchain-specialist/),
 
 ## LlamaIndex
 
-Gunakan retriever framework untuk retrieval dan masukkan hasilnya ke sesi.
-Contoh saat ini menggunakan `VectorStoreIndex.as_retriever().retrieve`;
-framework `QueryEngine` tidak digunakan sebagai loop penalaran.
+Gunakan framework retriever untuk retrieval dan masukkan hasilnya ke session.
+Example saat ini menggunakan `VectorStoreIndex.as_retriever().retrieve`;
+framework `QueryEngine` tidak digunakan sebagai reasoning loop.
 
 ```bash
 pip install llama-index llama-index-llms-openai
@@ -77,10 +77,10 @@ Lihat [`../../cases/llamaindex-retrieve/`](../../cases/llamaindex-retrieve/).
 
 ## CrewAI
 
-CrewAI dapat memberi label pada satu peran atau dua peran berurutan dengan
-`Agent`, `Task`, dan `Crew`. `run_session` tetap menjadi loop penalaran.
-`Crew.kickoff` tidak digunakan sebagai pengganti floor, dan contoh tidak
-mengaktifkan delegasi hierarkis.
+CrewAI dapat memberi label pada satu role atau dua role berurutan dengan
+`Agent`, `Task`, dan `Crew`. `run_session` tetap menjadi reasoning loop.
+`Crew.kickoff` tidak digunakan sebagai pengganti floor, dan example tidak
+mengaktifkan hierarchical delegation.
 
 ```bash
 pip install crewai
@@ -93,11 +93,11 @@ Lihat [`../../cases/crewai-pipe/`](../../cases/crewai-pipe/) dan
 
 ## AutoGen
 
-AutoGen dapat memberi label pada satu `ConversableAgent` atau dua peran
-berurutan. Contoh saat ini menetapkan `human_input_mode="NEVER"` dan memanggil
-`run_session` untuk slot penalaran. Contoh tidak menggunakan `initiate_chat`
-sebagai loop penalaran maupun `UserProxyAgent` sebagai mekanisme interupsi
-semantik.
+AutoGen dapat memberi label pada satu `ConversableAgent` atau dua role
+berurutan. Example saat ini menetapkan `human_input_mode="NEVER"` dan
+memanggil `run_session` untuk reasoning slot. Example tidak menggunakan
+`initiate_chat` sebagai reasoning loop maupun `UserProxyAgent` sebagai
+semantic interrupt mechanism.
 
 ```bash
 pip install autogen
@@ -110,11 +110,11 @@ Lihat [`../../cases/autogen-pipe/`](../../cases/autogen-pipe/) dan
 
 ## Handoff bernama di dalam framework
 
-Framework mempertahankan node, peran, pesan, atau indeksnya. `run_session`
-tetap menilai specialist. Ketika hasil menyebut penerima, host menyusun
-`Escalation`, `Consult`, atau `Takeover` dan membuka langkah berikutnya.
-Handoff, delegasi, chat engine, atau group chat milik framework tidak membuat
-pilihan tersebut.
+Framework mempertahankan node, role, message, atau index-nya. `run_session`
+tetap mengevaluasi specialist. Ketika hasil menyebut receiver, host menyusun
+`Escalation`, `Consult`, atau `Takeover` lalu membuka langkah berikutnya.
+Handoff, delegation, chat engine, atau group chat milik framework tidak
+membuat keputusan tersebut.
 
 | Host | Rute | Yang ditunjukkan folder |
 |---|---|---|
@@ -124,17 +124,17 @@ pilihan tersebut.
 | AutoGen | Takeover ke `human` | [`cases/autogen-support/`](../../cases/autogen-support/): manusia menerima paket; tidak ada agent kedua yang melanjutkan |
 | LlamaIndex | Consultation | [`cases/llamaindex-page/`](../../cases/llamaindex-page/): checker menerima satu halaman hasil retrieval; assistant yang sama hanya melanjutkan sejauh halaman itu |
 
-Setiap folder memiliki rutenya sendiri. Call site singkat berada di bawah
+Setiap folder memiliki path sendiri. Call site singkat berada di bawah
 [`examples/`](../../examples/). Instal framework dalam virtual environment saat
-menjalankan folder terkait. Jangan menambahkannya ke package inti.
+menjalankan folder terkait. Jangan menambahkannya ke core package.
 
 ## Batas integrasi
 
-Contoh integrasi menunjukkan wiring, bukan penggantian framework. Contoh tidak
-mengklaim InterrupThink mewarisi jaminan framework terkait keandalan,
-observability, persistensi, atau deployment.
+Integration example menunjukkan wiring, bukan pengganti framework. Example
+tidak mengklaim InterrupThink mewarisi jaminan framework terkait reliability,
+observability, persistence, atau deployment.
 
-Hasil sesi membawa prefix dan watermark. Host menyimpannya di checkpointer atau
-queue miliknya sendiri. InterrupThink tetap menjadi floor 1:1 di dalam proses
-yang memanggil `run_session`. InterrupThink tidak mengimpor graph checkpointer
-dan tidak memulihkan proses yang crash.
+Session result membawa prefix dan watermark. Host menyimpannya di
+checkpointer atau queue miliknya sendiri. InterrupThink tetap menjadi floor
+1:1 di dalam proses yang memanggil `run_session`. InterrupThink tidak
+mengimpor graph checkpointer dan tidak melakukan process recovery.

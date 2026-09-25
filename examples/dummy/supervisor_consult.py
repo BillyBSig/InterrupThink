@@ -13,26 +13,26 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_consult.py
+    python3 examples/dummy/supervisor_consult.py
 """
 
 from interrupthink import FakeLlm, Patch, ScriptedMonitor, run_session
 
 HANDRAISE = """
-<step kind="claim">ask the checker</step>
-<answer>I will finish without a check.</answer>
+claim: ask the checker
+answer: I will finish without a check.
 """
 
 CHECKER = """
-<step kind="tool_intent" reversible="true">{"name":"lookup_note","args":{"q":"draft"}}</step>
-<step kind="claim">the note matches the draft</step>
-<answer>The checker confirms the draft.</answer>
+tool_intent reversible: {"name":"lookup_note","args":{"q":"draft"}}
+claim: the note matches the draft
+answer: The checker confirms the draft.
 """
 
 CONTINUATION = """
-<step kind="tool_intent" reversible="true">{"name":"lookup_note","args":{"q":"draft"}}</step>
-<step kind="claim">the note can be finished</step>
-<answer>Finished after the check.</answer>
+tool_intent reversible: {"name":"lookup_note","args":{"q":"draft"}}
+claim: the note can be finished
+answer: Finished after the check.
 """
 
 

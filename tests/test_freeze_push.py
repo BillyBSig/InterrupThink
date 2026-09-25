@@ -7,7 +7,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "freeze_push_dummy.py"
+    path = REPO / "examples" / "dummy" / "freeze_push_dummy.py"
     spec = importlib.util.spec_from_file_location("freeze_push_dummy", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -33,7 +33,7 @@ def test_without_interrupt_dummy_push_runs():
 
 
 def test_example_is_library_dummy_not_git():
-    text = (REPO / "examples" / "freeze_push_dummy.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "freeze_push_dummy.py").read_text(encoding="utf-8")
     assert "from src." not in text
     assert "run_staging_case" not in text
     assert "OPENAI" not in text

@@ -7,14 +7,16 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-STEP_INSTRUCTIONS = """You are a specialist. Emit ONLY XML (no markdown fences, no prose outside tags).
-Use this shape, at least one <step> and one <answer>:
-<step kind="plan">...</step>
-<step kind="premise">...</step>
-<step kind="claim">...</step>
-<answer>...</answer>
-kind whitelist: plan, premise, claim, evidence, tool_intent, doubt, answer_draft.
-Do not use hidden reasoning as the team channel; put checkable thought in <step> tags."""
+STEP_INSTRUCTIONS = """You are a specialist. Write checkable thought as ordinary sentences.
+Do not use XML or step tags.
+When the work is finished, put the outcome on its own line starting with "answer: ".
+Do not use hidden reasoning as the team channel."""
+
+TOOL_INSTRUCTIONS = """You are a specialist. Perform every file write by calling the write tool.
+Never say a file was written unless you already called the write tool for that exact path in this conversation. If a corrected path replaces an earlier one, call the write tool again for the corrected path before answering.
+State checkable thought as ordinary sentences. Do not use XML or step tags.
+When the work is finished, put the outcome on its own line starting with "answer: ".
+Do not use hidden reasoning as the team channel."""
 
 
 class LiveLlmError(RuntimeError):
@@ -61,6 +63,7 @@ class LiveLlm:
         api_key: str | None = None,
         base_url: str | None = None,
         timeout_s: float = 90.0,
+        tools: list | None = None,
     ) -> None:
         """Store the prompt and the provider settings.
 
@@ -76,6 +79,8 @@ class LiveLlm:
             base_url: API root. Defaults to ``LLM_BASE_URL`` or the
                 OpenAI API.
             timeout_s: Socket timeout for the streaming request.
+            tools: Native function tools. Empty leaves the text channel
+                unchanged. A write call is yielded as one tool step.
         """
         self.user_prompt = user_prompt
         self.model = model or os.environ.get("LLM_MODEL", "gpt-5.6-luna")
@@ -90,8 +95,16 @@ class LiveLlm:
         self.last_usage: dict = {}
         self.response_id: str | None = None
         self.cancel_ok = False
+        self.tools = list(tools or [])
         self._stream = None
         self._request_tokens = 0
+        self._tool_names: dict[str, str] = {}
+        self._tool_call_ids: dict[str, str] = {}
+        self._tool_bufs: dict[str, str] = {}
+        self._tool_done: set[str] = set()
+        self._pending_call: dict | None = None
+        self._tool_result: str | None = None
+        self._transcript: list = []
 
     def generate(self) -> str:
         """Return the specialist document for this request.
@@ -123,17 +136,71 @@ class LiveLlm:
         self.aborted = False
         self.response_id = None
         self._request_tokens = 0
+        self._tool_names = {}
+        self._tool_call_ids = {}
+        self._tool_bufs = {}
+        self._tool_done = set()
+        self._pending_call = None
+        self._tool_result = None
         user = self.user_prompt
         if self.prefix:
             user = f"{self.user_prompt}\n\nResume prefix (do not repeat dropped text):\n{self.prefix}"
+        self._transcript = [{"role": "user", "content": user}]
+        for _round in range(4):
+            if self.aborted:
+                break
+            yield from self._stream_round(self._transcript)
+            if self.aborted or self._tool_result is None or self._pending_call is None:
+                break
+            call = self._pending_call
+            output = self._tool_result
+            self._pending_call = None
+            self._tool_result = None
+            self._transcript.append(
+                {
+                    "type": "function_call",
+                    "call_id": call["call_id"],
+                    "name": call["name"],
+                    "arguments": call["arguments"],
+                }
+            )
+            self._transcript.append(
+                {
+                    "type": "function_call_output",
+                    "call_id": call["call_id"],
+                    "output": output,
+                }
+            )
+
+    def submit_tool_result(self, output: str) -> None:
+        """Store the host's tool result for the next model turn.
+
+        Args:
+            output: Text returned by the executed tool.
+        """
+        self._tool_result = output
+
+    def _stream_round(self, model_input):
+        """Stream one provider turn.
+
+        Args:
+            model_input: User string or the running tool transcript.
+
+        Yields:
+            Text deltas and one tool step when a function call completes.
+            After a tool step, iteration returns so the host can submit
+            the tool result.
+        """
         req = _responses_request(
+
             base_url=self.base_url,
             api_key=self.api_key,
             model=self.model,
             effort=self.effort,
-            instructions=STEP_INSTRUCTIONS,
-            user=user,
+            instructions=TOOL_INSTRUCTIONS if self.tools else STEP_INSTRUCTIONS,
+            user=model_input,
             stream=True,
+            tools=self.tools,
         )
         try:
             stream = urllib.request.urlopen(req, timeout=self.timeout_s)
@@ -157,7 +224,12 @@ class LiveLlm:
                         self._request_tokens += n
                         self.tokens_emitted += n
                         yield delta
-                elif etype == "response.completed":
+                else:
+                    step = self._native_tool_step(event)
+                    if step:
+                        yield step
+                        return
+                if etype == "response.completed":
                     resp = event.get("response") or {}
                     usage = resp.get("usage") if isinstance(resp, dict) else {}
                     if isinstance(usage, dict):
@@ -170,6 +242,76 @@ class LiveLlm:
                 raise
         finally:
             self._close_stream()
+
+
+    def _native_tool_step(self, event: dict) -> str | None:
+        """Buffer one function-call stream and yield it once when complete.
+
+        Args:
+            event: One server-sent event from the Responses stream.
+
+        Returns:
+            A tool step after the arguments are complete. ``None`` while
+            the call is still streaming, or when this call was already
+            yielded.
+        """
+        etype = event.get("type") or ""
+        if etype == "response.output_item.added":
+            item = event.get("item") or {}
+            if isinstance(item, dict) and item.get("type") == "function_call":
+                item_id = str(item.get("id") or item.get("call_id") or "")
+                if item_id:
+                    self._tool_names[item_id] = str(item.get("name") or "")
+                    self._tool_call_ids[item_id] = str(item.get("call_id") or item_id)
+                    self._tool_bufs.setdefault(item_id, str(item.get("arguments") or ""))
+            return None
+        if etype == "response.function_call_arguments.delta":
+            item_id = str(event.get("item_id") or "")
+            if item_id:
+                self._tool_bufs[item_id] = self._tool_bufs.get(item_id, "") + str(event.get("delta") or "")
+            return None
+        if etype == "response.function_call_arguments.done":
+            item_id = str(event.get("item_id") or "")
+            name = str(event.get("name") or self._tool_names.get(item_id) or "")
+            arguments = str(event.get("arguments") or self._tool_bufs.get(item_id) or "")
+            return self._finish_tool(item_id, name, arguments)
+        if etype == "response.output_item.done":
+            item = event.get("item") or {}
+            if isinstance(item, dict) and item.get("type") == "function_call":
+                item_id = str(item.get("id") or item.get("call_id") or "")
+                name = str(item.get("name") or self._tool_names.get(item_id) or "")
+                arguments = str(item.get("arguments") or self._tool_bufs.get(item_id) or "")
+                return self._finish_tool(item_id, name, arguments)
+        return None
+
+    def _finish_tool(self, item_id: str, name: str, arguments: str) -> str | None:
+        """Emit one completed function call and ignore a second notice.
+
+        Args:
+            item_id: Provider item id. Empty ids are ignored.
+            name: Function name.
+            arguments: JSON object string.
+
+        Returns:
+            The tool step, or ``None`` only when this call id was already
+            emitted. Malformed arguments still return a step (a safe
+            fallback claim), so a completed call is never dropped.
+        """
+        if not item_id or item_id in self._tool_done:
+            return None
+        self._pending_call = {
+            "call_id": self._tool_call_ids.get(item_id, item_id),
+            "name": name,
+            "arguments": arguments,
+        }
+        step = tool_call_step(name, arguments)
+        if step is None:
+            return None
+        self._tool_done.add(item_id)
+        count = max(1, len(step.split()))
+        self._request_tokens += count
+        self.tokens_emitted += count
+        return step
 
     def abort(self) -> None:
         """Close the stream and post cancel.
@@ -225,6 +367,62 @@ def load_dotenv(path: str | Path = ".env") -> None:
         os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+
+def sandbox_write_tool() -> dict:
+    """Return the Responses schema for the sandbox write tool.
+
+    The host still executes ``SandboxWriteTool``. This schema is what a
+    current model calls. The stream adapter turns that call into one
+    tool step for the floor.
+
+    Returns:
+        One function tool with a strict object schema.
+    """
+    return {
+        "type": "function",
+        "name": "write",
+        "description": "Write one file. path is the relative file name. content is the file text.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "Relative file name."},
+                "content": {"type": "string", "description": "File text."},
+            },
+            "required": ["path", "content"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    }
+
+
+def tool_call_step(name: str, arguments: str) -> str:
+    """Turn one native function call into a tool step.
+
+    A leading newline guarantees this line starts on its own; the plain
+    text channel has no tag to mark a boundary, so a delta arriving right
+    after an unterminated text line would otherwise fuse onto it.
+
+    Args:
+        name: Function name from the provider.
+        arguments: JSON object string. An empty string is an empty object.
+
+    Returns:
+        One tool step the floor already parses. A malformed or nameless
+        call still returns a step, as a claim describing the raw call, so
+        a completed function-call event never yields nothing (a request
+        with zero steps raises ``ValueError`` in the session).
+    """
+    try:
+        args = json.loads(arguments) if arguments else {}
+    except json.JSONDecodeError:
+        args = None
+    if not name or not isinstance(args, dict):
+        raw = arguments.replace("\n", " ")
+        return f"\nclaim: malformed tool call {name!r} args={raw!r}\n"
+    body = json.dumps({"name": name, "args": args}, ensure_ascii=False)
+    return f"\ntool_intent: {body}\n"
+
+
 def _responses_request(
     *,
     base_url: str,
@@ -234,6 +432,7 @@ def _responses_request(
     instructions: str,
     user: str,
     stream: bool,
+    tools: list | None = None,
 ) -> urllib.request.Request:
     """Build a streaming or blocking Responses request.
 
@@ -257,6 +456,9 @@ def _responses_request(
         "stream": stream,
         "background": False,
     }
+    if tools:
+        body["tools"] = tools
+        body["tool_choice"] = "auto"
     return urllib.request.Request(
         f"{base_url}/responses",
         data=json.dumps(body).encode("utf-8"),

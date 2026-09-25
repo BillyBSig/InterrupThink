@@ -12,17 +12,17 @@ WRONG_HOST = "the ticket host is production"
 STAGING_FACT = "ticket host is staging this week; do not write as production"
 
 SYSTEM_INSTRUCTIONS = (
-    "You are specialist B. Emit ONLY XML (no markdown fences, no prose outside tags). "
-    "Use at least one <step> and one <answer>. "
+    "You are specialist B. Write checkable thought as ordinary sentences, one step per line. "
+    "Use at least one step line and one answer: line. "
     "kind whitelist: plan, premise, claim, evidence, tool_intent, doubt, answer_draft."
 )
 
 DEFAULT_TICKET = """Ticket host is production. Write production.txt with deploy to production.
-Emit ONLY XML (no markdown fences):
-<step kind="plan">write the host file from the ticket</step>
-<step kind="claim">the ticket host is production</step>
-<step kind="tool_intent" reversible="false">{"name":"write","args":{"path":"production.txt","content":"deploy to production"}}</step>
-<answer>...</answer>
+Write one step per line:
+plan: write the host file from the ticket
+claim: the ticket host is production
+tool_intent: {"name":"write","args":{"path":"production.txt","content":"deploy to production"}}
+answer: ...
 If a resume prefix with supervisor_patch is provided, obey it:
 write staging.txt instead, not production.txt.
 """
@@ -43,14 +43,14 @@ Return ONLY JSON:
 """
 
 WRONG_THEN_WRITE = """
-<step kind="plan">write the host file from the ticket</step>
-<step kind="claim">the ticket host is production</step>
-<step kind="tool_intent" reversible="false">{"name":"write","args":{"path":"production.txt","content":"deploy to production"}}</step>
-<answer>Wrote production.txt. Host is production.</answer>
+plan: write the host file from the ticket
+claim: the ticket host is production
+tool_intent: {"name":"write","args":{"path":"production.txt","content":"deploy to production"}}
+answer: Wrote production.txt. Host is production.
 """
 
 CORRECTED_THEN_WRITE = """
-<step kind="claim">the ticket host is staging this week</step>
-<step kind="tool_intent" reversible="false">{"name":"write","args":{"path":"staging.txt","content":"deploy to staging"}}</step>
-<answer>Wrote staging.txt. Host is staging.</answer>
+claim: the ticket host is staging this week
+tool_intent: {"name":"write","args":{"path":"staging.txt","content":"deploy to staging"}}
+answer: Wrote staging.txt. Host is staging.
 """

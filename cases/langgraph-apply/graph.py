@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any, TypedDict
@@ -72,13 +71,14 @@ def format_ticket(ticket: str | None = None) -> str:
 
 
 def _pending_tool(result) -> dict | None:
-    for rec in result.log_records:
-        if rec.get("event") == "thought.unit" and rec.get("kind") == "tool_intent":
-            try:
-                return json.loads(rec.get("text") or "")
-            except json.JSONDecodeError:
-                return None
-    return None
+    pending = None
+    for event in result.events:
+        if event.type != "tool.intent":
+            continue
+        name = event.payload.get("name")
+        if name:
+            pending = {"name": name, "args": event.payload.get("args") or {}}
+    return pending
 
 
 def make_agent_node(*, llm, monitor, logger, box: dict):

@@ -110,9 +110,8 @@ def live_task(task: str) -> str:
         task
         + "\n\nEmit only XML. Check the listed price, then one claim that asks policy, then an answer.\n"
         + "The price body is JSON on one line:\n"
-        + '<step kind="tool_intent" reversible="true">'
-        + '{"name":"check_price","args":{"model":"Tahoe"}}</step>\n'
-        + '<step kind="claim">ask policy</step>\n'
+        + 'tool_intent reversible: ' + '{"name":"check_price","args":{"model":"Tahoe"}}\n'
+        + 'claim: ask policy\n'
     )
 
 

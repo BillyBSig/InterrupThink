@@ -125,7 +125,7 @@ flowchart TB
 
 The graph, crew, or agent list does not choose the specialist. The host opens the next session only when the name is present.
 
-See [`examples/supervisor_escalation.py`](../examples/supervisor_escalation.py) and [`cases/langgraph-offer/`](../cases/langgraph-offer/).
+See [`examples/dummy/supervisor_escalation.py`](../examples/dummy/supervisor_escalation.py) and [`cases/langgraph-offer/`](../cases/langgraph-offer/).
 
 ### Consultation
 
@@ -133,7 +133,7 @@ See [`examples/supervisor_escalation.py`](../examples/supervisor_escalation.py) 
 
 The same chat history, or the same assistant object, continues from the kept prefix plus that patch. The checker does not become the new owner.
 
-See [`examples/supervisor_consult.py`](../examples/supervisor_consult.py) and [`cases/langchain-rule/`](../cases/langchain-rule/).
+See [`examples/dummy/supervisor_consult.py`](../examples/dummy/supervisor_consult.py) and [`cases/langchain-rule/`](../cases/langchain-rule/).
 
 ### Takeover
 
@@ -143,7 +143,7 @@ See [`examples/supervisor_consult.py`](../examples/supervisor_consult.py) and [`
 
 `human` is not a specialist. The host returns that same package text. No second specialist starts, and the monitor does not write the reply the person will see.
 
-See [`examples/supervisor_takeover.py`](../examples/supervisor_takeover.py) and [`cases/autogen-support/`](../cases/autogen-support/).
+See [`examples/dummy/supervisor_takeover.py`](../examples/dummy/supervisor_takeover.py) and [`cases/autogen-support/`](../cases/autogen-support/).
 
 ## Tool safety
 
@@ -160,7 +160,7 @@ Three checks, in this order:
 1. The monitor verdict on the `ThoughtUnit`.
 2. The host `tool_policy(name, args)`. An `Ok` verdict and
    `reversible="true"` do not authorize a name the host refuses.
-   [`examples/tool_policy_deny.py`](../examples/tool_policy_deny.py) shows
+   [`examples/dummy/tool_policy_deny.py`](../examples/dummy/tool_policy_deny.py) shows
    that with no API key: `publish` is denied and `save_draft` still runs.
 3. A person at the tool boundary, when the host adds that gate. It does not
    replace the monitor or the host policy.

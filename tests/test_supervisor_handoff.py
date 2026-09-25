@@ -9,7 +9,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_handoff.py"
+    path = REPO / "examples" / "dummy" / "supervisor_handoff.py"
     spec = importlib.util.spec_from_file_location("supervisor_handoff", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -63,7 +63,7 @@ def test_named_writer_receives_task_prefix_and_written_tool():
 
 
 def test_example_keeps_composition_on_the_host():
-    text = (REPO / "examples" / "supervisor_handoff.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_handoff.py").read_text(encoding="utf-8")
     assert "def writer_input" in text
     assert "Write the public release note." in text
     assert "from src." not in text

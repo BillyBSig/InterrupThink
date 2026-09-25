@@ -11,10 +11,8 @@ RUNS = CASE_DIR / "runs"
 
 BAD = "Order placed: cone with bacon."
 ORDER_DOCUMENT = (
-    '<step kind="tool_intent" reversible="true">'
-    '{"name":"read_order","args":{"transcript":"cone with bacon"}}</step>\n'
-    '<step kind="tool_intent" reversible="true">'
-    '{"name":"place_order","args":{"item":"cone with bacon"}}</step>\n'
-    '<step kind="claim">ask counter</step>\n'
-    "<answer>" + BAD + "</answer>\n"
+    'tool_intent reversible: ' '{"name":"read_order","args":{"transcript":"cone with bacon"}}\n'
+    'tool_intent reversible: ' '{"name":"place_order","args":{"item":"cone with bacon"}}\n'
+    'claim: ask counter\n'
+    "answer: " + BAD + "\n"
 )

@@ -78,9 +78,8 @@ def live_task(task: str) -> str:
         + "\n\nEmit only XML. Hold the reply, then one claim that the supervisor should take this.\n"
         + "Do not write a poem. Stay on the parcel until the supervisor is named.\n"
         + "The reply body is JSON on one line:\n"
-        + '<step kind="tool_intent" reversible="true">'
-        + '{"name":"hold_reply","args":{"topic":"parcel"}}</step>\n'
-        + '<step kind="claim">the supervisor should take this</step>\n'
+        + 'tool_intent reversible: ' + '{"name":"hold_reply","args":{"topic":"parcel"}}\n'
+        + 'claim: the supervisor should take this\n'
     )
 
 

@@ -25,7 +25,7 @@ frameworks are installed separately when running their examples.
 ## Run the deterministic example
 
 ```bash
-python3 examples/run_session_dummy.py
+python3 examples/dummy/run_session_dummy.py
 ```
 
 The example uses `FakeLlm`, `ScriptedMonitor`, and `DummyTool`. It demonstrates
@@ -48,17 +48,15 @@ optional tool:
 from interrupthink import DummyTool, FakeLlm, ScriptedMonitor, run_session
 
 wrong = """
-<step kind="plan">publish the changelog</step>
-<step kind="premise">the changelog is already approved</step>
-<step kind="tool_intent" reversible="false">
-{"name":"publish","args":{"doc":"changelog"}}
-</step>
-<answer>Published the changelog.</answer>
+plan: publish the changelog
+premise: the changelog is already approved
+tool_intent: {"name":"publish","args":{"doc":"changelog"}}
+answer: Published the changelog.
 """
 
 stopped = """
-<step kind="claim">the changelog is not approved</step>
-<answer>Did not publish.</answer>
+claim: the changelog is not approved
+answer: Did not publish.
 """
 
 tool = DummyTool()
@@ -128,36 +126,41 @@ except SessionError as exc:
     print(exc)
 ```
 
-`SessionError: llm has no further output for this request; after an interrupt, FakeLlm needs a second XML document`
+`SessionError: llm has no further output for this request; after an interrupt, FakeLlm needs a second document`
 
-Text with no `<step>` fails in the parser:
+Plain prose with no label is not an error; it becomes one `claim` step:
 
 ```python
-from interrupthink import ParseError, parse_steps
+from interrupthink import parse_steps
 
-parse_steps("The changelog is already approved. Publish it.")
+doc = parse_steps("The changelog is already approved. Publish it.")
+# doc.units[0].kind == "claim"
 ```
 
-`ParseError: no <step> element in llm output`
+An unlabeled step body must still be non-empty. Empty output fails instead:
 
-The same prose through `run_session` raises `ValueError: llm produced no complete <step>`, because the assembler never hands a step to the parser.
+```python
+parse_steps("")
+```
+
+`ParseError: empty llm output`
 
 ## Where to look
 
 | You see this | Open this first |
 |---|---|
-| A tool runs before the premise is accepted | [`examples/run_session_dummy.py`](../examples/run_session_dummy.py) |
+| A tool runs before the premise is accepted | [`examples/dummy/run_session_dummy.py`](../examples/dummy/run_session_dummy.py) |
 | A wrong premise, and the task should not restart from empty | [`cases/correct-resume/`](../cases/correct-resume/) |
 | A file write that must stay inside a sandbox | [`cases/freeze-write/`](../cases/freeze-write/) |
 | A stale retrieved chunk or note | [`cases/stale-retrieve/`](../cases/stale-retrieve/) |
 | An answer that cites a policy not in the source | [`cases/false-policy/`](../cases/false-policy/) |
 | Read is allowed and delete is not | [`cases/op-class/`](../cases/op-class/) |
 | A second specialist that must not start | [`cases/two-specialists/`](../cases/two-specialists/) |
-| The next specialist should receive the kept work | [`examples/supervisor_escalation.py`](../examples/supervisor_escalation.py), [`cases/langgraph-offer/`](../cases/langgraph-offer/) |
-| The same specialist should continue after a checker | [`examples/supervisor_consult.py`](../examples/supervisor_consult.py), [`cases/langchain-rule/`](../cases/langchain-rule/) |
-| A human should receive the package, with no second agent | [`examples/supervisor_takeover.py`](../examples/supervisor_takeover.py), [`cases/autogen-support/`](../cases/autogen-support/) |
-| `publish` still requested after the monitor returns `Ok` | [`examples/tool_policy_deny.py`](../examples/tool_policy_deny.py) |
-| A repeated tool step that must not write again | [`examples/host_idempotent_tool.py`](../examples/host_idempotent_tool.py) |
+| The next specialist should receive the kept work | [`examples/dummy/supervisor_escalation.py`](../examples/dummy/supervisor_escalation.py), [`cases/langgraph-offer/`](../cases/langgraph-offer/) |
+| The same specialist should continue after a checker | [`examples/dummy/supervisor_consult.py`](../examples/dummy/supervisor_consult.py), [`cases/langchain-rule/`](../cases/langchain-rule/) |
+| A human should receive the package, with no second agent | [`examples/dummy/supervisor_takeover.py`](../examples/dummy/supervisor_takeover.py), [`cases/autogen-support/`](../cases/autogen-support/) |
+| `publish` still requested after the monitor returns `Ok` | [`examples/dummy/tool_policy_deny.py`](../examples/dummy/tool_policy_deny.py) |
+| A repeated tool step that must not write again | [`examples/dummy/host_idempotent_tool.py`](../examples/dummy/host_idempotent_tool.py) |
 | An existing graph or role | [Integrations](integrations.md) |
 
 Command-line cases that call `LiveLlm` need a personal environment file. The scripted documents above are the no-key shape.

@@ -2,26 +2,27 @@
 
 [English](../reproducibility.md) · [Bahasa Indonesia](reproducibility.md)
 
-Hasil publik terikat pada source code, test, asumsi environment, dan kelas
-bukti yang dinyatakan. Menjalankan ulang hanya klaim dalam prosa tidak cukup.
+Public result terikat pada source code, test, environment assumption, dan
+evidence class yang dinyatakan. Menjalankan ulang hanya claim dalam prosa
+tidak cukup.
 
 ## Environment
 
 - Python: 3.11 atau lebih baru
-- Dependency inti: environment source yang di-commit
-- Framework opsional: dipasang terpisah di environment test
-- Test deterministik: tidak memerlukan API key
-- Jalur smoke live: hanya kredensial provider pribadi; bukan kredensial proyek
+- Core dependency: environment source yang di-commit
+- Optional framework: dipasang terpisah di test environment
+- Deterministic test: tidak memerlukan API key
+- Live smoke path: hanya provider credential pribadi; bukan project credential
 
-Buat environment terisolasi dan instal package inti:
+Buat isolated environment dan instal core package:
 
 ```bash
 uv venv
 uv pip install -e ".[dev]"
 ```
 
-Framework host opsional bukan bagian dari himpunan dependency inti. Instal
-hanya package yang diperlukan oleh case yang direproduksi:
+Optional host framework bukan bagian dari core dependency set. Instal hanya
+package yang diperlukan oleh case yang direproduksi:
 
 ```bash
 uv pip install langgraph
@@ -31,9 +32,9 @@ uv pip install crewai
 uv pip install autogen
 ```
 
-## Pemeriksaan deterministik
+## Deterministic check
 
-Jalankan pemeriksaan kontrak inti:
+Jalankan core contract check:
 
 ```bash
 python3 docs/check_publication.py
@@ -44,7 +45,7 @@ python3 -m pytest tests/test_llm_monitor.py tests/test_run_session_contract.py -
 python3 -m pytest tests/test_supervisor_escalation.py tests/test_supervisor_consult.py tests/test_supervisor_takeover.py tests/test_supervisor_handoff.py -q
 ```
 
-Jalankan pemeriksaan host opsional setelah package-nya terinstal:
+Jalankan optional host check setelah package-nya terinstal:
 
 ```bash
 python3 -m pytest tests/test_langgraph_node.py tests/test_langgraph_apply.py tests/test_langgraph_correct.py -q
@@ -54,31 +55,31 @@ python3 -m pytest tests/test_crewai_extra.py tests/test_crewai_correct.py tests/
 python3 -m pytest tests/test_langgraph_offer_case.py tests/test_langchain_rule_case.py tests/test_crewai_order_case.py tests/test_autogen_support_case.py tests/test_llamaindex_page_case.py -q
 ```
 
-Suite lengkapnya adalah:
+Full suite:
 
 ```bash
 python3 -m pytest -q
 ```
 
-## Catatan bukti
+## Evidence note
 
-Saat melaporkan hasil reproduksi, sertakan:
+Saat melaporkan reproduction result, sertakan:
 
-1. revisi source atau commit;
-2. sistem operasi;
+1. source revision atau commit;
+2. operating system;
 3. versi Python;
-4. perintah instalasi package;
-5. versi framework opsional;
-6. perintah test atau case yang tepat;
-7. status keluar dan artefak yang diamati;
-8. apakah hasilnya berupa bukti deterministik atau model live.
+4. package install command;
+5. optional framework version;
+6. test atau case command yang tepat;
+7. exit status dan artefak yang diamati;
+8. apakah hasilnya deterministic evidence atau live-model evidence.
 
-Jangan sertakan API key, prompt privat, trace model mentah, atau nilai
+Jangan sertakan API key, private prompt, raw model trace, atau nilai
 environment pribadi dalam laporan.
 
-## Perbedaan adalah bukti yang berguna
+## Perbedaan adalah evidence yang berguna
 
-Jika reproduksi berbeda, pertahankan kegagalan dan laporkan artefak berguna
-yang paling kecil: perintah, environment, nama test, exception, dan apakah
-dependency opsional terinstal. Jangan diam-diam mengubah hasil yang diharapkan
-agar run berhasil.
+Jika reproduction result berbeda, pertahankan failure dan laporkan artefak
+berguna yang paling kecil: command, environment, test name, exception, dan
+apakah optional dependency terinstal. Jangan diam-diam mengubah expected
+result agar run berhasil.

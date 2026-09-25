@@ -1,7 +1,7 @@
 """Live smoke test for the staging-migration example.
 
 Scenario
-    Same story as ``examples/staging_migrate.py``, but with live specialist and
+    Same story as ``examples/dummy/staging_migrate.py``, but with live specialist and
     supervisor models for paired baseline and interrupted runs.
 
 Flow
@@ -17,17 +17,22 @@ Usage (repo root)::
     PYTHONPATH=. python3 examples/staging_migrate_live.py --pairs 2 \\
         --out plan/experiments/runs/g4-04-smoke
 
-For the no-key public path, use ``examples/staging_migrate.py``.
+For the no-key public path, use ``examples/dummy/staging_migrate.py``.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
-from staging_case import run_staging_live
-from src.runtime.log import JsonlLogger
+_DUMMY = Path(__file__).resolve().parent / "dummy"
+if str(_DUMMY) not in sys.path:
+    sys.path.insert(0, str(_DUMMY))
+
+from staging_case import run_staging_live  # noqa: E402
+from src.runtime.log import JsonlLogger  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:

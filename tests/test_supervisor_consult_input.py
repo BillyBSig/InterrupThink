@@ -9,7 +9,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def _example():
-    path = REPO / "examples" / "supervisor_consult_input.py"
+    path = REPO / "examples" / "dummy" / "supervisor_consult_input.py"
     spec = importlib.util.spec_from_file_location("supervisor_consult_input", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -70,7 +70,7 @@ def test_checker_reads_the_package_and_the_same_specialist_continues():
 
 
 def test_example_keeps_composition_on_the_host():
-    text = (REPO / "examples" / "supervisor_consult_input.py").read_text(encoding="utf-8")
+    text = (REPO / "examples" / "dummy" / "supervisor_consult_input.py").read_text(encoding="utf-8")
     assert "def receiver_input" in text
     assert "from src." not in text
     assert "transfer_to_" not in text

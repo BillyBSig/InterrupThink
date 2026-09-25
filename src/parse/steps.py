@@ -75,6 +75,10 @@ class ParsedDocument:
 
 
 _STEP_TAG = re.compile(r"<step\b", re.IGNORECASE)
+_PLAIN_LINE = re.compile(
+    r"^(?P<kind>plan|premise|claim|evidence|tool_intent|doubt|answer_draft|answer)"
+    r"(?P<reversible> reversible)?:\s?(?P<body>.*)$"
+)
 
 
 def parse_steps(raw: str, *, agent: str = "B", start_n: int = 1) -> ParsedDocument:
@@ -95,7 +99,9 @@ def parse_steps(raw: str, *, agent: str = "B", start_n: int = 1) -> ParsedDocume
     if not raw or not raw.strip():
         raise ParseError("empty llm output")
     if _STEP_TAG.search(raw) is None:
-        raise ParseError("no <step> element in llm output")
+        if re.search(r"<answer\b", raw, re.IGNORECASE):
+            raise ParseError("no <step> element in llm output")
+        return _parse_plain(raw, agent=agent, start_n=start_n)
 
     wrapped = f"<doc>{raw.strip()}</doc>"
     try:
@@ -120,6 +126,88 @@ def parse_steps(raw: str, *, agent: str = "B", start_n: int = 1) -> ParsedDocume
     if not units:
         raise ParseError("no <step> element in llm output")
     return ParsedDocument(units=units, answer=answer or None)
+
+
+def _parse_plain(raw: str, *, agent: str, start_n: int) -> ParsedDocument:
+    """Parse one plain specialist document.
+
+    A labeled line is ``kind: text``. ``tool_intent reversible:`` marks a
+    reversible tool. A line without a label is one claim. ``answer:`` is
+    the answer and is not a step.
+
+    Args:
+        raw: Specialist text with one step per line.
+        agent: Name stored on each step.
+        start_n: Number used for the first step identifier.
+
+    Returns:
+        The steps and the optional answer.
+
+    Raises:
+        ParseError: The text has no step, or a tool line is not a JSON object.
+    """
+    units: list[ThoughtUnit] = []
+    answer: str | None = None
+    cursor = 0
+    logical: list[str] = []
+    pending: str | None = None
+    for raw_line in raw.splitlines():
+        if not raw_line.strip():
+            continue
+        if raw_line[0].isspace() and pending is not None:
+            pending = f"{pending}\n{raw_line.strip()}"
+            continue
+        if pending is not None:
+            logical.append(pending)
+        pending = raw_line.strip()
+    if pending is not None:
+        logical.append(pending)
+    for line in logical:
+        head, _sep, rest = line.partition("\n")
+        match = _PLAIN_LINE.match(head)
+        if match is None:
+            kind, body, reversible = "claim", line, None
+        elif match.group("kind") == "answer":
+            answer = match.group("body").strip()
+            continue
+        else:
+            kind = match.group("kind")
+            body = match.group("body").strip()
+            if rest:
+                body = f"{body}\n{rest}"
+            reversible = True if match.group("reversible") else False if kind == "tool_intent" else None
+        tool: dict[str, Any] | None = None
+        if kind == "tool_intent":
+            try:
+                tool = _parse_tool_body(body)
+            except ParseError:
+                # A real native tool call is always well-formed JSON
+                # (src.providers.live.tool_call_step builds it). An
+                # invalid body here is narrative text that merely
+                # mentions the reserved word; treat the whole line as
+                # one claim instead of crashing the session.
+                kind, body, reversible = "claim", line, None
+        start = raw.find(body, cursor) if body else cursor
+        if start < 0:
+            start = cursor
+        end = start + len(body)
+        cursor = end
+        seq = start_n + len(units)
+        units.append(
+            ThoughtUnit(
+                id=f"tu_{seq:02d}",
+                agent=agent,
+                parent_id=units[-1].id if units else "tu_00",
+                kind=kind,
+                text=body,
+                span={"token_start": start, "token_end": end},
+                reversible=reversible,
+                tool=tool,
+            )
+        )
+    if not units:
+        raise ParseError("no step in llm output")
+    return ParsedDocument(units=units, answer=answer)
 
 
 def _step_to_unit(

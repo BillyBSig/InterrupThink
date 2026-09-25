@@ -14,7 +14,7 @@ Expected
 Usage (repo root; no API key)::
 
     pip install -e .
-    python3 examples/supervisor_takeover_input.py
+    python3 examples/dummy/supervisor_takeover_input.py
 """
 
 from interrupthink import FakeLlm, ScriptedMonitor, Takeover, run_session
@@ -22,14 +22,14 @@ from interrupthink import FakeLlm, ScriptedMonitor, Takeover, run_session
 TASK = "Write the public release note."
 
 HANDRAISE = """
-<step kind="tool_intent" reversible="true">{"name":"write_note","args":{"text":"draft"}}</step>
-<step kind="claim">the supervisor should take this</step>
-<answer>I will finish it myself.</answer>
+tool_intent reversible: {"name":"write_note","args":{"text":"draft"}}
+claim: the supervisor should take this
+answer: I will finish it myself.
 """
 
 LEFT_UNREAD = """
-<step kind="claim">I resume the same draft</step>
-<answer>Still me.</answer>
+claim: I resume the same draft
+answer: Still me.
 """
 
 
@@ -41,15 +41,21 @@ def receiver_input(task: str, note: dict, role: str, reason: str) -> str:
     return Takeover.from_note(task, noted).text()
 
 
+def _quoted_claim(text: str) -> str:
+    """Keep a package inside one claim so later lines stay quoted context."""
+    lines = text.splitlines() or [""]
+    body = lines[0] + "".join(f"\n  {line}" for line in lines[1:])
+    return f"claim: {body}"
+
+
 def receiver_document(composed: str) -> str:
     visible = composed.replace("<", "[").replace(">", "]")
     tool = (
-        '<step kind="tool_intent" reversible="true">'
-        '{"name":"write_note","args":{"text":"draft"}}</step>'
+        'tool_intent reversible: ' '{"name":"write_note","args":{"text":"draft"}}'
     )
     return (
-        f'<step kind="claim">{visible}</step>\n{tool}\n'
-        "<answer>The editor holds the rest.</answer>"
+        _quoted_claim(visible) + f"\n{tool}\n"
+        "answer: The editor holds the rest.\n"
     )
 
 

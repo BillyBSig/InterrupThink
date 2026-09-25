@@ -202,6 +202,13 @@ def _run_session(
         for delta in _iter_deltas(llm):
             for fragment in assembler.feed(delta):
                 if is_answer_fragment(fragment):
+                    # The specialist produced content even when the whole
+                    # turn is one answer line with no plan/claim before it.
+                    # Without this, a held (Unknown) answer with no other
+                    # step left saw_step False and the request crashed with
+                    # "llm produced no complete step" despite the model
+                    # having answered (found 2026-09-25).
+                    saw_step = True
                     action = _offer_answer_for_verdict(
                         answer_text(fragment),
                         floor,
@@ -238,6 +245,7 @@ def _run_session(
                     events,
                     execute_tools_when_ok,
                     tool_policy,
+                    llm,
                 )
                 next_n = int(unit.id.split("_")[1]) + 1
                 if action.escalate_to:
@@ -374,7 +382,7 @@ def _run_session(
             events.append(RuntimeEvent("answer.rejected", {"status": "False"}))
             logger.write("answer.rejected", status="False")
         elif not saw_step:
-            raise ValueError("llm produced no complete <step>")
+            raise ValueError("llm produced no complete step")
         break
     else:
         raise SessionError(
@@ -501,12 +509,13 @@ def _iter_deltas(llm: Llm):
     try:
         if callable(iterator):
             yield from iterator()
-            return
-        yield llm.generate()
+        else:
+            yield llm.generate()
+        yield "\n"
     except IndexError as exc:
         raise SessionError(
             "llm has no further output for this request; "
-            "after an interrupt, FakeLlm needs a second XML document"
+            "after an interrupt, FakeLlm needs a second document"
         ) from exc
 
 
@@ -567,7 +576,7 @@ def _offer_answer_for_verdict(text, floor, monitor, events, logger, next_n) -> F
 
 
 def _ingest_and_judge(
-    unit, floor, monitor, tool, logger, events, execute_tools_when_ok, tool_policy=None
+    unit, floor, monitor, tool, logger, events, execute_tools_when_ok, tool_policy=None, llm=None
 ):
     """Record one step, judge it, and maybe execute its tool.
 
@@ -601,6 +610,7 @@ def _ingest_and_judge(
                 {
                     "unit_id": unit.id,
                     "name": (unit.tool or {}).get("name"),
+                    "args": (unit.tool or {}).get("args") or {},
                     "reversible": unit.reversible,
                 },
             )
@@ -680,7 +690,10 @@ def _ingest_and_judge(
     action = floor.apply_verdict(verdict)
     events.extend(action.events)
     if verdict.status == "Ok" and unit.kind == "tool_intent" and execute_tools_when_ok:
-        _maybe_execute_tool(unit, tool, logger, tool_policy)
+        result = _maybe_execute_tool(unit, tool, logger, tool_policy)
+        submit = getattr(llm, "submit_tool_result", None)
+        if result is not None and submit is not None:
+            submit(result)
     return action
 
 
@@ -703,5 +716,6 @@ def _maybe_execute_tool(
     if tool_policy is not None and not tool_policy(name, args):
         logger.write("tool.policy.deny", unit_id=unit.id, name=name, args=args)
         return
-    tool.execute(name, args)
+    result = tool.execute(name, args)
     logger.write("tool.execute", unit_id=unit.id, name=name, args=args)
+    return str(result) if result is not None else "ok"
