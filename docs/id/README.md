@@ -29,6 +29,18 @@ ditunjukkan oleh implementasi dan test saat ini, yang masih experimental, dan
 yang belum dievaluasi. Dokumentasi ini tidak mengklaim production readiness
 atau model quality.
 
+## Mengapa library ini ada
+
+Pada satu task yang panjang, policy bisa tetap tertulis di context sementara
+reason milik specialist terus bertambah. Laporan publik tentang instruction
+drift menggambarkan model yang kemudian mengikuti jejak kerja yang sudah
+dihasilkannya sendiri. Policy di awal masih ada, tetapi tidak lagi membentuk
+langkah berikutnya. InterrupThink dibuat agar monitor di luar model membaca
+setiap langkah semantik. Jika jalur itu tidak lagi sesuai policy, proses
+berhenti dan dilanjutkan dari langkah terakhir yang masih diterima.
+Pemeriksaan di repository ini belum menunjukkan kontras itu pada task yang
+panjang.
+
 ## Mulai cepat
 
 Package saat ini diinstal dari source repository. Package belum dipublikasikan

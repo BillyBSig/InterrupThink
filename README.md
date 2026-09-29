@@ -91,6 +91,15 @@ the missing fact and continue from the last accepted step. The supervisor is
 not a truth oracle: it works from the evidence and policy the application
 provides, and `Unknown` remains the default when that evidence is insufficient.
 
+A further reason is a long task in one process. A policy can stay written in
+the context while the specialist's own reasoning accumulates. Public reports
+of instruction drift describe the same pattern: the model follows the
+trajectory it has already produced, and the earlier policy no longer shapes
+the next step. InterrupThink is built so a monitor outside the model can read
+each semantic step. When that path no longer matches the policy, the run stops
+and continues from the last accepted step. The checks in this repository do
+not yet show that contrast on a long task.
+
 ## How it works
 
 ### Check decisions before committing them

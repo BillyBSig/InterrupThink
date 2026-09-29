@@ -28,6 +28,17 @@ current implementation and tests demonstrate, what remains experimental, and
 what has not been evaluated. It does not claim production readiness or model
 quality.
 
+## Why this library exists
+
+On a long task in one process, a policy can stay written in the context while
+the specialist's own reasoning accumulates. Public reports of instruction
+drift describe models that then follow the trajectory they have already
+produced, so the earlier policy no longer shapes the next step. InterrupThink
+is built so a monitor outside the model can read each semantic step. When that
+path no longer matches the policy, the run stops and continues from the last
+accepted step. The checks in this repository do not yet show that contrast on
+a long task.
+
 ## Quickstart
 
 The package currently installs from the source repository. It is not published

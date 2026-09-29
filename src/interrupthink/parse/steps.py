@@ -58,6 +58,7 @@ class ThoughtUnit:
     span: dict[str, int] | None = None
     reversible: bool | None = None  # model-declared intent; not host authorization
     tool: dict[str, Any] | None = None
+    tool_result: str | None = None
 
 
 @dataclass

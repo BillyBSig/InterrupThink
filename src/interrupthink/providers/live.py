@@ -64,6 +64,8 @@ class LiveLlm:
         base_url: str | None = None,
         timeout_s: float = 90.0,
         tools: list | None = None,
+        max_tool_rounds: int = 4,
+        resume_tool_history: bool = False,
     ) -> None:
         """Store the prompt and the provider settings.
 
@@ -81,6 +83,12 @@ class LiveLlm:
             timeout_s: Socket timeout for the streaming request.
             tools: Native function tools. Empty leaves the text channel
                 unchanged. A write call is yielded as one tool step.
+            max_tool_rounds: Cap on provider round-trips inside one
+                request. Default 4 is unchanged so earlier counted runs
+                do not shift. A task needing more tool steps (write,
+                then lookup, then a reaction to the lookup result)
+                needs a caller-set higher value or the model's reaction
+                round is never reached.
         """
         self.user_prompt = user_prompt
         self.model = model or os.environ.get("LLM_MODEL", "gpt-5.6-luna")
@@ -88,6 +96,9 @@ class LiveLlm:
         self.api_key = api_key or os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
         self.base_url = (base_url or os.environ.get("LLM_BASE_URL") or "https://api.openai.com/v1").rstrip("/")
         self.timeout_s = timeout_s
+        self.max_tool_rounds = max_tool_rounds
+        self.resume_tool_history = resume_tool_history
+        self._resume_items: list | None = None
         self.prefix: str | None = None
         self.tokens_emitted = 0
         self.tokens_wasted = 0
@@ -142,11 +153,8 @@ class LiveLlm:
         self._tool_done = set()
         self._pending_call = None
         self._tool_result = None
-        user = self.user_prompt
-        if self.prefix:
-            user = f"{self.user_prompt}\n\nResume prefix (do not repeat dropped text):\n{self.prefix}"
-        self._transcript = [{"role": "user", "content": user}]
-        for _round in range(4):
+        self._transcript = self.initial_transcript()
+        for _round in range(self.max_tool_rounds):
             if self.aborted:
                 break
             yield from self._stream_round(self._transcript)
@@ -330,12 +338,42 @@ class LiveLlm:
         """Store the resume prefix for the next request.
 
         The next stream sends the original prompt plus this prefix. The
-        provider cache is not rewound.
+        provider cache is not rewound. Clearing the prefix also clears
+        any opted-in tool history.
 
         Args:
             envelope: Resume text from the floor. ``None`` clears it.
         """
         self.prefix = envelope or None
+        if not envelope:
+            self._resume_items = None
+
+    def accept_tool_history(self, items: list | None) -> None:
+        """Store kept tool calls for the next request.
+
+        Args:
+            items: Provider input from the kept steps. ``None`` clears it.
+        """
+        self._resume_items = list(items) if items else None
+
+    def initial_transcript(self) -> list:
+        """Return the input the next request would send.
+
+        Opt-in tool history replaces the text-only prefix. The default
+        remains one user message.
+
+        Returns:
+            Provider input items. No request is sent.
+        """
+        if self.resume_tool_history and self._resume_items:
+            return list(self._resume_items)
+        user = self.user_prompt
+        if self.prefix:
+            user = (
+                f"{self.user_prompt}\n\nResume prefix "
+                f"(do not repeat dropped text):\n{self.prefix}"
+            )
+        return [{"role": "user", "content": user}]
 
     def _close_stream(self) -> None:
         """Close the current response stream, ignoring a second close."""
