@@ -11,6 +11,7 @@ from interrupthink.providers.base import Llm
 from interrupthink.providers.fake import DummyTool
 from interrupthink.runtime.events import Patch, RuntimeEvent, Verdict
 from interrupthink.runtime.floor import Floor, FloorAction
+from interrupthink.runtime.resume_history import build_resume_input
 from interrupthink.runtime.log import JsonlLogger
 
 ToolPolicy = Callable[[str, dict[str, Any]], bool]
@@ -331,6 +332,7 @@ def _run_session(
             seed = getattr(llm, "trial_seed", None)
             if mode == "restart":
                 _apply_resume(llm, None)
+                _offer_tool_history(llm, None)
                 if (
                     lab_restart_prompt
                     and fact
@@ -348,6 +350,7 @@ def _run_session(
             else:
                 prefix = floor.resume_prefix()
                 _apply_resume(llm, prefix)
+                _offer_tool_history(llm, floor)
                 if (
                     lab_resume_prompt
                     and fact
@@ -473,6 +476,26 @@ def _takeover_note(name: str, unit_id: str, floor, tool) -> dict:
         A handoff note whose route field is ``takeover_to``.
     """
     return _handoff_note("takeover_to", name, unit_id, floor, tool)
+
+
+
+def _offer_tool_history(llm, floor: Floor | None) -> None:
+    """Give an opted-in specialist the kept tool results.
+
+    Args:
+        llm: Specialist. Ignored unless ``resume_tool_history`` is set
+            and ``accept_tool_history`` exists.
+        floor: Floor after the cut. ``None`` clears history on restart.
+    """
+    if not getattr(llm, "resume_tool_history", False):
+        return
+    accept = getattr(llm, "accept_tool_history", None)
+    if not callable(accept):
+        return
+    if floor is None:
+        accept(None)
+        return
+    accept(build_resume_input(llm.user_prompt, floor.units, floor.dropped_ids))
 
 
 def _apply_resume(llm, envelope: str | None) -> None:
@@ -718,4 +741,6 @@ def _maybe_execute_tool(
         return
     result = tool.execute(name, args)
     logger.write("tool.execute", unit_id=unit.id, name=name, args=args)
-    return str(result) if result is not None else "ok"
+    text = str(result) if result is not None else "ok"
+    unit.tool_result = text
+    return text
